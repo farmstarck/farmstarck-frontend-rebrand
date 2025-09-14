@@ -1,0 +1,122 @@
+[
+    {
+    "id": "0368c11b-8c88-4d5b-8e19-b6b23c2b9472",
+      "name": "full basket of tomatoes",
+      "description": "In the past years, Joshua gained significant deal execution experience as lead user experience and user interface designer as a freelancer, Lorem ipsum dolor sit amet consectetur. Rhoncus sagittis commodo nec egestas nisl. Amet dolor tortor eget pharetra porttitor. Dui augue amet pellentesque diam. Metus blandit faucibus aliquam elementum et euismod nunc.",
+      "category": "vegetables",
+      "pricePerUnit": 1500,
+      "discountPerUnit": 1000,
+      "type": "bulk",
+      "unit": "kg",
+      "rating": 4.94,
+      "sku": "STRCK245",
+      "stockQuantity": 150,
+      "isAvailable": true,
+      "imageUrl": "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957067-tomato-img.png",
+      "images":["https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957067-tomato-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957017-apple-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464956428-egg-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957095-yam-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957059-corn-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957039-bananna-img.png"],
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Excellent!",
+          "author": "John Doe",
+          "date": "2024-05-23T08:56:21.618Z"
+        },
+        {
+          "rating": 4,
+          "comment": "Good",
+          "author": "Jane Smith",
+          "date": "2024-05-23T08:56:21.618Z"
+        }
+      ]
+    },
+    {
+        "id": "2a8485fd-d116-4e14-b6ec-727c65953654",
+      "name": "full bag of green apples",
+      "description": "In the past years, Joshua gained significant deal execution experience as lead user experience and user interface designer as a freelancer, Lorem ipsum dolor sit amet consectetur. Rhoncus sagittis commodo nec egestas nisl. Amet dolor tortor eget pharetra porttitor. Dui augue amet pellentesque diam. Metus blandit faucibus aliquam elementum et euismod nunc.",
+      "category": "fruit",
+      "pricePerUnit": 2000,
+      "discountPerUnit": 1500,
+      "type": "unit",
+      "unit": "kg",
+      "rating": 3.9,
+      "sku": "STRCK995",
+      "stockQuantity": 100,
+      "isAvailable": true,
+      "imageUrl": "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957017-apple-img.png",
+      "images":["https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957067-tomato-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957017-apple-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464956428-egg-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957095-yam-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957059-corn-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957039-bananna-img.png"],
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Excellent!",
+          "author": "John Doe",
+          "date": "2024-05-23T08:56:21.618Z"
+        },
+        {
+          "rating": 4,
+          "comment": "Good",
+          "author": "Jane Smith",
+          "date": "2024-05-23T08:56:21.618Z"
+        }
+      ]
+    },
+    {
+        "id": "6513daff-93f7-4392-a252-c3f068f6f356",
+      "name": "1 full crate of eggs",
+      "description": "In the past years, Joshua gained significant deal execution experience as lead user experience and user interface designer as a freelancer, Lorem ipsum dolor sit amet consectetur. Rhoncus sagittis commodo nec egestas nisl. Amet dolor tortor eget pharetra porttitor. Dui augue amet pellentesque diam. Metus blandit faucibus aliquam elementum et euismod nunc.",
+      "category": "vegetables",
+      "pricePerUnit": 4500,
+      "discountPerUnit": 0,
+      "type": "unit",
+      "unit": "kg",
+      "rating": 5,
+      "sku": "STRCK195",
+      "stockQuantity": 200,
+      "isAvailable": true,
+      "imageUrl": "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464956428-egg-img.png",
+      "images":["https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957067-tomato-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957017-apple-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464956428-egg-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957095-yam-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957059-corn-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957039-bananna-img.png"],
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "This product remains the best! Second time getting this",
+          "author": "John Doe",
+          "date": "2025-01-21T08:56:21.618Z"
+        },
+        {
+          "rating": 4,
+          "comment": "Good",
+          "author": "Jane Smith",
+          "date": "2024-05-23T08:56:21.618Z"
+        }
+      ]
+    },
+    {
+        "id": "dc9601b3-5f5b-4979-8aa2-6e3949a75517",
+      "name": "1 full barn of white yams",
+      "description": "In the past years, Joshua gained significant deal execution experience as lead user experience and user interface designer as a freelancer, Lorem ipsum dolor sit amet consectetur. Rhoncus sagittis commodo nec egestas nisl. Amet dolor tortor eget pharetra porttitor. Dui augue amet pellentesque diam. Metus blandit faucibus aliquam elementum et euismod nunc.",
+      "category": "barns",
+      "pricePerUnit": 2500,
+      "discountPerUnit": 1800,
+      "type": "bulk",
+      "unit": "kg",
+      "rating": 4.2,
+      "sku": "STRCK103",
+      "stockQuantity": 90,
+      "isAvailable": true,
+      "imageUrl": "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957095-yam-img.png",
+      "images":["https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957067-tomato-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957017-apple-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464956428-egg-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957095-yam-img.png","https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957059-corn-img.png", "https://couplespark-dev.s3.us-east-2.amazonaws.com/images/1737464957039-bananna-img.png"],
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Excellent!",
+          "author": "John Doe",
+          "date": "2024-05-23T08:56:21.618Z"
+        },
+        {
+          "rating": 4,
+          "comment": "Good",
+          "author": "Jane Smith",
+          "date": "2024-05-23T08:56:21.618Z"
+        }
+      ]
+    }
+  ]

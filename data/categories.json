@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "name": "bulk",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 2,
+        "name": "unit",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 3,
+        "name": "grains",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 4,
+        "name": "seed-nuts",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 5,
+        "name": "vegetables",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 6,
+        "name": "tubers",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 7,
+        "name": "livestock",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    },
+    {
+        "id": 8,
+        "name": "fruits",
+        "description": "Groundnut, Tigernut, Soya Beans, Locust Beans,  Pumpkin Seeds, Melon Seeds, etc"
+    }
+]
