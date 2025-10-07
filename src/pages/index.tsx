@@ -1,18 +1,20 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import Faq from "@/components/Home/Faq";
+import Foodvault from "@/components/Home/Foodvault";
+import HeroSection from "@/components/Home/HeroSection";
+import Market from "@/components/Home/Market";
+import Procurement from "@/components/Home/Procurement";
+import Testimonials from "@/components/Home/Testimonials";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export default function Home() {
   return (
-    <div className="cabinet">Hello World!</div>
+    <div>
+      <HeroSection />
+      <Market />
+      <Foodvault />
+      <Procurement />
+      <Testimonials />
+      <Faq />
+    </div>
   );
 }

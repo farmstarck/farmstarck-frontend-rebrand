@@ -1,0 +1,87 @@
+"use client"
+import Image from "next/image";
+import Link from "next/link";
+import Faq from "@/components/Home/Faq";
+
+
+const marketplace = () => {
+  return (
+    <div className="flex flex-col">
+      <div className="bg-[var(--lite)] ">
+        <div className="p-5 relative flex flex-col justify-center items-center ">
+          <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
+            <h2 className="uppercase text-sm md:text-base text-center text-[var(--dark-green)] font-subHeading leading-relaxed">
+              our product
+            </h2>
+            <h1 className="font-subHeading text-2xl md:text-4xl text-[var(--dark-green)] font-extrabold">
+              Marketplace
+            </h1>
+          </div>
+          <div className="w-full max-w-3xl m-auto space-y-8 flex flex-col items-center">
+            <Image
+              width={500}
+              height={500}
+              src={`/assets/images/landing-market.png`}
+              alt="market-img"
+              className="object-contain w-full h-auto min-w-[350px]"
+            />
+            <div className="w-full flex flex-col items-center gap-3 md:gap-7 md:w-5/6 m-auto pb-8 px-4">
+              <h2 className="text-xl sm:text-3xl md:text-4xl  text-center font-subHeading leading-tight font-extrabold text-[var(--dark-primary)] text-centers">
+                Everything You Need,{" "}
+                <span className="text-[var(--primary)]">
+                  Delivered To Your Doorstep
+                </span>
+              </h2>
+              <p className="text-sm font-subHeading2 text-[var(--dark-primary)] sm:text-base md:text-lg text-center">
+                All-in-one marketplace for fresh farm produce, raw and processed
+                food, agro-mechicals and tools
+              </p>
+              <Link
+                href=""
+                className="px-12 self-auto text-center py-2  md:py-4 md:px-28 bg-[var(--primary)] text-white text-base rounded-full font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
+              >
+                Visit Marketplace
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white">
+        <div className="p-5 relative flex flex-col justify-center items-center ">
+          <div className="w-full max-w-4xl m-auto space-y-8 flex flex-col items-center py-4 md:py-8">
+            <h2 className="uppercase text-base text-center text-[var(--dark-primary)] font-bold leading-relaxed">
+              Become a merchant
+            </h2>
+            <Image
+              width={500}
+              height={500}
+              src={`/assets/images/marketplace-merchant.png`}
+              alt="market-img"
+              className="object-contain w-full md:w-2/3 h-auto min-w-[350px]"
+            />
+            <div className="w-full flex flex-col items-center gap-3 md:gap-7 md:w-5/6 m-auto pb-8 px-4">
+              <h2 className="text-xl sm:text-3xl md:text-4xl  text-center font-subHeading leading-tight font-extrabold text-[var(--dark-primary)] text-centers">
+                Grow Your Business With Farmstarck
+              </h2>
+              <p className="text-sm font-subHeading2 sm:text-base md:text-lg text-center">
+                Join thousands of farmers and agro-merchants already growing
+                with Farmstarck. From sourcing support and inventory tracking to
+                real-time sales and bulk delivery — we help you.
+              </p>
+              <Link
+                // to="shop"
+                href="underconstruction"
+                className="px-12 self-auto text-center py-2  md:py-4 md:px-28 bg-[var(--primary)] text-white text-base hover:border hover:border-[var(--primary)] rounded-full font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Faq />
+    </div>
+  );
+};
+
+export default marketplace;
