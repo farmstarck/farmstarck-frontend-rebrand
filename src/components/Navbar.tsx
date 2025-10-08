@@ -26,7 +26,7 @@ const menuItems: MenuItem[] = [
         title: "Market Place",
         description:
           "Get direct from farm & agro-processed produce delivered at your doorstep",
-        link: "/general/marketplace",
+        link: "/marketing/marketplace",
         comingSoon: false,
       },
       {
@@ -34,7 +34,7 @@ const menuItems: MenuItem[] = [
         title: "Procurement",
         description:
           "Streamline your agricultural supply chain with tailored procurement solutions",
-        link: "/general/procurement",
+        link: "/marketing/procurement",
         comingSoon: false,
       },
       {
@@ -42,14 +42,14 @@ const menuItems: MenuItem[] = [
         title: "Food Vault",
         description:
           "Our Food Vault helps you securely save for food purchases while earning exclusive benefits",
-        link: "/general/foodvault",
+        link: "/marketing/foodvault",
         comingSoon: false,
       },
       {
         img: "/assets/images/product-menu4.png",
         title: "Smart Inventory",
         description: "Manage all your agricultural assets in one place",
-        link: "/general/smartinventory",
+        link: "/marketing/smartinventory",
         comingSoon: true,
       },
     ],
@@ -57,10 +57,10 @@ const menuItems: MenuItem[] = [
   {
     title: "Your Journey",
     submenu: [
-      { img: "/assets/images/journey-menu1.png", title: "Farmer", link: "/general/farm_empowerment" },
-      { img: "/assets/images/journey-menu2.png", title: "Merchant", link: "/general/become_merchant" },
-      { img: "/assets/images/journey-menu3.png", title: "Business", link: "/general/business_journey" },
-      { img: "/assets/images/journey-menu4.png", title: "Investment", link: "/general/investment" },
+      { img: "/assets/images/journey-menu1.png", title: "Farmer", link: "/marketing/farm_empowerment" },
+      { img: "/assets/images/journey-menu2.png", title: "Merchant", link: "/marketing/become_merchant" },
+      { img: "/assets/images/journey-menu3.png", title: "Business", link: "/marketing/business_journey" },
+      { img: "/assets/images/journey-menu4.png", title: "Investment", link: "/marketing/investment" },
     ],
   },
   {

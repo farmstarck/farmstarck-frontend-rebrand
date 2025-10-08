@@ -305,7 +305,7 @@ const Footer = () => {
                   <li>About Us</li>
                 </Link>
                 <Link
-                  href="contact"
+                  href="/contact"
                   className="text-white md:text-base font-footerBody  transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Contact Us</li>
@@ -317,7 +317,7 @@ const Footer = () => {
                   <li>Career</li>
                 </Link>
                 <Link
-                  href="/become-partner"
+                  href="/marketing/becomepartner"
                   className="text-white md:text-base font-footerBody  transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Partnership</li>
@@ -331,19 +331,19 @@ const Footer = () => {
               </h2>
               <ul className="flex flex-col gap-2 font-thin text-sm">
                 <Link
-                  href="/marketplace"
+                  href="/marketing/marketplace"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Marketplace</li>
                 </Link>
                 <Link
-                  href="/underconstruction"
+                  href="/marketing/procurement"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Procurement</li>
                 </Link>
                 <Link
-                  href="/under-construction"
+                  href="/marketing/foodvault"
                   className="text-white md:text-base font-footerBody  transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Food Vault</li>
@@ -363,7 +363,7 @@ const Footer = () => {
               </h2>
               <ul className="flex flex-col gap-2 font-thin text-sm">
                 <Link
-                  href="/become-a-farmer"
+                  href="/marketing/becomeafarmer"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Farmers</li>
@@ -381,7 +381,7 @@ const Footer = () => {
                   <li>Business</li>
                 </Link>
                 <Link
-                  href="/investment-opportunity"
+                  href="/marketing/investment_opportunity"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Investor</li>
@@ -395,13 +395,13 @@ const Footer = () => {
               </h2>
               <ul className="flex flex-col gap-2 font-thin text-sm">
                 <Link
-                  href="/blog"
+                  href="/marketing/blog"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Blog</li>
                 </Link>
                 <Link
-                  href="/underconstruction"
+                  href="/marketing/faqs"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>FAQs</li>

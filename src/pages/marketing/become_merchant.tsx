@@ -1,9 +1,10 @@
+"use client"
 import Image from "next/image";
 import Testimonial from "../../components/GenericTestimonial";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
 
-const accordionItems = [
+export const MerchantAccordionItems = [
   {
     header: "Who is a merchant on Farmstarck?",
     text: "A merchant is a business or individual that buys and/or sells on Farmstarck, primarily dealing in agri-commodities, chemicals, farm equipment, animal feeds, and bulk produce.",
@@ -183,7 +184,7 @@ const BecomeMerchant = () => {
           </div>
         </div>
       </div>
-      <Faq accordionItems={accordionItems} />
+      <Faq accordionItems={MerchantAccordionItems} />
     </div>
   );
 };

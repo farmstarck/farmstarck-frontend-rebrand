@@ -1,6 +1,16 @@
 @import "tailwindcss";
 
 /* Root colors */
+@theme {
+  --color-dark-green: #064e3b;
+  --color-primary: #00c700;
+  --color-dark-primary: #027402;
+  --color-lite: #d4f5d5;
+  --color-dark: #171717;
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --color-dark-green:#015401;
+}
 :root {
   --background: #ffffff;
   --foreground: #171717;

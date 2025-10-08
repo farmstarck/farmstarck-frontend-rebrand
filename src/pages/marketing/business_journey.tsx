@@ -1,13 +1,13 @@
+"use client"
 
-
-import BusinessWork from "@/components/common/Business Journey/BusinessWork";
-import Serve from "@/components/common/Business Journey/Serve";
-import WhyChoose from "@/components/common/Business Journey/WhyChoose";
+import BusinessWork from "@/components/common/Marketing/Business Journey/BusinessWork";
+import Serve from "@/components/common/Marketing/Business Journey/Serve";
+import WhyChoose from "@/components/common/Marketing/Business Journey/WhyChoose";
 import Faq from "@/components/Home/Faq";
 import Image from "next/image";
 import Link from "next/link";
 
-const accordionItems = [
+export const BusinessAccordionItems = [
   {
     header: "What services does Farmstarck offer to businesses?",
     text: "We provide procurement, bulk supply, inventory tools, and a marketplace for all agri-related needs.",
@@ -122,7 +122,7 @@ const BusinessJourney = () => {
           </div>
         </div>
       </div>
-      <Faq accordionItems={accordionItems} />
+      <Faq accordionItems={BusinessAccordionItems} />
     </div>
   );
 };

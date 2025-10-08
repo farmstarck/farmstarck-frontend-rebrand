@@ -1,10 +1,11 @@
+"use client"
 import Image from "next/image";
 import Testimonial from "../../components/GenericTestimonial";
-import ProgramHighlight from "@/components/common/Farm Empowerment/ProgramHighlight";
-import Benefits from "@/components/common/Farm Empowerment/Benefits";
+import ProgramHighlight from "@/components/common/Marketing/Farm Empowerment/ProgramHighlight";
+import Benefits from "@/components/common/Marketing/Farm Empowerment/Benefits";
 import Faq from "@/components/Home/Faq";
 
-const accordionItems = [
+export const FarmerAccordionItems = [
   {
     header: "How do I sell my produce on Farmstarck?",
     text: "Register as a farmer, list your crops or join our cooperative vendor network.",
@@ -97,7 +98,7 @@ const FarmEmpowerment = () => {
           <Testimonial />
         </div>
       </div>
-      <Faq accordionItems={accordionItems} />
+      <Faq accordionItems={FarmerAccordionItems} />
     </div>
   );
 };

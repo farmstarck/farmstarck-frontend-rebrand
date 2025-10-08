@@ -3,6 +3,29 @@ import Image from "next/image";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
 
+export const MarketplaceAccordionItems = [
+  {
+    header: "What can I buy on the Farmstarck Marketplace?",
+    text: "You can buy fresh produce, grains, tubers, fertilizers, farm equipment, processed food, animal feed, and farm tools.",
+  },
+  {
+    header: "Who can use the marketplace?",
+    text: "Farmers, agro-merchants, caterers, households, retailers, and institutions like restaurants and schools.",
+  },
+  {
+    header: "Do I need to register to make purchases?",
+    text: "Yes. You need to create an account as a buyer or seller to access the full features.",
+  },
+  {
+    header: "Is there a minimum order quantity?",
+    text: "No. We serve both bulk and small-quantity buyers. Whether you want 5 yams or 5,000, we’ve got you.",
+  },
+
+  {
+    header: "Are your vendors verified?",
+    text: "Yes. All vendors undergo verification to ensure product quality and reliability.",
+  },
+];
 
 const marketplace = () => {
   return (
@@ -79,7 +102,7 @@ const marketplace = () => {
           </div>
         </div>
       </div>
-      <Faq />
+      <Faq accordionItems={MarketplaceAccordionItems} />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import HowItWorks from "@/components/common/HowItWorks";
 import Faq from "@/components/Home/Faq";
 
 
-const accordionItems = [
+export const ProcurementAccordionItems = [
   {
     header: "What is Farmstarck Procurement?",
     text: "It’s our service that helps source, transport, and deliver farm produce in bulk across Nigeria.",
@@ -224,7 +224,7 @@ const Procurement = () => {
           </div>
         </div>
       </div>
-      <Faq  accordionItems={accordionItems} />
+      <Faq  accordionItems={ProcurementAccordionItems} />
     </div>
   );
 };

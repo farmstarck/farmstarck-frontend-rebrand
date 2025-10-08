@@ -18,11 +18,11 @@ const Statistics: React.FC<StatisticsProps> = ({ insight }) => {
         insight ? "bg-white" : "primary-bg py-24 sm:py-32"
       }`}
     >
-      <div className={`${insight ? "" : "mx-auto max-w-7xl px-6 lg:px-8"}`}>
+      <div className={`${insight ? "" : "mx-auto max-w-7xl px-6 lg:px-8 "} mb-5`}>
         <h5
           className={` uppercase ${
             insight
-              ? "mx-auto max-w-3xl  text-center text-xs font-subHeading2 md:text-start md:text-sm"
+              ? "mx-auto max-w-3xl w-fit  text-center  flex items-center justify-center text-xs font-medium text-primary px-4 py-1.5 rounded-full border border-primary md:text-start md:text-sm"
               : "text-center text-xs"
           } mb-10`}
         >

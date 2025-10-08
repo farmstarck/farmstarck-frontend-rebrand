@@ -1,10 +1,10 @@
 
-import Benefits from "@/components/common/Investment/Benefits";
-import Options from "@/components/common/Investment/Options";
+import Benefits from "@/components/common/Marketing/Investment/Benefits";
+import Options from "@/components/common/Marketing/Investment/Options";
 import Faq from "@/components/Home/Faq";
 import Image from "next/image";
 
-const accordionItems = [
+export const InvestmentAccordionItems = [
   {
     header: "What is the Farmstarck investment feature?",
     text: "It allows individuals to invest in agriculture without farming physically.",
@@ -145,7 +145,7 @@ const Investment = () => {
         </div>
       </div>
 
-      <Faq accordionItems={accordionItems} />
+      <Faq accordionItems={InvestmentAccordionItems} />
     </div>
   );
 };

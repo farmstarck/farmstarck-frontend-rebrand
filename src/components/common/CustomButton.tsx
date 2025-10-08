@@ -16,18 +16,18 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
   ...props
 }) => {
   const baseStyle: Style = {
-    white: "group bg-white hover:bg-secondary-dark",
-    green: "group bg-secondary-dark hover:bg-white",
+    white: "group bg-white hover:bg-dark-primary",
+    green: "group bg-dark-primary hover:bg-white",
   };
   const texStyle: Style = {
-    green: "text-white group-hover:dark-primary-txt",
-    white: "dark-primary-txt group-hover:text-white",
+    green: "text-white group-hover:text-dark-primary ",
+    white: "dark-primary group-hover:text-white",
   };
   const iconStyle: Style = {
     green:
-      "bg-white dark-primary-txt group-hover:bg-secondary-dark group-hover:text-white",
+      "bg-white dark-primary group-hover:bg-dark-primary group-hover:text-white",
     white:
-      "bg-secondary-dark text-white group-hover:dark-primary-txt group-hover:bg-white",
+      "bg-dark-primary text-white group-hover:dark-primary group-hover:bg-white",
   };
   return (
     <button

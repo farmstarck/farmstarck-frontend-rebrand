@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
 
-const accordionItems = [
+export const FoodVaultAccordionItems = [
   {
     header: "What is Food Vault?",
     text: "Food Vault is a savings wallet that helps you save gradually towards food purchases on Farmstarck.",
@@ -225,7 +225,7 @@ const Foodvault = () => {
           </div>
         </div>
       </div>
-      <Faq accordionItems={accordionItems} />
+      <Faq accordionItems={FoodVaultAccordionItems} />
     </div>
   );
 };

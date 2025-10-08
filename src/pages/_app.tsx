@@ -4,6 +4,7 @@ import MainLayout from "@/layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import BaseLoader from "@/Loaders/BaseLoader";
 import { useRouter } from "next/router";
+import { Toaster } from "react-hot-toast"; 
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -16,23 +17,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const handleStart = (url: string) => {
-      // Only show loader if navigating to a different page
-      if (url !== router.asPath) {
-        setLoading(true);
-      }
+      if (url !== router.asPath) setLoading(true);
     };
 
     const handleComplete = () => {
-      // Add a delay before hiding the loader for smoother transition
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000); // 1 second delay, adjust as needed (1000-2000ms)
+      setTimeout(() => setLoading(false), 1000);
     };
 
     const handleError = () => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setTimeout(() => setLoading(false), 1000);
     };
 
     router.events.on("routeChangeStart", handleStart);
@@ -46,7 +39,6 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [router]);
 
-  // If the page defines its own layout, use it. Otherwise, wrap in MainLayout.
   const getLayout =
     PageComponent.getLayout ||
     ((page: React.ReactNode) => <MainLayout>{page}</MainLayout>);
@@ -58,7 +50,33 @@ export default function App({ Component, pageProps }: AppProps) {
           <BaseLoader />
         </div>
       )}
+
+      {/* ✅ Your pages and layouts */}
       {getLayout(<PageComponent {...pageProps} />)}
+
+      {/* ✅ Global Toast container */}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#333",
+            color: "#fff",
+            borderRadius: "8px",
+          },
+          success: {
+            style: {
+              background: "#16a34a",
+            },
+          },
+          error: {
+            style: {
+              background: "#dc2626",
+            },
+          },
+        }}
+      />
     </>
   );
 }
