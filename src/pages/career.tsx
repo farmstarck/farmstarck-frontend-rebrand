@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Accordion from "../components/common/Marketing/Career/Accordion";
 
 const accordionItems = [
@@ -89,7 +90,24 @@ const accordionItems = [
 
 const Career = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Careers at Farmstarck - Join Our Mission to Transform Agriculture</title>
+        <meta name="description" content="Join Farmstarck's innovative team working on solutions that transform Africa's agricultural ecosystem. Explore career opportunities in mobile development, business development, marketing, and farm education." />
+        <meta name="keywords" content="careers Farmstarck, jobs agriculture, mobile developer, business development, marketing officer, farm educator, Nigeria jobs, tech careers, agri-tech" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Careers at Farmstarck - Join Our Mission to Transform Agriculture" />
+        <meta property="og:description" content="Join Farmstarck's innovative team working on solutions that transform Africa's agricultural ecosystem. Explore career opportunities in mobile development, business development, marketing, and farm education." />
+        <meta property="og:image" content="/assets/images/career-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/career" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Careers at Farmstarck - Join Our Mission to Transform Agriculture" />
+        <meta name="twitter:description" content="Join Farmstarck's innovative team working on solutions that transform Africa's agricultural ecosystem. Explore career opportunities in mobile development, business development, marketing, and farm education." />
+        <meta name="twitter:image" content="/assets/images/career-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/career" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="max-w-5xl m-auto  w-full flex flex-col py-10 gap-3 md:gap-5 items-center ">
@@ -120,6 +138,7 @@ const Career = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

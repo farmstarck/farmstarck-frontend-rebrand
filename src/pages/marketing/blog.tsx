@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import { useState } from "react";
 import Insighter from "@/components/common/Marketing/Blog/Insighter";
 import Media from "@/components/common/Marketing/Community/Media";
@@ -40,7 +41,24 @@ const Blog = () => {
   const [activeMap, setActiveMap] = useState(1);
 
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Blog - Agricultural Trends, News & Publications</title>
+        <meta name="description" content="Stay updated with Farmstarck's latest agricultural trends, news, publications, and community insights. Discover farming innovations and market updates in Nigeria." />
+        <meta name="keywords" content="Farmstarck blog, agricultural trends Nigeria, farming news, agricultural publications, farming community, Farmstarck insights, agricultural market updates" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Blog - Agricultural Trends, News & Publications" />
+        <meta property="og:description" content="Stay updated with Farmstarck's latest agricultural trends, news, publications, and community insights. Discover farming innovations and market updates in Nigeria." />
+        <meta property="og:image" content="/assets/images/blog-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/blog" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Blog - Agricultural Trends, News & Publications" />
+        <meta name="twitter:description" content="Stay updated with Farmstarck's latest agricultural trends, news, publications, and community insights. Discover farming innovations and market updates in Nigeria." />
+        <meta name="twitter:image" content="/assets/images/blog-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/blog" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-lite ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col py-10 gap-3 md:gap-5 items-center ">
@@ -120,6 +138,7 @@ const Blog = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

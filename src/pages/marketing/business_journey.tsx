@@ -1,5 +1,5 @@
 "use client"
-
+import Head from "next/head";
 import BusinessWork from "@/components/common/Marketing/Business Journey/BusinessWork";
 import Serve from "@/components/common/Marketing/Business Journey/Serve";
 import WhyChoose from "@/components/common/Marketing/Business Journey/WhyChoose";
@@ -33,7 +33,24 @@ export const BusinessAccordionItems = [
 
 const BusinessJourney = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Business Journey - Smarter Agri-Procurement Solutions</title>
+        <meta name="description" content="Power your business with Farmstarck's smarter agri-procurement solutions. Access bulk pricing, expert support, and stress-free procurement for factories, retail outlets, and distribution businesses in Nigeria." />
+        <meta name="keywords" content="Farmstarck business, agri-procurement Nigeria, bulk agricultural supply, business procurement solutions, agricultural marketplace, farm products wholesale, business sourcing Nigeria" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Business Journey - Smarter Agri-Procurement Solutions" />
+        <meta property="og:description" content="Power your business with Farmstarck's smarter agri-procurement solutions. Access bulk pricing, expert support, and stress-free procurement for factories, retail outlets, and distribution businesses in Nigeria." />
+        <meta property="og:image" content="/assets/images/business-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/business_journey" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Business Journey - Smarter Agri-Procurement Solutions" />
+        <meta name="twitter:description" content="Power your business with Farmstarck's smarter agri-procurement solutions. Access bulk pricing, expert support, and stress-free procurement for factories, retail outlets, and distribution businesses in Nigeria." />
+        <meta name="twitter:image" content="/assets/images/business-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/business_journey" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -124,6 +141,7 @@ const BusinessJourney = () => {
       </div>
       <Faq accordionItems={BusinessAccordionItems} />
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Image from "next/image";
 
 const solutionItem = [
@@ -77,7 +78,24 @@ const teamItems = [
 
 const About = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>About Farmstarck - Our Story and Mission</title>
+        <meta name="description" content="Learn about Farmstarck's journey from a family farm to Africa's leading agri-commerce ecosystem. Meet our team and discover our vision for agricultural transformation." />
+        <meta name="keywords" content="about Farmstarck, agricultural company, Africa agriculture, farming innovation, agri-commerce, team, vision, mission" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="About Farmstarck - Our Story and Mission" />
+        <meta property="og:description" content="Learn about Farmstarck's journey from a family farm to Africa's leading agri-commerce ecosystem. Meet our team and discover our vision for agricultural transformation." />
+        <meta property="og:image" content="/assets/images/about-hero1.png" />
+        <meta property="og:url" content="https://farmstarck.com/about" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About Farmstarck - Our Story and Mission" />
+        <meta name="twitter:description" content="Learn about Farmstarck's journey from a family farm to Africa's leading agri-commerce ecosystem. Meet our team and discover our vision for agricultural transformation." />
+        <meta name="twitter:image" content="/assets/images/about-hero1.png" />
+        <link rel="canonical" href="https://farmstarck.com/about" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -267,6 +285,7 @@ const About = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

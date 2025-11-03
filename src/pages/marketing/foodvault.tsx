@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
@@ -111,7 +112,24 @@ const whyItem = [
 
 const Foodvault = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Food Vault - Smart Saving for Smarter Eating</title>
+        <meta name="description" content="Create your Food Vault on Farmstarck for stress-free food access. Save gradually, earn rewards, and shop with exclusive discounts and priority access to fresh produce." />
+        <meta name="keywords" content="Food Vault Farmstarck, food savings Nigeria, digital food wallet, food budget protection, food savings app, inflation protection food, food rewards Nigeria" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Food Vault - Smart Saving for Smarter Eating" />
+        <meta property="og:description" content="Create your Food Vault on Farmstarck for stress-free food access. Save gradually, earn rewards, and shop with exclusive discounts and priority access to fresh produce." />
+        <meta property="og:image" content="/assets/images/landing-vault.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/foodvault" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Food Vault - Smart Saving for Smarter Eating" />
+        <meta name="twitter:description" content="Create your Food Vault on Farmstarck for stress-free food access. Save gradually, earn rewards, and shop with exclusive discounts and priority access to fresh produce." />
+        <meta name="twitter:image" content="/assets/images/landing-vault.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/foodvault" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)]">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -227,6 +245,7 @@ const Foodvault = () => {
       </div>
       <Faq accordionItems={FoodVaultAccordionItems} />
     </div>
+    </>
   );
 };
 

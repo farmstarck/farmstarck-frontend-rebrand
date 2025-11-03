@@ -1,4 +1,5 @@
 
+import Head from "next/head";
 import Benefits from "@/components/common/Marketing/Investment/Benefits";
 import Options from "@/components/common/Marketing/Investment/Options";
 import Faq from "@/components/Home/Faq";
@@ -48,7 +49,24 @@ const howItems = [
 
 const Investment = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Agricultural Investment Opportunities - Farmstarck</title>
+        <meta name="description" content="Invest in agricultural commodities like yams, maize, and rice with Farmstarck. Earn 10-25% returns through profit-sharing without physical farming. Minimum investment from ₦50,000." />
+        <meta name="keywords" content="agricultural investment, farm investment, profit sharing, crop investment, Nigeria agriculture investment, Farmstarck investment, passive income agriculture" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Agricultural Investment Opportunities - Farmstarck" />
+        <meta property="og:description" content="Invest in agricultural commodities like yams, maize, and rice with Farmstarck. Earn 10-25% returns through profit-sharing without physical farming. Minimum investment from ₦50,000." />
+        <meta property="og:image" content="/assets/images/investment-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/investment" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Agricultural Investment Opportunities - Farmstarck" />
+        <meta name="twitter:description" content="Invest in agricultural commodities like yams, maize, and rice with Farmstarck. Earn 10-25% returns through profit-sharing without physical farming. Minimum investment from ₦50,000." />
+        <meta name="twitter:image" content="/assets/images/investment-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/investment" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -147,6 +165,7 @@ const Investment = () => {
 
       <Faq accordionItems={InvestmentAccordionItems} />
     </div>
+    </>
   );
 };
 

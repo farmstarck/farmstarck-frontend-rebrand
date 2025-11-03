@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
@@ -29,7 +30,24 @@ export const MarketplaceAccordionItems = [
 
 const marketplace = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Marketplace - Buy Fresh Produce, Tools & Equipment</title>
+        <meta name="description" content="Shop Farmstarck's marketplace for fresh farm produce, grains, fertilizers, farm equipment, processed food, and tools. Verified vendors, bulk and small orders, doorstep delivery across Nigeria." />
+        <meta name="keywords" content="Farmstarck marketplace, buy farm produce, agricultural marketplace, fresh produce Nigeria, farm tools, fertilizers, agrochemicals, bulk buying, verified vendors" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Marketplace - Buy Fresh Produce, Tools & Equipment" />
+        <meta property="og:description" content="Shop Farmstarck's marketplace for fresh farm produce, grains, fertilizers, farm equipment, processed food, and tools. Verified vendors, bulk and small orders, doorstep delivery across Nigeria." />
+        <meta property="og:image" content="/assets/images/landing-market.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/marketplace" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Marketplace - Buy Fresh Produce, Tools & Equipment" />
+        <meta name="twitter:description" content="Shop Farmstarck's marketplace for fresh farm produce, grains, fertilizers, farm equipment, processed food, and tools. Verified vendors, bulk and small orders, doorstep delivery across Nigeria." />
+        <meta name="twitter:image" content="/assets/images/landing-market.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/marketplace" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -104,6 +122,7 @@ const marketplace = () => {
       </div>
       <Faq accordionItems={MarketplaceAccordionItems} />
     </div>
+    </>
   );
 };
 

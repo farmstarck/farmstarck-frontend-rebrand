@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Image from "next/image";
 import Testimonial from "../../components/GenericTestimonial";
 import Link from "next/link";
@@ -73,7 +74,24 @@ const featuresItem = [
 
 const BecomeMerchant = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Become a Merchant - Start Selling Agricultural Products</title>
+        <meta name="description" content="Become a Farmstarck merchant and start selling agricultural products. Access wholesale pricing, manage orders with our dashboard, and grow your business with verified buyers across Nigeria." />
+        <meta name="keywords" content="become merchant Farmstarck, sell agricultural products, agro-merchant, wholesale pricing, farm produce selling, merchant dashboard, Farmstarck marketplace" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Become a Merchant - Start Selling Agricultural Products" />
+        <meta property="og:description" content="Become a Farmstarck merchant and start selling agricultural products. Access wholesale pricing, manage orders with our dashboard, and grow your business with verified buyers across Nigeria." />
+        <meta property="og:image" content="/assets/images/marketplace-merchant.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/become_merchant" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Become a Merchant - Start Selling Agricultural Products" />
+        <meta name="twitter:description" content="Become a Farmstarck merchant and start selling agricultural products. Access wholesale pricing, manage orders with our dashboard, and grow your business with verified buyers across Nigeria." />
+        <meta name="twitter:image" content="/assets/images/marketplace-merchant.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/become_merchant" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)]">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -186,6 +204,7 @@ const BecomeMerchant = () => {
       </div>
       <Faq accordionItems={MerchantAccordionItems} />
     </div>
+    </>
   );
 };
 

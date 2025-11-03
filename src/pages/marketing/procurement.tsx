@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import WhyUs from "@/components/common/WhyUs";
@@ -91,7 +92,24 @@ const Procurement = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Procurement Services - Bulk Farm Produce Sourcing</title>
+        <meta name="description" content="Farmstarck procurement services for bulk sourcing, transportation, and delivery of farm produce across Nigeria. Reliable logistics, quality assurance, and competitive pricing for businesses." />
+        <meta name="keywords" content="procurement services, bulk farm produce, agricultural sourcing, logistics Nigeria, farm produce delivery, institutional supply, food manufacturing procurement, Farmstarck procurement" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Procurement Services - Bulk Farm Produce Sourcing" />
+        <meta property="og:description" content="Farmstarck procurement services for bulk sourcing, transportation, and delivery of farm produce across Nigeria. Reliable logistics, quality assurance, and competitive pricing for businesses." />
+        <meta property="og:image" content="/assets/images/landing-procurement.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/procurement" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Procurement Services - Bulk Farm Produce Sourcing" />
+        <meta name="twitter:description" content="Farmstarck procurement services for bulk sourcing, transportation, and delivery of farm produce across Nigeria. Reliable logistics, quality assurance, and competitive pricing for businesses." />
+        <meta name="twitter:image" content="/assets/images/landing-procurement.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/procurement" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -226,6 +244,7 @@ const Procurement = () => {
       </div>
       <Faq  accordionItems={ProcurementAccordionItems} />
     </div>
+    </>
   );
 };
 

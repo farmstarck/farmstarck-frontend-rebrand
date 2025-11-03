@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Faq from "@/components/Home/Faq";
 import Image from "next/image";
 
@@ -82,7 +83,24 @@ const accordionItems = [
 
 const SmartInventory = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Smart Inventory - Advanced Inventory Solutions Coming Soon</title>
+        <meta name="description" content="Get notified about Farmstarck's upcoming Smart Inventory system. Real-time tracking, barcode scanning, analytics, and mobile app for agricultural businesses in Nigeria." />
+        <meta name="keywords" content="Smart Inventory Farmstarck, inventory management Nigeria, agricultural inventory, barcode scanning, real-time inventory tracking, inventory analytics Nigeria, mobile inventory app" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Smart Inventory - Advanced Inventory Solutions Coming Soon" />
+        <meta property="og:description" content="Get notified about Farmstarck's upcoming Smart Inventory system. Real-time tracking, barcode scanning, analytics, and mobile app for agricultural businesses in Nigeria." />
+        <meta property="og:image" content="/assets/images/inventory-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/smartinventory" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Smart Inventory - Advanced Inventory Solutions Coming Soon" />
+        <meta name="twitter:description" content="Get notified about Farmstarck's upcoming Smart Inventory system. Real-time tracking, barcode scanning, analytics, and mobile app for agricultural businesses in Nigeria." />
+        <meta name="twitter:image" content="/assets/images/inventory-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/smartinventory" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -190,6 +208,7 @@ const SmartInventory = () => {
       </div>
       <Faq accordionItems={accordionItems} />
     </div>
+    </>
   );
 };
 

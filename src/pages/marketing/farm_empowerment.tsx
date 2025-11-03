@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head";
 import Image from "next/image";
 import Testimonial from "../../components/GenericTestimonial";
 import ProgramHighlight from "@/components/common/Marketing/Farm Empowerment/ProgramHighlight";
@@ -31,7 +32,24 @@ export const FarmerAccordionItems = [
 
 const FarmEmpowerment = () => {
   return (
-    <div className="flex flex-col">
+    <>
+      <Head>
+        <title>Farmstarck Farmer Empowerment - Supporting Smallholder Farmers in Nigeria</title>
+        <meta name="description" content="Join Farmstarck's Farmer Empowerment Program supporting smallholder farmers with resources, training, and market access. Focus on women farmers (70%) and sustainable agriculture in Nigeria." />
+        <meta name="keywords" content="farmer empowerment Nigeria, smallholder farmers support, agricultural training, market access farmers, sustainable farming Nigeria, women farmers program, Farmstarck farmers" />
+        <meta name="author" content="Farmstarck" />
+        <meta property="og:title" content="Farmstarck Farmer Empowerment - Supporting Smallholder Farmers in Nigeria" />
+        <meta property="og:description" content="Join Farmstarck's Farmer Empowerment Program supporting smallholder farmers with resources, training, and market access. Focus on women farmers (70%) and sustainable agriculture in Nigeria." />
+        <meta property="og:image" content="/assets/images/farmer-hero.png" />
+        <meta property="og:url" content="https://farmstarck.com/marketing/farm_empowerment" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Farmstarck Farmer Empowerment - Supporting Smallholder Farmers in Nigeria" />
+        <meta name="twitter:description" content="Join Farmstarck's Farmer Empowerment Program supporting smallholder farmers with resources, training, and market access. Focus on women farmers (70%) and sustainable agriculture in Nigeria." />
+        <meta name="twitter:image" content="/assets/images/farmer-hero.png" />
+        <link rel="canonical" href="https://farmstarck.com/marketing/farm_empowerment" />
+      </Head>
+      <div className="flex flex-col">
       <div className="bg-[var(--lite)] ">
         <div className="p-5 relative flex flex-col justify-center items-center ">
           <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
@@ -100,6 +118,7 @@ const FarmEmpowerment = () => {
       </div>
       <Faq accordionItems={FarmerAccordionItems} />
     </div>
+    </>
   );
 };
 
