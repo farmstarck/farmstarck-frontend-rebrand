@@ -28,7 +28,7 @@ const Market = () => {
           </p>
           <Link
             // to="shop"
-            href="underconstruction"
+            href="/market/marketplace"
             className="px-12 self-auto text-center py-2  md:py-4 bg-[var(--primary)] text-white hover:text-[var(--primary)]  text-base rounded-full font-bold hover:bg-white   transition-all duration-300 "
           >
             View Marketplace

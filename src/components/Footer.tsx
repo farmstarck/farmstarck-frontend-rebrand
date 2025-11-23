@@ -438,7 +438,7 @@ const Footer = () => {
               &#8593;
             </button>
             <div className="flex flex-col-reverse space-x-3 items-center text-xs text-white text-opacity-75  md:flex-row">
-              <p>© All Right Reserved 2024 Farmstarck</p>
+              <p>© All Right Reserved {new Date().getFullYear()} Farmstarck</p>
               <Link href="/underconstruction">Terms & Condition</Link>
               <Link href="/underconstruction">Privacy Policy</Link>
             </div>

@@ -1,400 +1,513 @@
 @import "tailwindcss";
 
 /* Root colors */
+
 @theme {
-  --color-dark-green: #064e3b;
-  --color-primary: #00c700;
-  --color-dark-primary: #027402;
-  --color-lite: #d4f5d5;
-  --color-dark: #171717;
-  --color-background: #ffffff;
-  --color-foreground: #171717;
-  --color-dark-green:#015401;
+    --color-dark-green: #064e3b;
+    --color-primary: #00c700;
+    --color-dark-primary: #027402;
+    --color-lite: #d4f5d5;
+    --color-dark: #171717;
+    --color-background: #ffffff;
+    --color-litegreen: #a5faa5;
+    --color-foreground: #171717;
+    --color-dark-green: #015401;
+    --color-yellowish: #ffbb28;
 }
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #00c700;
-  --dark-primary: #027402;
-  --lite: #d4f5d5;
-  --dark-green:#015401;
+    --background: #ffffff;
+    --foreground: #171717;
+    --primary: #00c700;
+    --dark-primary: #027402;
+    --color-litegreen: #a5faa5;
+    --lite: #d4f5d5;
+    --dark-green: #015401;
+    --color-yellowish: #ffbb28;
 }
 
-button{
-  cursor: pointer;
+button {
+    cursor: pointer;
 }
+
+
 /* optional helpers — use whichever you prefer */
-.primary-bg { background-color: var(--primary); }
-.primary-txt { color: var(--primary); }
-.primary-border { border-color :var(--primary); }
 
-.dark-primary-bg { background-color: var(--dark-primary); }
-.dark-primary-txt { color: var(--dark-primary); }
-.dark-primary-border { border-color: var(--dark-primary); }
+.primary-bg {
+    background-color: var(--primary);
+}
+
+.primary-txt {
+    color: var(--primary);
+}
+
+.primary-border {
+    border-color: var(--primary);
+}
+
+.dark-primary-bg {
+    background-color: var(--dark-primary);
+}
+
+.dark-primary-txt {
+    color: var(--dark-primary);
+}
+
+.dark-primary-border {
+    border-color: var(--dark-primary);
+}
+
+.lite-bg {
+    background-color: var(--lite);
+}
+
+.lite-txt {
+    color: var(--lite);
+}
+
+.lite-border {
+    border-color: var(--lite);
+}
+
+.dark-green-bg {
+    background-color: var(--dark-green);
+}
+
+.dark-green-txt {
+    color: var(--dark-green);
+}
+
+.dark-green-border {
+    border-color: var(--dark-green);
+}
 
 
-.lite-bg { background-color: var(--lite); }
-.lite-txt { color: var(--lite); }
-.lite-border { border-color: var(--lite); }
-
-.dark-green-bg { background-color: var(--dark-green); }
-.dark-green-txt { color: var(--dark-green); }
-.dark-green-border { border-color: var(--dark-green); }
 /* ======================
    Cabinet Grotesk font faces (OTF)
    ====================== */
+
 @font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Thin.otf') format('opentype');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Light.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-SemiBold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-ExtraBold.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cabinet Grotesk';
-  src: url('/fonts/cabinet/CabinetGrotesk-Black.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Thin.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
 }
 
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-SemiBold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-ExtraBold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cabinet Grotesk';
+    src: url('/fonts/cabinet/CabinetGrotesk-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
 
 
 /* Satoshi Font Faces */
+
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Black.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-BlackItalic.otf') format('opentype');
-  font-weight: 900;
-  font-style: italic;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-BlackItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-BoldItalic.otf') format('opentype');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-BoldItalic.otf') format('opentype');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Italic.otf') format('opentype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Light.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-LightItalic.otf') format('opentype');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-LightItalic.otf') format('opentype');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-MediumItalic.otf') format('opentype');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-MediumItalic.otf') format('opentype');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/satoshi/Satoshi-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+    font-family: 'Satoshi';
+    src: url('/fonts/satoshi/Satoshi-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
 }
 
 
 /* ======================
    Apply globally
    ====================== */
-html, body {
-   font-family: 'Cabinet Grotesk', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  width: 100%;
+
+html,
+body {
+    font-family: 'Cabinet Grotesk', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-.satoshi{
-   font-family: 'Satoshi', sans-serif;
-}
-.cabinet{
-   font-family: 'Cabinet Grotesk', sans-serif;
+.satoshi {
+    font-family: 'Satoshi', sans-serif;
 }
 
+.cabinet {
+    font-family: 'Cabinet Grotesk', sans-serif;
+}
 
 .extra-loose {
-  line-height: 4;
+    line-height: 4;
 }
+
 
 /* Hamburber Menu */
 
 .hamburger {
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  transition: all 0.25s;
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    transition: all 0.25s;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .hamburger-top,
 .hamburger-middle,
 .hamburger-bottom {
-  position: absolute;
-  top: 0;
-  width: 25px;
-  height: 5.5px;
-  background: #333;
-  transform: rotate(0);
-  transition: all 0.5s;
+    position: absolute;
+    top: 0;
+    width: 25px;
+    height: 5.5px;
+    background: #333;
+    transform: rotate(0);
+    transition: all 0.5s;
 }
+
 .hamburger-top-light,
 .hamburger-middle-light,
 .hamburger-bottom-light {
-  position: absolute;
-  top: 0;
-  width: 25px;
-  height: 5.5px;
-  transform: rotate(0);
-  transition: all 0.5s;
-  background: #fff;
+    position: absolute;
+    top: 0;
+    width: 25px;
+    height: 5.5px;
+    transform: rotate(0);
+    transition: all 0.5s;
+    background: #fff;
 }
 
 .hamburger-top {
-  width: 10px;
+    width: 10px;
 }
+
 .hamburger-middle {
-  transform: translateY(7px);
+    transform: translateY(7px);
 }
+
 .hamburger-bottom {
-  transform: translateY(14px);
+    transform: translateY(14px);
 }
+
 .open {
-  transform: rotate(90deg);
-  transform: translateY(0px);
+    transform: rotate(90deg);
+    transform: translateY(0px);
 }
+
 .open .hamburger-top {
-  width: 25px;
-  transform: rotate(45deg) translateY(6px) translate(6px);
+    width: 25px;
+    transform: rotate(45deg) translateY(6px) translate(6px);
 }
+
 .open .hamburger-middle {
-  display: none;
+    display: none;
 }
+
 .open .hamburger-bottom {
-  border-top: 2px solid #027402;
-  height: 6px;
-  transform: rotate(-45deg) translateY(6px) translate(-6px);
+    border-top: 2px solid #027402;
+    height: 6px;
+    transform: rotate(-45deg) translateY(6px) translate(-6px);
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+    display: none;
+    /* Chrome, Safari */
 }
+
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+
+/* Width */
+
+::-webkit-scrollbar {
+    width: 8px;
+    /* vertical */
+    height: 8px;
+    /* horizontal */
+}
+
+
+/* Track (background) */
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+    background: #00c700;
+    /* scrollbar color */
+    border-radius: 8px;
+}
+
+
+/* search box animation */
+
+@keyframes fadeSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+    background: #45a049;
 }
 
 thead tr {
-  text-align: left;
+    text-align: left;
 }
 
 th {
-  padding: 1.1em 2em;
+    padding: 1.1em 2em;
 }
 
 td {
-  padding: 1.1em 2em;
+    padding: 1.1em 2em;
 }
 
 td:first-child,
 th:first-child {
-  padding-left: 0;
+    padding-left: 0;
 }
 
 .PhoneInputInput {
-  border: none;
+    border: none;
 }
+
 .PhoneInputInput:focus {
-  outline: none;
+    outline: none;
 }
 
 .auth_img:before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  display: block;
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  animation: pulse-border 1500ms ease-out infinite;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    display: block;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: pulse-border 1500ms ease-out infinite;
+    z-index: 1;
 }
 
 .auth_img:after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  display: block;
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  animation: pulse-border 1500ms ease-out infinite;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    display: block;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: pulse-border 1500ms ease-out infinite;
+    z-index: 1;
 }
 
 .loader_img:before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  display: block;
-  width: 150px;
-  height: 150px;
-  background: rgba(0, 199, 0, 0.2);
-  border-radius: 50%;
-  animation: pulse-border 1000ms ease-out infinite;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    display: block;
+    width: 150px;
+    height: 150px;
+    background: rgba(0, 199, 0, 0.2);
+    border-radius: 50%;
+    animation: pulse-border 1000ms ease-out infinite;
+    z-index: 1;
 }
 
 .loader_img:after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  display: block;
-  width: 200px;
-  height: 200px;
-  background: rgba(0, 199, 0, 0.2);
-  border-radius: 50%;
-  animation: pulse-border 1000ms ease-out infinite;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    display: block;
+    width: 200px;
+    height: 200px;
+    background: rgba(0, 199, 0, 0.2);
+    border-radius: 50%;
+    animation: pulse-border 1000ms ease-out infinite;
+    z-index: 1;
 }
 
 @keyframes pulse-border {
-  0% {
-    transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1.3);
-    opacity: 0;
-  }
+    0% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1.3);
+        opacity: 0;
+    }
 }
 
 .button-spinner {
-  position: absolute;
-  width: 25px;
-  height: 25px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  border: 3px solid transparent;
-  border-top-color: rgb(34, 199, 0);
-  border-radius: 50%;
-  animation: button-loading-spinner 1s linear infinite;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    border: 3px solid transparent;
+    border-top-color: rgb(34, 199, 0);
+    border-radius: 50%;
+    animation: button-loading-spinner 1s linear infinite;
 }
 
 @keyframes button-loading-spinner {
-  from {
-    transform: rotate(0turn);
-  }
-  to {
-    transform: rotate(1turn);
-  }
+    from {
+        transform: rotate(0turn);
+    }
+    to {
+        transform: rotate(1turn);
+    }
 }

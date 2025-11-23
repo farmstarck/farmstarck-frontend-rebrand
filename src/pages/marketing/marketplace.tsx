@@ -34,7 +34,7 @@ const marketplace = () => {
       <Head>
         <title>Farmstarck Marketplace - Buy Fresh Produce, Tools & Equipment</title>
         <meta name="description" content="Shop Farmstarck's marketplace for fresh farm produce, grains, fertilizers, farm equipment, processed food, and tools. Verified vendors, bulk and small orders, doorstep delivery across Nigeria." />
-        <meta name="keywords" content="Farmstarck marketplace, buy farm produce, agricultural marketplace, fresh produce Nigeria, farm tools, fertilizers, agrochemicals, bulk buying, verified vendors" />
+        <meta name="keywords" content="agricultural marketplace Nigeria Africa, buy farm produce online platform, farming marketplace platform Nigeria, fresh produce delivery Africa, farm tools Nigeria platform, fertilizers online marketplace, agrochemicals marketplace Nigeria, bulk buying agriculture Africa, verified vendors Nigeria platform, agricultural e-commerce platform Nigeria, farm produce marketplace Africa, farming equipment Nigeria platform, agricultural inputs online Nigeria, crop marketplace Nigeria Africa, livestock feed marketplace Nigeria, farm machinery Nigeria platform, agricultural chemicals online Africa, produce marketplace Africa Nigeria, farming supplies Nigeria platform, agricultural commodities marketplace Nigeria, farm produce trading platform Africa, agricultural marketplace app Nigeria, farming marketplace Nigeria Africa, agricultural supply chain platform Nigeria, farm produce procurement Africa, agricultural marketplace solutions Nigeria, farming marketplace technology Africa, agricultural e-commerce Nigeria platform, farm produce logistics Nigeria, agricultural marketplace integration Africa, farming marketplace analytics Nigeria, agricultural marketplace automation platform, farm produce traceability Nigeria, agricultural marketplace security Africa, farming marketplace scalability Nigeria, agricultural marketplace innovation platform, farm produce marketplace growth Nigeria, agricultural marketplace partnerships Africa, farming marketplace expansion Nigeria, agricultural marketplace adoption platform, farm produce marketplace engagement Nigeria, agricultural marketplace retention Africa, farming marketplace monetization Nigeria, agricultural marketplace sustainability platform, farm produce marketplace impact Nigeria" />
         <meta name="author" content="Farmstarck" />
         <meta property="og:title" content="Farmstarck Marketplace - Buy Fresh Produce, Tools & Equipment" />
         <meta property="og:description" content="Shop Farmstarck's marketplace for fresh farm produce, grains, fertilizers, farm equipment, processed food, and tools. Verified vendors, bulk and small orders, doorstep delivery across Nigeria." />
@@ -78,7 +78,7 @@ const marketplace = () => {
                 food, agro-mechicals and tools
               </p>
               <Link
-                href=""
+                href="/market/marketplace"
                 className="px-12 self-auto text-center py-2  md:py-4 md:px-28 bg-[var(--primary)] text-white text-base rounded-full font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
               >
                 Visit Marketplace
@@ -111,7 +111,7 @@ const marketplace = () => {
               </p>
               <Link
                 // to="shop"
-                href="underconstruction"
+                href="/market/marketplace"
                 className="px-12 self-auto text-center py-2  md:py-4 md:px-28 bg-[var(--primary)] text-white text-base hover:border hover:border-[var(--primary)] rounded-full font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
               >
                 Get Started
