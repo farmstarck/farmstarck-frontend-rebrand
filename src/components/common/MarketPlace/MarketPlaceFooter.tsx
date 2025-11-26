@@ -22,11 +22,11 @@ const MarketPlaceFooter = () => {
     };
 
     return (
-        <footer className="w-full  dark-green-bg satoshi space-y-7  md:py-14 md:space-y-12">
+        <footer className="w-full  bg-dark-green satoshi space-y-7  py-14 md:space-y-12">
             <div className=" m-auto w-full flex flex-col gap-5 md:gap-10 md:py-10">
 
 
-                <div className="space-y-8 md:max-w-6xl mx-auto flex flex-col items-center justify-center md:justify-between md:space-y-12 ">
+                <div className="space-y-8 md:max-w-6xl w-11/12  mx-auto flex flex-col items-center justify-center md:justify-between md:space-y-12 ">
                     <div className="w-full md:w-2/3">
                         <h1 className="text-lg  font-btnBody font-extrabold text-white md:text-2xl text-center ">
                             Stay ahead of the food and hospitality industry curve with news, updates and analytics
@@ -53,7 +53,7 @@ const MarketPlaceFooter = () => {
                 </div>
 
                 <div className="border-t-2 border-b-2 primary-border w-full">
-                    <div className="space-y-4 flex flex-col gap-10 items-center md:max-w-6xl mx-auto  justify-center py-10 md:justify-between md:space-y-8 md:flex-row">
+                    <div className="space-y-4 w-11/12  flex flex-col gap-10 items-center md:max-w-6xl mx-auto  justify-center py-10 md:justify-between md:space-y-8 md:flex-row">
                         <div className="space-y-5  w-full flex flex-col items-center md:items-start md:w-2/3">
                             <Link href="/">
                                 <Image

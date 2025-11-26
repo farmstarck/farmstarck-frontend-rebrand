@@ -1,5 +1,5 @@
 import { CategoryFilter } from '@/components/common/MarketPlace/CategoryFilter';
-import Navigation from '@/components/common/MarketPlace/Navigation'
+import Navigation from '@/components/common/MarketPlace/Navigation';
 import { PriceRangeFilter } from '@/components/common/MarketPlace/PriceRangeFilter';
 import { ProductsGrid } from '@/components/common/MarketPlace/ProductGrid';
 import { ProductsTopBar } from '@/components/common/MarketPlace/ProductsTopBar';
@@ -10,8 +10,8 @@ import Button from '@/ui/Button';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react'
 
-const AllProductsPage = () => {
-    const [sort, setSort] = useState("bulk");
+const Allcategories = () => {
+ const [sort, setSort] = useState("bulk");
     const [selectedCats, setSelectedCats] = useState<string[]>([]);
     const [filtered, setFiltered] = useState(AllProducts);
 
@@ -69,11 +69,11 @@ const AllProductsPage = () => {
                 <div className="">
                     <Navigation
                         routes={[
-                            { name: "All Products", href: "/marketplace" }
+                            { name: "All Categories", href: "/marketplace" }
                         ]}
                     />
                 </div>
-                <div className="my-6 text-2xl font-extrabold">All Products</div>
+                <div className="my-6 text-2xl font-extrabold">All Categories</div>
                 <ProductsTopBar total={finalList.length} sort={sort} setSort={setSort} />
                 <div className=" grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Left Filters */}
@@ -119,8 +119,8 @@ const AllProductsPage = () => {
     )
 }
 
-AllProductsPage.getLayout = (page: React.ReactNode) => (
+Allcategories.getLayout = (page: React.ReactNode) => (
     <MarketPlaceLayout>{page}</MarketPlaceLayout>
 )
 
-export default AllProductsPage
+export default Allcategories

@@ -2,11 +2,12 @@
 import React from 'react'
 import Image from 'next/image'
 import { ShoppingCart, Heart, MapPin, Headphones, Smartphone, ShieldCheck, BadgeCheck, Truck, BadgeDollarSign } from 'lucide-react'
-import { AllProducts, productsProps } from '@/data/ProductsData'
+import { AllProducts } from '@/data/ProductsData'
 import { useCartStore, useWishlistStore } from '@/store/Client/CartSlice'
 import { SuccessMessage } from '@/utils/PageUtils'
 import Button from '@/ui/Button'
 import { useRouter } from 'next/router'
+import { productsProps } from '@/types/products'
 
 const Features = [
     {
@@ -81,14 +82,14 @@ const ProductCard = ({ product }: { product: productsProps }) => {
     const isWishlisted = wishlist.some(item => item.id === product.id)
 
     return (
-        <div className='bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
+        <div className='bg-white satoshi rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
             {/* Image Container */}
             <div className='relative w-full h-40'>
                 <Image
                     src={product.image}
                     alt={product.title}
                     fill
-                    className='object-contain p-4'
+                    className='object-contain pt-2'
                 />
             </div>
 
@@ -103,7 +104,7 @@ const ProductCard = ({ product }: { product: productsProps }) => {
                     />
                     {product.size}
                 </div>
-                <h3 className='font-semibold text-base mb-1 line-clamp-2'>{product.title}</h3>
+                <h3 className='font-semibold text-base mb-1 line-clamp-2 mt-2'>{product.title}</h3>
 
                 {/* Price */}
                 <div className='text-[#00C700] font-bold text-lg mb-2'>
@@ -115,6 +116,7 @@ const ProductCard = ({ product }: { product: productsProps }) => {
                     <MapPin size={14} />
                     <span>{product.location}</span>
                 </div>
+                <hr className="my-3 border-0.5  border-gray-300" />
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 mt-auto">
@@ -123,7 +125,7 @@ const ProductCard = ({ product }: { product: productsProps }) => {
                         onClick={() => addToCartFunction(product)}
                         className={`flex-1 border rounded-lg py-2 px-4 flex items-center justify-center gap-2 transition-all duration-300 text-sm font-medium ${idFound
                             ? "border-primary bg-primary text-white"
-                            : "border-dark-green text-dark-green hover:bg-primary hover:border-none hover:text-white"
+                            : "border-primary text-primary hover:bg-primary hover:text-white"
                             }`}
                     >
                         <ShoppingCart size={16} />
@@ -151,10 +153,10 @@ const ProductCard = ({ product }: { product: productsProps }) => {
 
 const OtherProducts = () => {
 
- const router = useRouter()
+    const router = useRouter()
     const switchPage = (route: string) => {
-    router.push(route)
-  }
+        router.push(route)
+    }
     return (
         <div className='w-full py-8'>
             <div className='w-11/12 lg:max-w-6xl mx-auto flex items-start flex-col gap-10'>
@@ -162,9 +164,9 @@ const OtherProducts = () => {
                 <div className=' w-full'>
                     <div className='flex items-center justify-between mb-6'>
                         <h2 className='text-2xl font-bold text-gray-900'>All Products</h2>
-                        <button 
-                        onClick={()=> switchPage('marketplace/allproducts')}
-                        className='text-[#00C700] font-medium hover:underline text-sm'>
+                        <button
+                            onClick={() => switchPage('marketplace/allproducts')}
+                            className='text-[#00C700] font-medium hover:underline text-sm'>
                             View All
                         </button>
                     </div>
@@ -180,9 +182,9 @@ const OtherProducts = () => {
                 <div className='w-full'>
                     <div className='flex items-center justify-between mb-6'>
                         <h2 className='text-2xl font-bold text-gray-900'>Most Viewed Products</h2>
-                        <button 
-                        onClick={()=> switchPage('marketplace/most_viewed')}
-                        className='text-[#00C700] font-medium hover:underline text-sm'>
+                        <button
+                            onClick={() => switchPage('marketplace/most_viewed')}
+                            className='text-[#00C700] font-medium hover:underline text-sm'>
                             View All
                         </button>
                     </div>
@@ -207,9 +209,9 @@ const OtherProducts = () => {
                 <div className='w-full '>
                     <div className='flex items-center justify-between mb-6'>
                         <h2 className='text-2xl font-bold text-gray-900'>Best Selling Products</h2>
-                        <button 
-                        onClick={()=> switchPage('marketplace/best_selling')}
-                        className='text-[#00C700] font-medium hover:underline text-sm'>
+                        <button
+                            onClick={() => switchPage('marketplace/best_selling')}
+                            className='text-[#00C700] font-medium hover:underline text-sm'>
                             View All
                         </button>
                     </div>

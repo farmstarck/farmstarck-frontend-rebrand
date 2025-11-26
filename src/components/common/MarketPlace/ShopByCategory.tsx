@@ -2,23 +2,28 @@
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 const categories = [
     {
         img: '/assets/images/marketplaces/food.png',
-        title: "Food"
+        title: "Food",
+        slug: "food"
     },
     {
         img: '/assets/images/marketplaces/feeds.png',
-        title: "Animal Feed & Supplement"
+        title: "Animal Feed & Supplement",
+        slug: 'animal-feed-supplement'
     },
     {
         img: '/assets/images/marketplaces/oil.png',
-        title: "Agro Chemicals"
+        title: "Agro Chemicals",
+        slug: 'agro-chemicals'
     },
     {
         img: '/assets/images/marketplaces/tracktor.png',
-        title: "Machinery & Equipment"
+        title: "Machinery & Equipment",
+        slug: 'farm-machine-equipments'
     },
 
 ]
@@ -62,8 +67,8 @@ const ShopByCategory = () => {
                         onClick={() => scroll('left')}
                         disabled={!showLeftArrow}
                         className={`p-1 rounded-full border transition-all ${showLeftArrow
-                                ? 'border-gray-300 hover:border-[#00C700] hover:bg-[#00C700] hover:text-white'
-                                : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                            ? 'border-gray-300 hover:border-[#00C700] hover:bg-[#00C700] hover:text-white'
+                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
                             }`}
                     >
                         <ChevronLeft size={20} />
@@ -72,8 +77,8 @@ const ShopByCategory = () => {
                         onClick={() => scroll('right')}
                         disabled={!showRightArrow}
                         className={`p-2 rounded-full border transition-all ${showRightArrow
-                                ? 'border-gray-300 hover:border-[#00C700] hover:bg-[#00C700] hover:text-white'
-                                : 'border-gray-200 text-gray-300 cursor-not-allowed'
+                            ? 'border-gray-300 hover:border-[#00C700] hover:bg-[#00C700] hover:text-white'
+                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
                             }`}
                     >
                         <ChevronRight size={20} />
@@ -82,7 +87,7 @@ const ShopByCategory = () => {
             </div>
 
             <div className="relative w-full">
-               
+
 
                 {/* Scrollable Container */}
                 <div
@@ -98,12 +103,13 @@ const ShopByCategory = () => {
 
                     {/* Category Items */}
                     {categories.map((item, i) => (
-                        <button
+                        <Link
                             key={i}
-                            onClick={() => setSelectedCategory(item.title)}
+                            href={`marketplace/${item.slug}`}
+                            onClick={() => { setSelectedCategory(item.title) }}
                             className={`lg:min-w-24 items-center flex bg-gray-50 justify-center gap-2 p-2 rounded-lg border-2 transition-all ${selectedCategory === item.title
-                                    ? 'border-[#00C700] bg-lite'
-                                    : 'border-gray-200 hover:border-[#00C700]'
+                                ? 'border-[#00C700] bg-lite'
+                                : 'border-gray-200 hover:border-[#00C700]'
                                 }`}
                         >
                             <div className="w-10 h-10 relative">
@@ -117,16 +123,17 @@ const ShopByCategory = () => {
                             <span className="text-xs lg:text-base text-start font-medium ">
                                 {item.title}
                             </span>
-                        </button>
+                        </Link>
                     ))}
 
                     {/* All Categories Button */}
-                    <button
+                    <Link
+                        href={'marketplace/allcategories'}
                         onClick={() => setSelectedCategory('All Categories')}
                         className={``}
                     >
-                    <span className={`${selectedCategory === 'All Categories' ? 'bg-primary text-white ':'border-2  text-dark bg-white border-gray-200 hover:border-[#00C700]' } lg:text-base text-xs truncate py-5 lg:py-4 px-8 rounded-md font-medium text-center`}>All Categories</span>
-                    </button>
+                        <span className={`${selectedCategory === 'All Categories' ? 'bg-primary text-white ' : 'border-2  text-dark bg-white border-gray-200 hover:border-[#00C700]'} lg:text-base text-xs truncate py-5 lg:py-4 px-8 rounded-md font-medium text-center`}>All Categories</span>
+                    </Link>
                 </div>
             </div>
 

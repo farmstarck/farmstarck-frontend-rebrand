@@ -124,9 +124,9 @@ const Marketplace = () => {
                       {item.txt && <p className='text-normal'>{item.txt}</p>}
                       {item.title && <h1 className='text-2xl font-bold'>{item.title}</h1>}
                       <div className="text-xl">{item.desc}</div>
-                      <button className={`mt-4 text-sm px-8 py-2 mb-4 ${item.btn_color} rounded-full`}>
+                      {/* <button className={`mt-4 text-sm px-8 py-2 mb-4 ${item.btn_color} rounded-full`}>
                         {item.btn_txt}
-                      </button>
+                      </button> */}
                     </div>
                     <div className="w-1/2">
                       <Image

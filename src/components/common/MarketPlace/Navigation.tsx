@@ -26,7 +26,7 @@ const Navigation = ({ routes }: NavigationProps) => {
           <ChevronRightIcon className="text-dark-green "/>
           <Link
             href={index === routes.length -1 ? "":item.href}
-            className={`${index === routes.length - 1
+            className={`capitalize ${index === routes.length - 1
                 ? "text-dark"
                 : "text-primary"
               }`}
