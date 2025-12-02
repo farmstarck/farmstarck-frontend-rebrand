@@ -1,24 +1,25 @@
 "use client"
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
-import { XMarkIcon, ShoppingCartIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline'
+import { ShoppingCartIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline'
 import { ShoppingCartIcon as ShoppingCartSolidIcon, HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
-import { SearchIcon } from 'lucide-react'
 import { useCartStore, useWishlistStore } from '@/store/Client/CartSlice'
 import CustomSearch from './CustomSearch'
+import { useNavigate } from '@/hooks/useNavigate'
 
 const MarketSearch = () => {
     const { cart } = useCartStore()
     const { wishlist } = useWishlistStore()
-    
+
 
     // Check if cart and wishlist have items
     const hasItemsInCart = cart.length > 0
     const hasFavorites = wishlist.length > 0
+    const { navigate } = useNavigate()
 
 
     return (
-        <div className='bg-dark-primary w-full p-5 text-white flex items-center justify-between'>
+        <div className='bg-dark-primary w-full p-5  text-white flex items-center justify-between'>
             <Image
                 src="/assets/svg/logo-primary.svg"
                 alt="farmstarck logo"
@@ -26,17 +27,21 @@ const MarketSearch = () => {
                 height={48}
                 className="w-32 md:w-48 lg:block hidden"
             />
-            <div className="w-3/4 lg:w-[50%] p-2 flex items-center gap-4 bg-white rounded-lg">
-                <CustomSearch/>
+            <div className="w-3/5 lg:w-[50%] p-2 flex items-center gap-4 bg-white rounded-lg">
+                <CustomSearch />
             </div>
 
             {/* Cart, Favorites, Sign In */}
             <div className='flex items-center gap-4'>
                 {/* Cart Button with Count */}
-                <button className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
-                    <div className='relative'>
+                <button
+                    onClick={() => navigate('/market/marketplace/cart-items')}
+                    className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
+                    <div
+                        className='relative'>
                         {hasItemsInCart ? (
-                            <ShoppingCartSolidIcon className='w-6 h-6' />
+                            <ShoppingCartSolidIcon
+                                className='w-6 h-6' />
                         ) : (
                             <ShoppingCartIcon className='w-6 h-6' />
                         )}
@@ -49,7 +54,9 @@ const MarketSearch = () => {
                 </button>
 
                 {/* Wishlist Button with Count */}
-                <button className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
+                <button 
+                onClick={() => navigate('/market/marketplace/wishlist-items')}
+                className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
                     <div className='relative'>
                         {hasFavorites ? (
                             <HeartSolidIcon className='w-6 h-6' />

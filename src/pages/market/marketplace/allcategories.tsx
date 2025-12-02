@@ -17,7 +17,7 @@ const Allcategories = () => {
 
     const applyPriceFilter = (min: number, max: number) => {
         setFiltered(
-            AllProducts.filter((p) => p.amountFrom >= min && p.amountTo <= max)
+            AllProducts.filter((p) => p.amount >= min && p.amount <= max)
         );
     };
 
@@ -57,8 +57,8 @@ const Allcategories = () => {
             });
         }
 
-        if (sort === "price_low") out.sort((a, b) => a.amountFrom - b.amountFrom);
-        if (sort === "price_high") out.sort((a, b) => b.amountTo - a.amountTo);
+        if (sort === "price_low") out.sort((a, b) => a.amount- b.amount);
+        if (sort === "price_high") out.sort((a, b) => b.amount - a.amount);
 
         return out;
     }, [filtered, selectedCats, sort]);
@@ -89,7 +89,7 @@ const Allcategories = () => {
                     {/* Main Area */}
                     <div className="col-span-3">
                         <div className="mt-4">
-                            <ProductsGrid products={finalList} />
+                            <ProductsGrid url='/market/marketplace/product' products={finalList} />
                         </div>
                     </div>
                 </div>

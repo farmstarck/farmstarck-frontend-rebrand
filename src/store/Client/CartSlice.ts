@@ -1,34 +1,50 @@
+import { productsProps } from "@/types/products";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// ======= Shared Item Interface =======
-export interface CartItem {
-  size: string;
-  id: number;
-  title: string;
-  amountFrom: number;
-  amountTo: number;
-  quantity?: string;
-  location: string;
-  image: string;
+interface CartItem extends productsProps {
+ cartQuantity: number
 }
 
-// ======= Cart Store =======
 interface CartState {
   cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: productsProps) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
+  updateQuantity: (id: number, quantity: number) => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       cart: [],
 
-      addToCart: (item) =>
+      // Add item — if it exists, increase quantity
+      addToCart: (item) => {
+        const cart = get().cart;
+        const exists = cart.find((p) => p.id === item.id);
+
+        if (exists) {
+          return set({
+            cart: cart.map((p) =>
+              p.id === item.id
+                ? { ...p, cartQuantity: p.cartQuantity + 1 }
+                : p
+            ),
+          });
+        }
+
+        set({
+          cart: [...cart, { ...item, cartQuantity: 1 }],
+        });
+      },
+
+      // Update quantity manually from UI
+      updateQuantity: (id, cartQuantity) =>
         set((state) => ({
-          cart: [...state.cart, item],
+          cart: state.cart.map((item) =>
+            item.id === id ? { ...item, cartQuantity } : item
+          ),
         })),
 
       removeFromCart: (id) =>
@@ -41,14 +57,15 @@ export const useCartStore = create<CartState>()(
           cart: [],
         })),
     }),
-    { name: "cart-storage" } 
+    { name: "cart-storage" }
   )
 );
 
+
 // ======= Wishlist Store =======
 interface WishlistState {
-  wishlist: CartItem[];
-  addToWishlist: (item: CartItem) => void;
+  wishlist: productsProps[];
+  addToWishlist: (item: productsProps) => void;
   removeFromWishlist: (id: number) => void;
   clearWishlist: () => void;
 }

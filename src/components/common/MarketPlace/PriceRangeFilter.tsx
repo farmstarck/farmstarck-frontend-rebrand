@@ -9,8 +9,8 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
   products,
   onFilter,
 }) => {
-  const minPrice = Math.min(...products.map((p) => p.amountFrom));
-  const maxPrice = Math.max(...products.map((p) => p.amountTo));
+  const minPrice = Math.min(...products.map((p) => p.amount));
+  const maxPrice = Math.max(...products.map((p) => p.amount));
 
   const [min, setMin] = useState(minPrice);
   const [max, setMax] = useState(maxPrice);
@@ -136,7 +136,7 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
 
           {/* Min Thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform z-10"
+            className="absolute top-1/2 -translate-y-1/2 z-0 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform "
             style={{ left: `${minPercentage}%` }}
             onMouseDown={(e) => {
               e.stopPropagation();
@@ -146,7 +146,7 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
 
           {/* Max Thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform z-10"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform z-0"
             style={{ left: `${maxPercentage}%` }}
             onMouseDown={(e) => {
               e.stopPropagation();
@@ -158,17 +158,17 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
 
       {/* Prices */}
 
-      <div className="mt-5 text-xs font-medium w-full ">
-        Prices:₦{min.toLocaleString()}-₦{max.toLocaleString()}
+      <div className="mt-5 text-sm font-extrabold w-full ">
+        Prices: ₦{min.toLocaleString()} - ₦{max.toLocaleString()}
       </div>
 
 
       {/* Apply Button */}
       <button
         onClick={handleApply}
-        className="w-full bg-primary mt-5 text-white py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+        className="w-full bg-primary mt-5 text-white py-2 text-sm rounded-lg font-medium hover:bg-primary/90 transition-colors"
       >
-        Apply Filter
+        Apply Price Filter
       </button>
     </div>
   );

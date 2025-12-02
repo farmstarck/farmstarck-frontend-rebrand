@@ -38,9 +38,11 @@ const MarketPlaceFooter = () => {
                                 <input
                                     type="email"
                                     placeholder="Enter Email Address"
-                                    className="w-2/3  pl-4 rounded-md h-auto text-gray-700 font-light text-sm placeholder-gray-700 focus:outline-none "
+                                    className="w-2/3 py-4  pl-4 rounded-md h-auto text-gray-700 font-light text-sm placeholder-gray-700 focus:outline-none "
                                 />
-                                <button className="w-1/2 bg-[var(--primary)]  text-white hpx-12 py-2 md:py-4 text-base rounded-full font-btnBody transition-all duration-300 ">
+                                <button
+                                 type='button'
+                                className="w-1/2 bg-[var(--primary)]  text-white hpx-12 py-2 md:py-4 text-base rounded-full font-btnBody transition-all duration-300 ">
                                     Send
                                 </button>
 

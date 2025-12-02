@@ -9,12 +9,13 @@ interface Crumb {
 
 interface NavigationProps {
   routes: Crumb[]
+  forward?: boolean
 }
 
-const Navigation = ({ routes }: NavigationProps) => {
+const Navigation = ({ routes, forward = false }: NavigationProps) => {
   return (
     <nav className="flex items-center gap-2 text-sm text-gray-600">
-      
+
       {/* First link ALWAYS Home */}
       <Link href="/market/marketplace" className="text-primary font-medium">
         Home
@@ -23,12 +24,12 @@ const Navigation = ({ routes }: NavigationProps) => {
       {/* Loop through all passed routes */}
       {routes.map((item, index) => (
         <div key={index} className="flex items-center gap-2">
-          <ChevronRightIcon className="text-dark-green "/>
+          <ChevronRightIcon className="text-dark-green " />
           <Link
-            href={index === routes.length -1 ? "":item.href}
+            href={index === routes.length - 1 && !forward ? "" : index === routes.length - 1 && forward ? item.href : item.href}
             className={`capitalize ${index === routes.length - 1
-                ? "text-dark"
-                : "text-primary"
+              ? "text-dark"
+              : "text-primary"
               }`}
           >
             {item.name}

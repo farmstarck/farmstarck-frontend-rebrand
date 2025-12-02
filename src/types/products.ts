@@ -3,9 +3,8 @@ export interface productsProps {
   id: number;
   size: string;
   title: string;
-  amountFrom: number;
+  amount: number;
   quantity?: string;
-  amountTo: number;
   location: string;
   image: string;
   category?: string; 

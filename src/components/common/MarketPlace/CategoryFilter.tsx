@@ -29,12 +29,19 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     );
   };
 
-  const handleSelect = (item: string) => {
-    setSelected(
-      selected.includes(item)
-        ? selected.filter((c) => c !== item)
-        : [...selected, item]
-    );
+  // ✅ Modified: Single selection per group (independent categories)
+  const handleSelect = (item: string, groupName: string) => {
+    // Remove any previously selected item from this specific group
+    const itemsInCurrentGroup = categoryGroups.find(g => g.groupName === groupName)?.items || [];
+    const filteredSelected = selected.filter(s => !itemsInCurrentGroup.includes(s));
+    
+    // If clicking the already selected item, just deselect it
+    if (selected.includes(item)) {
+      setSelected(filteredSelected);
+    } else {
+      // Add the new selection from this group
+      setSelected([...filteredSelected, item]);
+    }
   };
 
   return (
@@ -47,16 +54,6 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${selected.some((item) => group.items.includes(item))
-                  ? "border-green-500 bg-white"
-                  : "border-gray-300"
-                  }`}
-              >
-                {selected.some((item) => group.items.includes(item)) && (
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                )}
-              </div>
               <span className="font-medium text-gray-900">{group.groupName}</span>
             </div>
             {expandedGroups.includes(group.groupName) ? (
@@ -68,27 +65,29 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
           {/* Group Items */}
           {expandedGroups.includes(group.groupName) && (
-            <div className="px-4 pb-4 space-y-2">
+            <div className="px-1 pb-4 space-y-2">
               {group.items.map((item) => (
                 <label
                   key={item}
                   className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
                 >
                   <div
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected.includes(item)
-                      ? "border-primary bg-white"
-                      : "border-gray-300"
-                      }`}
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      selected.includes(item)
+                        ? "border-primary bg-white"
+                        : "border-gray-300"
+                    }`}
                   >
                     {selected.includes(item) && (
                       <div className="w-2 h-2 rounded-full bg-primary"></div>
                     )}
                   </div>
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name={`category-filter-${group.groupName}`}
                     className="hidden"
                     checked={selected.includes(item)}
-                    onChange={() => handleSelect(item)}
+                    onChange={() => handleSelect(item, group.groupName)}
                   />
                   <span className="text-gray-700 text-sm">{item}</span>
                 </label>

@@ -26,6 +26,16 @@
     --color-yellowish: #ffbb28;
 }
 
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 button {
     cursor: pointer;
 }
@@ -114,14 +124,6 @@ button {
     font-family: 'Cabinet Grotesk';
     src: url('/fonts/cabinet/CabinetGrotesk-Medium.otf') format('opentype');
     font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Cabinet Grotesk';
-    src: url('/fonts/cabinet/CabinetGrotesk-SemiBold.otf') format('opentype');
-    font-weight: 600;
     font-style: normal;
     font-display: swap;
 }
@@ -240,7 +242,7 @@ button {
 
 html,
 body {
-    font-family: 'Cabinet Grotesk', sans-serif;
+    font-family: 'Cabinet Grotesk', 'Satoshi', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;

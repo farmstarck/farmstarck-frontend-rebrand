@@ -8,6 +8,7 @@ import { SuccessMessage } from '@/utils/PageUtils'
 import Button from '@/ui/Button'
 import { useRouter } from 'next/router'
 import { productsProps } from '@/types/products'
+import { useNavigate } from '@/hooks/useNavigate'
 
 const Features = [
     {
@@ -45,6 +46,7 @@ const Features = [
 const ProductCard = ({ product }: { product: productsProps }) => {
     const { addToCart, cart, removeFromCart } = useCartStore()
     const { addToWishlist, removeFromWishlist, wishlist } = useWishlistStore()
+    const { navigate } = useNavigate()
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('en-NG', {
@@ -82,54 +84,62 @@ const ProductCard = ({ product }: { product: productsProps }) => {
     const isWishlisted = wishlist.some(item => item.id === product.id)
 
     return (
-        <div className='bg-white satoshi rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
-            {/* Image Container */}
-            <div className='relative w-full h-40'>
-                <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className='object-contain pt-2'
-                />
-            </div>
-
-            {/* Content */}
-            <div className='p-4 flex flex-col flex-grow relative'>
-                <div className='w-fit flex items-center gap-1 bg-[#a5faa5] text-primary py-1 text-[10px] font-medium px-3 rounded-full'>
+        <div
+            className='bg-white satoshi pb-4 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
+            <div
+                onClick={() => navigate(`marketplace/product/${product.category}/${product.id}`)}
+                className="flex items-start cursor-pointer  flex-col ">
+                {/* Image Container */}
+                <div className='relative w-full h-72 lg:h-40'>
                     <Image
-                        width={8}
-                        height={8}
-                        src='/assets/images/marketplaces/productIcon.png'
-                        alt='size image'
+                        src={product.image}
+                        alt={product.title}
+                        fill
+                        className='object-contain pt-2'
                     />
-                    {product.size}
                 </div>
-                <h3 className='font-semibold text-base mb-1 line-clamp-2 mt-2'>{product.title}</h3>
+                {/* Content */}
+                <div className='px-3 pt-3 flex flex-col flex-grow relative'>
+                    <div className='w-fit flex items-center gap-1 bg-[#a5faa5] text-primary py-1 text-[10px] font-medium px-3 rounded-full'>
+                        <Image
+                            width={8}
+                            height={8}
+                            src='/assets/images/marketplaces/productIcon.png'
+                            alt='size image'
+                        />
+                        {product.size}
+                    </div>
+                    <h3 className='font-semibold text-base mb-1 line-clamp-2 mt-2'>{product.title}</h3>
 
-                {/* Price */}
-                <div className='text-[#00C700] font-bold text-lg mb-2'>
-                    {formatPrice(product.amountFrom)} - {formatPrice(product.amountTo)}
+                    {/* Price */}
+                    <div className='text-[#00C700] font-bold text-base mb-2'>
+                        {formatPrice(product.amount)}
+                    </div>
+
+                    {/* Location */}
+                    <div className='flex items-center gap-1 text-gray-500 text-sm mb-4'>
+                        <MapPin size={14} />
+                        <span>{product.location}</span>
+                    </div>
                 </div>
 
-                {/* Location */}
-                <div className='flex items-center gap-1 text-gray-500 text-sm mb-4'>
-                    <MapPin size={14} />
-                    <span>{product.location}</span>
-                </div>
-                <hr className="my-3 border-0.5  border-gray-300" />
+
+            </div>
+            <div className="w-11/12 mx-auto ">
+                <hr className="mb-3 border-0.5  border-gray-300" />
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 mt-auto">
                     {/* ADD TO CART BUTTON */}
                     <button
                         onClick={() => addToCartFunction(product)}
-                        className={`flex-1 border rounded-lg py-2 px-4 flex items-center justify-center gap-2 transition-all duration-300 text-sm font-medium ${idFound
+                        className={`flex-1 text-sm border rounded-lg py-2 px-4 flex items-center justify-center gap-2 transition-all duration-300  font-medium ${idFound
                             ? "border-primary bg-primary text-white"
                             : "border-primary text-primary hover:bg-primary hover:text-white"
                             }`}
                     >
                         <ShoppingCart size={16} />
-                        {idFound ? "Added" : "Add"}
+                        {idFound ? "Remove" : "Add"}
                     </button>
 
                     {/* WISHLIST BUTTON - FIXED STYLING */}
@@ -147,6 +157,8 @@ const ProductCard = ({ product }: { product: productsProps }) => {
                     </button>
                 </div>
             </div>
+
+
         </div>
     )
 }
@@ -171,7 +183,7 @@ const OtherProducts = () => {
                         </button>
                     </div>
 
-                    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
                         {AllProducts.map((product, index) => (
                             <ProductCard key={index} product={product} />
                         ))}
@@ -189,7 +201,7 @@ const OtherProducts = () => {
                         </button>
                     </div>
 
-                    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
                         {AllProducts.slice(0, 5).map((product, index) => (
                             <ProductCard key={index} product={product} />
                         ))}
@@ -216,7 +228,7 @@ const OtherProducts = () => {
                         </button>
                     </div>
 
-                    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
                         {AllProducts.slice(0, 5).map((product, index) => (
                             <ProductCard key={index} product={product} />
                         ))}
@@ -224,8 +236,8 @@ const OtherProducts = () => {
                 </div>
             </div>
 
-            <div className="w-full bg-white p-10 my-10 lg:py-20 ">
-                <div className="w-11/12 mx-auto flex lg:items-center gap-10 flex-col lg:flex-row">
+            <div className="w-full bg-white p-5 lg:p-10 my-10 lg:py-20 ">
+                <div className="w-full mx-auto flex lg:items-center gap-10 flex-col lg:flex-row">
                     <div className="w-full lg:w-1/2 flex items-start flex-col gap-4">
                         <div className="text-4xl font-bold max-w-md">Looking for a product that is not listed here?</div>
                         <p className='font-medium satoshi'>Request the product right away and we will help you source for it</p>

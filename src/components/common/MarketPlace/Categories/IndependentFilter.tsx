@@ -29,130 +29,107 @@ export const IndependentFilter: React.FC<IndependentFilterProps> = ({
     );
   };
 
-  // Check if all items in a group are selected (excluding "Show All")
-  const isGroupFullySelected = (group: CategoryGroup): boolean => {
+  // Check if "Show All" is active for this group (no selection from this group)
+  const isShowAllActive = (group: CategoryGroup): boolean => {
     const groupItems = group.items.filter(item => item !== "Show All");
-    return groupItems.every(item => selected.includes(item));
+    return !groupItems.some(item => selected.includes(item));
   };
 
-  // Check if any item in a group is selected
-  const isGroupPartiallySelected = (group: CategoryGroup): boolean => {
+  // Get the selected item for this group (if any)
+  const getSelectedItemInGroup = (group: CategoryGroup): string | null => {
     const groupItems = group.items.filter(item => item !== "Show All");
-    return groupItems.some(item => selected.includes(item));
+    const selectedItem = groupItems.find(item => selected.includes(item));
+    return selectedItem || null;
   };
 
-  // Handle "Show All" toggle for a specific group
-  const handleShowAllToggle = (group: CategoryGroup) => {
-    const groupItems = group.items.filter(item => item !== "Show All");
-    const allSelected = isGroupFullySelected(group);
-
-    if (allSelected) {
-      // Uncheck all items in this group
-      setSelected(selected.filter(item => !groupItems.includes(item)));
-    } else {
-      // Check all items in this group
-      const newSelected = [...selected];
-      groupItems.forEach(item => {
-        if (!newSelected.includes(item)) {
-          newSelected.push(item);
-        }
-      });
-      setSelected(newSelected);
-    }
-  };
-
-  // Handle individual item selection
+  // Handle item selection (single select per group)
   const handleItemSelect = (item: string, group: CategoryGroup) => {
+    const groupItems = group.items.filter(i => i !== "Show All");
+    
+    // If "Show All" is clicked, remove any selection from this group
     if (item === "Show All") {
-      handleShowAllToggle(group);
+      setSelected(selected.filter(s => !groupItems.includes(s)));
       return;
     }
 
-    setSelected(
-      selected.includes(item)
-        ? selected.filter((c) => c !== item)
-        : [...selected, item]
-    );
+    // Remove any previously selected item from this group
+    const filteredSelected = selected.filter(s => !groupItems.includes(s));
+    
+    // If clicking the already selected item, deselect it (back to "Show All")
+    if (selected.includes(item)) {
+      setSelected(filteredSelected);
+    } else {
+      // Add the new selection from this group
+      setSelected([...filteredSelected, item]);
+    }
   };
 
   return (
     <div className="space-y-4">
-      {categoryGroups.map((group) => (
-        <div key={group.groupName} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          {/* Group Header */}
-          <button
-            onClick={() => toggleGroup(group.groupName)}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                  isGroupPartiallySelected(group)
-                    ? "border-primary bg-white"
-                    : "border-gray-300"
-                }`}
-              >
-                {isGroupPartiallySelected(group) && (
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                )}
+      {categoryGroups.map((group) => {
+        const showAllActive = isShowAllActive(group);
+
+        return (
+          <div key={group.groupName} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            {/* Group Header */}
+            <button
+              onClick={() => toggleGroup(group.groupName)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="font-medium text-gray-900">{group.groupName}</span>
+                
               </div>
-              <span className="font-medium text-gray-900">{group.groupName}</span>
-              {isGroupPartiallySelected(group) && (
-                <span className="text-xs text-primary font-medium">
-                  ({group.items.filter(item => item !== "Show All" && selected.includes(item)).length})
-                </span>
+              {expandedGroups.includes(group.groupName) ? (
+                <Minus className="w-4 h-4 text-gray-500" />
+              ) : (
+                <Plus className="w-4 h-4 text-gray-500" />
               )}
-            </div>
-            {expandedGroups.includes(group.groupName) ? (
-              <Minus className="w-4 h-4 text-gray-500" />
-            ) : (
-              <Plus className="w-4 h-4 text-gray-500" />
-            )}
-          </button>
+            </button>
 
-          {/* Group Items */}
-          {expandedGroups.includes(group.groupName) && (
-            <div className="px-4 pb-4 space-y-2">
-              {group.items.map((item) => {
-                const isShowAll = item === "Show All";
-                const isChecked = isShowAll 
-                  ? isGroupFullySelected(group)
-                  : selected.includes(item);
+            {/* Group Items */}
+            {expandedGroups.includes(group.groupName) && (
+              <div className="px-2 pb-4 space-y-2">
+                {group.items.map((item) => {
+                  const isShowAll = item === "Show All";
+                  const isChecked = isShowAll 
+                    ? showAllActive
+                    : selected.includes(item);
 
-                return (
-                  <label
-                    key={item}
-                    className={`flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors ${
-                      isShowAll ? " mt-2" : ""
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        isChecked
-                          ? "border-primary bg-white"
-                          : "border-gray-300"
-                      }`}
+                  return (
+                    <label
+                      key={item}
+                      className={`flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors `}
                     >
-                      {isChecked && (
-                        <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      )}
-                    </div>
-                    <input
-                      type="checkbox"
-                      className="hidden"
-                      checked={isChecked}
-                      onChange={() => handleItemSelect(item, group)}
-                    />
-                    <span className={`text-sm text-dark`}>
-                      {item}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      ))}
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isChecked
+                            ? "border-primary bg-white"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {isChecked && (
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        )}
+                      </div>
+                      <input
+                        type="radio"
+                        name={`filter-${group.groupName}`}
+                        className="hidden"
+                        checked={isChecked}
+                        onChange={() => handleItemSelect(item, group)}
+                      />
+                      <span className={`text-sm ${isShowAll ? 'font-medium' : 'text-dark'}`}>
+                        {item}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
