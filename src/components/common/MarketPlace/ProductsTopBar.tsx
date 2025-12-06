@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CustomDropDown } from "../CustomDropDown";
 import { LayoutDashboard, List } from "lucide-react";
 
@@ -14,37 +14,40 @@ export const ProductsTopBar: React.FC<ProductsTopBarProps> = ({
   setSort,
 }) => {
   const data = [
-    { label: "Bulk", value: "bulk" },
+    { label: "A-Z", value: "a-z" },
     { label: "Low Price", value: "price_low" },
     { label: "High Price", value: "price_high" },
   ];
+
+  // 👉 Automatically assign default value if none is selected
+  
 
   const Icons = [LayoutDashboard, List];
   const [iconStyle, setIconStyle] = useState(0);
 
   return (
     <div className="flex flex-col lg:flex-row w-full my-5 justify-between items-start lg:items-center p-4 bg-white rounded-md shadow-sm gap-4">
-      
+
       {/* Left text */}
       <p className="text-xs lg:text-sm text-gray-600">
         Showing 1–20 of {total} results
       </p>
 
-      {/* Right side (sort + icons) */}
-      <div className="flex items-center w-full lg:w-fit  justify-between gap-5 lg:gap-10 lg:ml-auto">
+      {/* Right side */}
+      <div className="flex items-center w-full lg:w-fit justify-between gap-5 lg:gap-10 lg:ml-auto">
 
-        {/* Sort section - now never breaks */}
-        <div className="flex  items-center gap-2 whitespace-nowrap">
+        {/* Sort */}
+        <div className="flex items-center gap-2 whitespace-nowrap">
           <span className="text-xs">Sort by:</span>
 
           <CustomDropDown
             value={sort}
-            onChange={(e) => setSort(e)}
+            onChange={(value) => setSort(value)}
             options={data}
           />
         </div>
 
-        {/* Icon view toggles */}
+        {/* Toggle icons */}
         <div className="flex items-center gap-2">
           {Icons.map((Icon, index) => {
             const active = index === iconStyle;
@@ -55,7 +58,7 @@ export const ProductsTopBar: React.FC<ProductsTopBarProps> = ({
                 onClick={() => setIconStyle(index)}
                 className={`
                   p-2 rounded-md transition-all duration-200
-                  ${active ? "bg-lite " : "bg-gray-100 text-gray-500"}
+                  ${active ? "bg-lite" : "bg-gray-100 text-gray-500"}
                 `}
               >
                 <Icon size={20} />

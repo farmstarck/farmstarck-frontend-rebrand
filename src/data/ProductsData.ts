@@ -149,24 +149,24 @@ export const AllProducts: productsProps[] = [
   },
 ];
 
-export const categoryGroups = [
-  {
-    groupName: "Food",
-    items: ["Vegetables", "Grains", "Livestock", "Seed/Nut", "Tubers", "Fruits", "Raw Food", "Processed Food", "Others"]
-  },
-  {
-    groupName: "Animal Feed & Supplement",
-    items: ["Roughages", "Concentrates", "Mixed Feeds", "Meal Feeds", "Additives", "Nutrient Feed Supplement", "Non-Nutrient Feed Supplement"]
-  },
-  {
-    groupName: "Agro Chemicals",
-    items: ["Fertilizers", "Herbicides", "Fungicides", "Veterinary Chemicals", "Others"]
-  },
-  {
-    groupName: "Farm Machine & Equipment",
-    items: ["Planting Equipment", "Harvesting Equipment", "Irrigation Equipment", "Cultivation Equipment", "Crop/Poultry Equipment", "Others"]
-  }
-];
+// export const categoryGroups = [
+//   {
+//     groupName: "Food",
+//     items: ["Vegetables", "Grains", "Livestock", "Seed/Nut", "Tubers", "Fruits", "Raw Food", "Processed Food", "Others"]
+//   },
+//   {
+//     groupName: "Animal Feed & Supplement",
+//     items: ["Roughages", "Concentrates", "Mixed Feeds", "Meal Feeds", "Additives", "Nutrient Feed Supplement", "Non-Nutrient Feed Supplement"]
+//   },
+//   {
+//     groupName: "Agro Chemicals",
+//     items: ["Fertilizers", "Herbicides", "Fungicides", "Veterinary Chemicals", "Others"]
+//   },
+//   {
+//     groupName: "Farm Machine & Equipment",
+//     items: ["Planting Equipment", "Harvesting Equipment", "Irrigation Equipment", "Cultivation Equipment", "Crop/Poultry Equipment", "Others"]
+//   }
+// ];
 
 
 

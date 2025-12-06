@@ -1,7 +1,7 @@
 import React from 'react';
 import MarketPlaceLayout from '@/layouts/MarketPlaceLayout';
 import { ProductFilterLayout } from '@/components/common/MarketPlace/ProductFilterLayout';
-import { AllProducts, categoryGroups } from '@/data/ProductsData';
+import { AllProducts} from '@/data/ProductsData';
 
 const MostViewedProductsPage = () => {
     return (
@@ -11,7 +11,7 @@ const MostViewedProductsPage = () => {
                 { name: "Most Viewed", href: "/marketplace/most-viewed" }
             ]}
             products={AllProducts}
-            categoryGroups={categoryGroups}
+            categoryType='all'
             productUrl='/market/marketplace/product'
             showPagination={false} // Optional: hide pagination for this page
         >

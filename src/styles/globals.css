@@ -325,7 +325,7 @@ body {
 }
 
 .open .hamburger-bottom {
-    border-top: 2px solid #027402;
+    border-top: 1px solid #027402;
     height: 6px;
     transform: rotate(-45deg) translateY(6px) translate(-6px);
 }

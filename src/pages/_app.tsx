@@ -4,7 +4,7 @@ import MainLayout from "@/layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import BaseLoader from "@/Loaders/BaseLoader";
 import { useRouter } from "next/router";
-import { Toaster } from "react-hot-toast"; 
+import { Toaster } from "react-hot-toast";
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -39,6 +39,15 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [router]);
 
+  const noLayoutRoutes =
+    ["/signin",
+      "/onboarding/signup",
+      "/onboarding/verify-email",
+      '/password/forgot-password',
+      '/password/reset-password'
+    ];
+  const isNoLayout = noLayoutRoutes.includes(router.pathname);
+
   const getLayout =
     PageComponent.getLayout ||
     ((page: React.ReactNode) => <MainLayout>{page}</MainLayout>);
@@ -52,7 +61,10 @@ export default function App({ Component, pageProps }: AppProps) {
       )}
 
       {/* ✅ Your pages and layouts */}
-      {getLayout(<PageComponent {...pageProps} />)}
+      {isNoLayout
+        ? <PageComponent {...pageProps} />
+        : getLayout(<PageComponent {...pageProps} />)
+      }
 
       {/* ✅ Global Toast container */}
       <Toaster

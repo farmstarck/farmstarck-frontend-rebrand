@@ -24,13 +24,10 @@ const Navigation = ({ routes, forward = false }: NavigationProps) => {
       {/* Loop through all passed routes */}
       {routes.map((item, index) => (
         <div key={index} className="flex items-center gap-2">
-          <ChevronRightIcon className="text-dark-green " />
+          <ChevronRightIcon size={16} className="text-dark-green" />
           <Link
             href={index === routes.length - 1 && !forward ? "" : index === routes.length - 1 && forward ? item.href : item.href}
-            className={`capitalize ${index === routes.length - 1
-              ? "text-dark"
-              : "text-primary"
-              }`}
+            className={`capitalize font-semibold text-dark-green`}
           >
             {item.name}
           </Link>

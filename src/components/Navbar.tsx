@@ -259,13 +259,13 @@ const Navbar = () => {
           {/* Desktop Buttons */}
           <div className="hidden lg:flex gap-4">
             <Link
-              href=""
+              href="/signin"
               className="px-7 py-2 bg-[var(--primary)] text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
             >
               Sign In
             </Link>
             <Link
-              href=""
+              href="/onboarding/signup"
               className="px-7 py-2 text-secondary-light bg-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-[var(--primary)]  hover:text-white text-[var(--primary)]"
             >
               Create Account
@@ -382,16 +382,16 @@ const Navbar = () => {
             {/* Mobile Buttons */}
             <div className="pt-4  mt-4 flex flex-col gap-3">
               <Link
-                href="#"
+                href="signin"
                 onClick={handleLinkClick}
-                className="  w-full px-4 py-3 text-center bg-[var(--primary)] text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:primary-txt"
+                className="  w-full px-4 py-3 text-center bg-primary text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:text-primary"
               >
                 Sign In
               </Link>
               <Link
-                href="#"
+                href="/onboarding/signup"
                 onClick={handleLinkClick}
-                className="w-full px-4 py-3 text-center text-secondary-light bg-white text-base rounded-md font-btnBody transition-all duration-300 hover:text-white hover:primary-bg"
+                className="w-full px-4 py-3 text-center text-primary bg-white text-base rounded-md font-btnBody transition-all duration-300 hover:text-white hover:bg-primary"
               >
                 Create Account
               </Link>

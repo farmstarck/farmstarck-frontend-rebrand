@@ -1,7 +1,7 @@
 import React from 'react';
 import MarketPlaceLayout from '@/layouts/MarketPlaceLayout';
 import { ProductFilterLayout } from '@/components/common/MarketPlace/ProductFilterLayout';
-import { AllProducts, categoryGroups } from '@/data/ProductsData';
+import { AllProducts } from '@/data/ProductsData';
 import Button from '@/ui/Button';
 import Image from 'next/image';
 
@@ -11,8 +11,8 @@ const AllProductsPage = () => {
             title="All Products"
             routes={[{ name: "All Products", href: "/marketplace" }]}
             products={AllProducts}
-            categoryGroups={categoryGroups}
             productUrl='/market/marketplace/product'
+            categoryType='all'
         >
             {/* CTA Banner */}
             <div className="my-10 w-full">
@@ -35,6 +35,7 @@ const AllProductsPage = () => {
                                 src='/assets/images/marketplaces/vegetables.png' 
                                 alt='veges image' 
                                 fill 
+                                className="object-contain"
                             />
                         </div>
                     </div>

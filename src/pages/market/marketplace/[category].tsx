@@ -1,13 +1,13 @@
 import { IndependentFilter } from '@/components/common/MarketPlace/Categories/IndependentFilter';
 import Navigation from '@/components/common/MarketPlace/Navigation';
 import { PriceRangeFilter } from '@/components/common/MarketPlace/PriceRangeFilter';
+import { LocationFilter } from '@/components/common/MarketPlace/LocationFilter';
 import { ProductsGrid } from '@/components/common/MarketPlace/ProductGrid';
 import { ProductsTopBar } from '@/components/common/MarketPlace/ProductsTopBar';
 import { SlidersHorizontal, X } from 'lucide-react';
 
 import {
     AllProducts,
-    categoryGroups,
     foodFilters,
     animalFeedFilters,
     agroChemicalsFilters,
@@ -18,19 +18,20 @@ import MarketPlaceLayout from '@/layouts/MarketPlaceLayout';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState, useEffect } from 'react';
+import CategoriesImageFilters from '@/components/common/MarketPlace/Categories/CategoriesImageFilters';
 
 const normalizeCategoryName = (name: string): string =>
     name.toLowerCase().replace(/[&\s-]+/g, '');
 
-/* --- CATEGORY SLUG → CATEGORY NAME --- */
-const slugToCategoryMap: Record<string, string> = {
-    foods: "Food",
-    "animal-feeds": "Animal Feed & Supplement",
-    "agro-chemicals": "Agro Chemicals",
-    "machinery-and-equipments": "Farm Machine & Equipment",
+/* --- CATEGORY SLUG → CATEGORY NAME & TYPE --- */
+const slugToCategoryMap: Record<string, { name: string; type: 'food' | 'agro' | 'animals' | 'farm' }> = {
+    foods: { name: "Food", type: "food" },
+    "animal-feeds": { name: "Animal Feed & Supplement", type: "animals" },
+    "agro-chemicals": { name: "Agro Chemicals", type: "agro" },
+    "machinery-and-equipments": { name: "Farm Machine & Equipment", type: "farm" },
 };
 
-/* --- CATEGORY → FILTERS MAP (MATCHES NORMALIZED CATEGORY NAMES) --- */
+/* --- CATEGORY → FILTERS MAP --- */
 const filterMap: Record<string, any[]> = {
     food: foodFilters,
     animalfeedsupplement: animalFeedFilters,
@@ -44,67 +45,102 @@ const DynamicCategories = () => {
 
     const [sort, setSort] = useState("bulk");
     const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>([]);
+    // In DynamicCategories.tsx, update the state initialization:
+    const [selectedSubCategoryFromImage, setSelectedSubCategoryFromImage] =
+        useState<{ slug: string; index?: number }>({
+            slug: 'all',
+            index: -1
+        });
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<{ min: number; max: number } | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const categoryName = category?.toString().replace(/-/g, " ") || "";
-    const rawCategory = slugToCategoryMap[category as string] || "";
-
-    // NORMALIZED KEY FOR LOOKUPS
+    const categorySlug = category as string;
+    const categoryInfo = slugToCategoryMap[categorySlug];
+    const categoryName = categoryInfo?.name.replace(/-/g, " ") || "";
+    const categoryType = categoryInfo?.type || "food";
+    const rawCategory = categoryInfo?.name || "";
     const normalizedCategoryKey = normalizeCategoryName(rawCategory);
-
-    /* --- SUBCATEGORIES --- */
-    const subCategoryFilters = useMemo(() => {
-        const group = categoryGroups.find(
-            g => normalizeCategoryName(g.groupName) === normalizedCategoryKey
-        );
-        return group
-            ? [{ groupName: group.groupName, items: ["Show All", ...group.items] }]
-            : [];
-    }, [normalizedCategoryKey]);
 
     /* --- FILTER GROUPS FOR CATEGORY --- */
     const additionalFilters = filterMap[normalizedCategoryKey] || [];
 
-    /* --- RESET FILTERS WHEN CATEGORY CHANGES --- */
-    useEffect(() => {
-        setSelectedSubCategories([]);
-        setSelectedFilters([]);
-        setPriceRange(null);
-    }, [normalizedCategoryKey]);
-
-    /* --- GET ALL PRODUCTS FOR THIS CATEGORY (USED BY PRICE FILTER) --- */
+    /* --- GET ALL PRODUCTS FOR THIS CATEGORY --- */
     const categoryProducts = useMemo(() => {
         return AllProducts.filter(p =>
             normalizeCategoryName(p.category || "") === normalizedCategoryKey
         );
     }, [normalizedCategoryKey]);
 
-    /* --- APPLY PRICE FILTER TRIGGERED FROM SLIDER --- */
+    /* --- EXTRACT UNIQUE LOCATIONS FROM CATEGORY PRODUCTS --- */
+    const locations = useMemo(() => {
+        const uniqueLocations = Array.from(
+            new Set(categoryProducts.map(p => p.location).filter(Boolean))
+        );
+        return uniqueLocations.sort();
+    }, [categoryProducts]);
+
+    /* --- RESET FILTERS WHEN CATEGORY CHANGES --- */
+    useEffect(() => {
+        setSelectedSubCategories([]);
+        setSelectedSubCategoryFromImage({ slug: '', index: -1 });
+        setSelectedFilters([]);
+        setSelectedLocations([]);
+        setPriceRange(null);
+    }, [normalizedCategoryKey]);
+
+    /* --- APPLY PRICE FILTER --- */
     const applyPriceFilter = (min: number, max: number) => {
         setPriceRange({ min, max });
+    };
+
+    /* --- HANDLE SUBCATEGORY SELECTION FROM IMAGE FILTER --- */
+    const handleSubCategoryItemSelect = (slug: string, name?: string, index?: number) => {
+        if (selectedSubCategoryFromImage.slug === slug) {
+            // Deselect if same category clicked
+            setSelectedSubCategoryFromImage({ slug: '', index: -1 });
+        } else {
+            // Select new category
+            setSelectedSubCategoryFromImage({
+                slug,
+                index: index !== undefined ? index : -1
+            });
+        }
     };
 
     /* --- MAIN FILTERING LOGIC --- */
     const finalList = useMemo(() => {
         let out = [...AllProducts];
 
-        // Filter by category
+        // Filter by main category
         out = out.filter(
             p => normalizeCategoryName(p.category || "") === normalizedCategoryKey
         );
 
         if (out.length === 0) return out;
 
-        // Price
+        // Filter by subcategory from image selector
+        if (selectedSubCategoryFromImage.slug && selectedSubCategoryFromImage.slug !== 'all') {
+            out = out.filter(p => {
+                const productSubCat = p.subCategory?.toLowerCase().replace(/[\/\s]+/g, '-');
+                return productSubCat === selectedSubCategoryFromImage.slug;
+            });
+        }
+
+        // Price filter
         if (priceRange) {
             out = out.filter(p =>
                 p.amount >= priceRange.min && p.amount <= priceRange.max
             );
         }
 
-        // Subcategories
+        // Location filter
+        if (selectedLocations.length > 0) {
+            out = out.filter(p => selectedLocations.includes(p.location || ""));
+        }
+
+        // Subcategories from filter
         if (selectedSubCategories.length > 0) {
             out = out.filter(p => selectedSubCategories.includes(p.subCategory || ""));
         }
@@ -139,7 +175,9 @@ const DynamicCategories = () => {
         return out;
     }, [
         selectedSubCategories,
+        selectedSubCategoryFromImage,
         selectedFilters,
+        selectedLocations,
         priceRange,
         sort,
         normalizedCategoryKey
@@ -149,17 +187,24 @@ const DynamicCategories = () => {
     const closeFilter = () => setIsFilterOpen(false);
 
     // Calculate total active filters
-    const totalActiveFilters = selectedSubCategories.length + selectedFilters.length + (priceRange ? 1 : 0);
+    const totalActiveFilters =
+        selectedSubCategories.length +
+        selectedFilters.length +
+        selectedLocations.length +
+        (priceRange ? 1 : 0) +
+        (selectedSubCategoryFromImage.slug ? 1 : 0);
     const hasActiveFilters = totalActiveFilters > 0;
 
     // Clear all filters
     const clearAllFilters = () => {
         setSelectedSubCategories([]);
+        setSelectedSubCategoryFromImage({ slug: '', index: -1 });
         setSelectedFilters([]);
+        setSelectedLocations([]);
         setPriceRange(null);
     };
 
-    // Filter Content Component (reusable for mobile & desktop)
+    // Filter Content Component
     const FilterContent = () => (
         <>
             <PriceRangeFilter
@@ -168,12 +213,12 @@ const DynamicCategories = () => {
             />
 
             {/* Clear Filters Button */}
-            <div 
+            <div
                 className={`
                     overflow-hidden
                     transition-all duration-300 ease-in-out
-                    ${hasActiveFilters 
-                        ? 'max-h-20 opacity-100 translate-y-0' 
+                    ${hasActiveFilters
+                        ? 'max-h-20 opacity-100 translate-y-0'
                         : 'max-h-0 opacity-0 -translate-y-2'
                     }
                 `}
@@ -194,14 +239,16 @@ const DynamicCategories = () => {
                 </button>
             </div>
 
-            {subCategoryFilters.length > 0 && (
-                <IndependentFilter
-                    categoryGroups={subCategoryFilters}
-                    selected={selectedSubCategories}
-                    setSelected={setSelectedSubCategories}
+            {/* Location Filter */}
+            {locations.length > 0 && (
+                <LocationFilter
+                    locations={locations}
+                    selected={selectedLocations}
+                    setSelected={setSelectedLocations}
                 />
             )}
 
+            {/* Additional Filters */}
             {additionalFilters.length > 0 && (
                 <IndependentFilter
                     categoryGroups={additionalFilters}
@@ -213,33 +260,38 @@ const DynamicCategories = () => {
     );
 
     return (
-        <div className="w-full py-5 relative">
+        <div className="w-full py-5 relative bg-lite min-h-screen">
             <div className="w-11/12 lg:max-w-7xl mx-auto">
-
                 <Navigation
                     routes={[
-                        { name: categoryName, href: `/marketplace/${category}` }
+                        { name: categoryName, href: `/market/marketplace/${category}` }
                     ]}
                 />
 
-                <div className="my-6 text-2xl font-extrabold capitalize">
+                <div className="my-6 text-2xl font-extrabold capitalize text-dark-green">
                     {categoryName}
                 </div>
 
                 {categoryProducts.length === 0 ? (
                     <div className="text-center py-12">
                         <p className="text-gray-500 text-lg">No products available in this category yet.</p>
-                        <p className="text-gray-400 text-sm mt-2">Looking for: {normalizedCategoryKey}</p>
                     </div>
                 ) : (
                     <>
+                        {/* Category Image Filter */}
+                        <CategoriesImageFilters
+                            name={categoryType}
+                            onCategorySelect={handleSubCategoryItemSelect}
+                            selectedCategory={selectedSubCategoryFromImage}
+                        />
+
                         <ProductsTopBar
                             total={finalList.length}
                             sort={sort}
                             setSort={setSort}
                         />
 
-                        {/* Mobile Filter Button - Fixed Position */}
+                        {/* Mobile Filter Button */}
                         <button
                             onClick={toggleFilter}
                             className="
@@ -254,8 +306,8 @@ const DynamicCategories = () => {
                             "
                             aria-label="Toggle Filters"
                         >
-                            <SlidersHorizontal 
-                                className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" 
+                            <SlidersHorizontal
+                                className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90"
                             />
                             {hasActiveFilters && (
                                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center animate-pulse font-bold">
@@ -281,7 +333,6 @@ const DynamicCategories = () => {
                                 ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'}
                             `}
                         >
-                            {/* Mobile Filter Header */}
                             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
                                 <div>
                                     <h3 className="text-lg font-bold text-dark-green">Filters</h3>
@@ -300,12 +351,10 @@ const DynamicCategories = () => {
                                 </button>
                             </div>
 
-                            {/* Mobile Filter Content */}
                             <div className="p-4 space-y-4">
                                 <FilterContent />
                             </div>
 
-                            {/* Mobile Filter Footer */}
                             <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
                                 <button
                                     onClick={closeFilter}
@@ -317,13 +366,12 @@ const DynamicCategories = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-                            {/* LEFT FILTERS - Desktop Only */}
+                            {/* Desktop Filters */}
                             <div className="hidden md:block col-span-1 space-y-4">
                                 <FilterContent />
                             </div>
 
-                            {/* PRODUCTS AREA */}
+                            {/* Products Area */}
                             <div className="col-span-1 md:col-span-3">
                                 {finalList.length === 0 ? (
                                     <div className='w-full text-center flex flex-col items-center'>

@@ -1,7 +1,7 @@
 import React from 'react';
 import MarketPlaceLayout from '@/layouts/MarketPlaceLayout';
 import { ProductFilterLayout } from '@/components/common/MarketPlace/ProductFilterLayout';
-import { AllProducts, categoryGroups } from '@/data/ProductsData';
+import { AllProducts} from '@/data/ProductsData';
 
 const BestSellingProductsPage = () => {
     return (
@@ -11,8 +11,8 @@ const BestSellingProductsPage = () => {
                 { name: "Best Selling", href: "/marketplace/best-selling" }
             ]}
             products={AllProducts}
-            categoryGroups={categoryGroups}
             productUrl='/market/marketplace/product'
+            categoryType='all'
         />
     );
 };

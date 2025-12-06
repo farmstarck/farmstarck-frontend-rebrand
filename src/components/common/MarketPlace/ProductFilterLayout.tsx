@@ -1,13 +1,13 @@
-// components/common/MarketPlace/ProductFilterLayout.tsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Navigation from '@/components/common/MarketPlace/Navigation';
 import { PriceRangeFilter } from '@/components/common/MarketPlace/PriceRangeFilter';
-import { CategoryFilter } from '@/components/common/MarketPlace/CategoryFilter';
 import { ProductsTopBar } from '@/components/common/MarketPlace/ProductsTopBar';
 import { ProductsGrid } from '@/components/common/MarketPlace/ProductGrid';
 import { NavigationButtons } from '@/components/common/Navigation/NavigationButton';
-import { useProductFilter, SortOption } from '@/hooks/useProductFilter';
 import { SlidersHorizontal, X } from 'lucide-react';
+import CategoriesImageFilters from './Categories/CategoriesImageFilters';
+import { LocationFilter } from './LocationFilter';
+import { IndependentFilter } from './Categories/IndependentFilter';
 
 interface Route {
     name: string;
@@ -18,37 +18,156 @@ interface ProductFilterLayoutProps {
     title: string;
     routes: Route[];
     products: any[];
-    categoryGroups: any[];
     productUrl?: string;
     showPagination?: boolean;
     children?: React.ReactNode;
+    categoryType?: 'food' | 'agro' | 'animals' | 'farm' | 'all';
 }
+
+// General filters for "All Products" page
+const generalFilters = [
+    {
+        groupName: "Quantity",
+        items: ["Show All", "Bulk", "Unit"]
+    },
+    {
+        groupName: "Count",
+        items: ["Show All", "Pieces", "Dozen", "Kilogram", "Carton", "Bag", "Crate", "Each", "Basket", "Others"]
+    },
+    {
+        groupName: "Discount",
+        items: ["Show All", "With Discount", "Without Discount"]
+    }
+];
 
 export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
     title,
     routes,
     products,
-    categoryGroups,
     productUrl = '/market/marketplace/product',
     showPagination = true,
     children,
+    categoryType = 'all'
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    
-    const {
-        sort,
-        selectedCats,
-        filteredProducts,
-        setSort,
-        setSelectedCats,
-        applyPriceFilter,
-        clearFilters,
-        hasActiveFilters,
-        totalFiltered,
-    } = useProductFilter({ products, categoryGroups });
+    const [sort, setSort] = useState("a-z");
+    const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<{ slug: string; index?: number }>({
+        slug: 'all', 
+        index: -1
+    });
+    const [selectedGeneralFilters, setSelectedGeneralFilters] = useState<string[]>([]);
+    const [priceRange, setPriceRange] = useState<{ min: number; max: number } | null>(null);
+
+    // Extract unique locations from products
+    const locations = useMemo(() => {
+        const uniqueLocations = Array.from(new Set(products.map(p => p.location).filter(Boolean)));
+        return uniqueLocations.sort();
+    }, [products]);
+
+    const applyPriceFilter = (min: number, max: number) => {
+        setPriceRange({ min, max });
+    };
+
+    const clearFilters = () => {
+        setSelectedLocations([]);
+        setSelectedCategory({ slug: '', index: -1 });
+        setSelectedGeneralFilters([]);
+        setPriceRange(null);
+    };
+
+    // Calculate active filters
+    const totalActiveFilters = 
+        selectedLocations.length + 
+        selectedGeneralFilters.length +
+        (priceRange ? 1 : 0) + 
+        (selectedCategory.slug && selectedCategory.slug !== 'all' ? 1 : 0);
+    const hasActiveFilters = totalActiveFilters > 0;
+
+    // Filter products
+    const filteredProducts = useMemo(() => {
+        let result = [...products];
+
+        // Apply price filter
+        if (priceRange) {
+            result = result.filter(p => p.amount >= priceRange.min && p.amount <= priceRange.max);
+        }
+
+        // Apply location filter
+        if (selectedLocations.length > 0) {
+            result = result.filter(p => selectedLocations.includes(p.location));
+        }
+
+        // Apply category filter from image selection
+        if (selectedCategory.slug && selectedCategory.slug !== 'all') {
+            result = result.filter(p => {
+                const productSubCat = p.subCategory?.toLowerCase().replace(/[\/\s]+/g, '-');
+                return productSubCat === selectedCategory.slug;
+            });
+        }
+
+        // Apply general filters (Quantity, Count, Discount)
+        if (selectedGeneralFilters.length > 0) {
+            result = result.filter(product =>
+                selectedGeneralFilters.some(filter => {
+                    // Quantity filter
+                    if (filter === "Bulk" || filter === "Unit") {
+                        return product.quantityType === filter;
+                    }
+                    
+                    // Count filter
+                    if (["Pieces", "Dozen", "Kilogram", "Carton", "Bag", "Crate", "Each", "Basket", "Others"].includes(filter)) {
+                        return product.size === filter;
+                    }
+                    
+                    // Discount filter
+                    if (filter === "With Discount") {
+                        return product.discount;
+                    }
+                    if (filter === "Without Discount") {
+                        return !product.discount;
+                    }
+                    
+                    return false;
+                })
+            );
+        }
+
+        // Apply sorting
+        if (sort === "a-z") {
+            result.sort((a, b) => {
+                const at = (a.title ?? "").toString().toLowerCase();
+                const bt = (b.title ?? "").toString().toLowerCase();
+                return at.localeCompare(bt);
+            });
+        }
+
+        if (sort === "z-a") {
+            result.sort((a, b) => {
+                const at = (a.title ?? "").toString().toLowerCase();
+                const bt = (b.title ?? "").toString().toLowerCase();
+                return bt.localeCompare(at);
+            });
+        }
+
+        if (sort === "price_low") result.sort((a, b) => a.amount - b.amount);
+        if (sort === "price_high") result.sort((a, b) => b.amount - a.amount);
+
+        return result;
+    }, [products, priceRange, selectedLocations, selectedCategory, selectedGeneralFilters, sort]);
 
     const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
     const closeFilter = () => setIsFilterOpen(false);
+
+    const handleCategorySelect = (slug: string, name?: string, index?: number) => {
+        if (selectedCategory.slug === slug) {
+            // Deselect if same category clicked
+            setSelectedCategory({ slug: '', index: -1 });
+        } else {
+            // Select new category
+            setSelectedCategory({ slug, index: index !== undefined ? index : -1 });
+        }
+    };
 
     // Filter content component (reusable for both mobile and desktop)
     const FilterContent = () => (
@@ -57,14 +176,14 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
                 products={products}
                 onFilter={applyPriceFilter}
             />
-            
+
             {/* Clear Filters Button */}
-            <div 
+            <div
                 className={`
                     overflow-hidden
                     transition-all duration-300 ease-in-out
-                    ${hasActiveFilters 
-                        ? 'max-h-20 opacity-100 translate-y-0' 
+                    ${hasActiveFilters
+                        ? 'max-h-20 opacity-100 translate-y-0'
                         : 'max-h-0 opacity-0 -translate-y-2'
                     }
                 `}
@@ -85,26 +204,42 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
                 </button>
             </div>
 
-            <CategoryFilter
-                categoryGroups={categoryGroups}
-                selected={selectedCats}
-                setSelected={setSelectedCats}
+            <LocationFilter
+                locations={locations}
+                selected={selectedLocations}
+                setSelected={setSelectedLocations}
             />
+
+            {/* General Filters - Only show on "All Products" page */}
+            {categoryType === 'all' && (
+                <IndependentFilter
+                    categoryGroups={generalFilters}
+                    selected={selectedGeneralFilters}
+                    setSelected={setSelectedGeneralFilters}
+                />
+            )}
         </>
     );
 
     return (
-        <div className='w-full py-5 relative'>
+        <div className='w-full py-5 relative bg-lite min-h-screen'>
             <div className="w-11/12 lg:max-w-7xl mx-auto">
                 {/* Breadcrumb Navigation */}
                 <Navigation routes={routes} />
 
                 {/* Page Title */}
-                <div className="my-6 text-2xl font-extrabold">{title}</div>
+                <div className="my-6 text-2xl font-extrabold text-dark-green">{title}</div>
+
+                {/* Category Image Filters */}
+                <CategoriesImageFilters
+                    name={categoryType}
+                    onCategorySelect={handleCategorySelect}
+                    selectedCategory={selectedCategory}
+                />
 
                 {/* Top Bar with Sort & Count */}
                 <ProductsTopBar
-                    total={totalFiltered}
+                    total={filteredProducts.length}
                     sort={sort}
                     setSort={setSort as (value: string) => void}
                 />
@@ -124,12 +259,12 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
                     "
                     aria-label="Toggle Filters"
                 >
-                    <SlidersHorizontal 
-                        className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" 
+                    <SlidersHorizontal
+                        className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90"
                     />
                     {hasActiveFilters && (
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center animate-pulse">
-                            {selectedCats.length}
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center animate-pulse font-bold">
+                            {totalActiveFilters}
                         </span>
                     )}
                 </button>
@@ -153,7 +288,14 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
                 >
                     {/* Mobile Filter Header */}
                     <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
-                        <h3 className="text-lg font-bold text-dark-green">Filters</h3>
+                        <div>
+                            <h3 className="text-lg font-bold text-dark-green">Filters</h3>
+                            {hasActiveFilters && (
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    {totalActiveFilters} filter{totalActiveFilters !== 1 ? 's' : ''} applied
+                                </p>
+                            )}
+                        </div>
                         <button
                             onClick={closeFilter}
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"

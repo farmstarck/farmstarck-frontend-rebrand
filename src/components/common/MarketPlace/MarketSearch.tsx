@@ -6,6 +6,7 @@ import { ShoppingCartIcon as ShoppingCartSolidIcon, HeartIcon as HeartSolidIcon 
 import { useCartStore, useWishlistStore } from '@/store/Client/CartSlice'
 import CustomSearch from './CustomSearch'
 import { useNavigate } from '@/hooks/useNavigate'
+import Link from 'next/link'
 
 const MarketSearch = () => {
     const { cart } = useCartStore()
@@ -72,10 +73,12 @@ const MarketSearch = () => {
                 </button>
 
                 {/* Sign In Button */}
-                <button className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
+                <Link
+                href={'/signin'}
+                className='flex items-center gap-2 text-white hover:opacity-80 transition-opacity'>
                     <UserIcon className='w-6 h-6' />
                     <span className='hidden md:inline'>Sign In</span>
-                </button>
+                </Link>
             </div>
         </div>
     )

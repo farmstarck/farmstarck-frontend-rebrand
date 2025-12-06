@@ -7,29 +7,42 @@ interface DropdownProps {
   options: { value: string | number; label: string }[];
   placeholder?: string;
   icon?: React.ReactNode;
-  textclass?:string;
-  searchable?: boolean; // 👈 Added: controls visibility of search box
+  textclass?: string;
+  width?: string
+  searchholder?:string
+  disabled?:boolean
+  searchable?: boolean;
 }
 
 export const CustomDropDown: React.FC<DropdownProps> = ({
   value,
   onChange,
+  disabled  = false,
   options,
+  width = 32,
   textclass,
-  placeholder,
+  searchholder,
+  placeholder = "Select an option",
   icon,
   searchable = false,
 }) => {
-  const [open, setOpen] = useState<boolean>(false);
-  const [search, setSearch] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const refDiv = useRef<HTMLDivElement | null>(null);
 
-  // Filter options based on search term
+  // 👉 Auto-select first option if value is empty
+  useEffect(() => {
+    if (!value && options.length > 0) {
+      onChange(options[0].value.toString());
+    }
+  }, [value, options, onChange]);
+
+  // Filter options
   const filteredOptions = options.filter((opt) =>
     opt.label.toLowerCase().startsWith(search.toLowerCase())
   );
 
-  // Close on outside click
+  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (refDiv.current && !refDiv.current.contains(e.target as Node)) {
@@ -40,40 +53,45 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
     return () => window.removeEventListener("click", handleClickOutside, true);
   }, []);
 
+  // Find selected label
+  const selected = options.find((opt) => opt.value === value)?.label;
+
   return (
-    <div ref={refDiv} className="relative w-full">
+    <div ref={refDiv} className={`relative w-${width} `}>
       {/* Trigger */}
       <div
-        className={`flex items-center gap-2 ${open ? 'px-4':'px-3'} py-2  ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer shadow-sm`}
+        className={`flex items-center gap-2 max-w-3xl px-3 py-2 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer shadow-sm`}
         onClick={() => setOpen((prev) => !prev)}
       >
         {icon && <span className="text-gray-500">{icon}</span>}
-        <span className={`flex-1 ${!value ? "text-gray-400" : "text-gray-700"}`}>
-          {value ? options.find((opt) => opt.value === value)?.label : placeholder}
+        <span className={`flex-1 text-sm ${!value ? "text-gray-400" : "text-gray-700"}`}>
+          {selected || placeholder}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-gray-500 transition-transform ${open ? "rotate-180" : ""
+            }`}
         />
       </div>
 
-      {/* Options Dropdown */}
-      {open && (
-        <div className="absolute max-h-72 left-0 overflow-y-auto mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-[10000]">
-          {/* Search Box */}
+      {/* Options */}
+      {open && !disabled && (
+        <div className="absolute max-h-72 left-0 overflow-y-auto mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+
+          {/* Search */}
           {searchable && (
             <div className="sticky top-0 bg-white border-b border-gray-100 flex items-center px-3 py-2">
               <Search className="w-4 h-4 text-gray-400 mr-2" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder={searchholder || 'search...'}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full outline-none text-sm text-gray-700 placeholder-gray-400"
+                className="w-full  outline-none text-sm text-gray-700 placeholder-gray-400"
               />
             </div>
           )}
 
-          {/* Filtered Options */}
+          {/* Option List */}
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (
               <div
@@ -81,13 +99,12 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
                 onClick={() => {
                   onChange(option.value.toString());
                   setOpen(false);
-                  setSearch(""); // reset search after selection
+                  setSearch("");
                 }}
-                className={`px-4  py-2 text-sm cursor-pointer transition-all ${
-                  value === option.value
+                className={`px-4 py-2 text-sm cursor-pointer transition-all ${value === option.value
                     ? "bg-[var(--primary)] text-white"
                     : "hover:bg-lite text-gray-700"
-                }`}
+                  }`}
               >
                 {option.label}
               </div>

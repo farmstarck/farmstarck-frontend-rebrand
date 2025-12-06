@@ -1,15 +1,27 @@
 import Navigation from '@/components/common/MarketPlace/Navigation'
 import MarketPlaceLayout from '@/layouts/MarketPlaceLayout';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCartStore } from '@/store/Client/CartSlice';
 import Image from 'next/image';
-import { MapPin, Package } from 'lucide-react';
+import { allStates, fetchLGAs, nigerianStatesWithLGAs, type lgaTypes } from '@/data/states';
+import { CustomDropDown } from '@/components/common/CustomDropDown';
+import { isObject } from 'framer-motion';
+import { useNavigate } from '@/hooks/useNavigate';
+
 
 const Checkout = () => {
     const { cart } = useCartStore();
+    const { navigate } = useNavigate()
     const [deliveryMethod, setDeliveryMethod] = useState<'doorstep' | 'pickup'>('doorstep');
     const [saveAddress, setSaveAddress] = useState(true);
+    const [lgaOptions, setLgaOptions] = useState<Array<{ value: string, label: string }>>([]);
 
+
+
+    const statesArr = allStates.map(state => ({
+        label: state,
+        value: state
+    }));
     // Form states
     const [formData, setFormData] = useState({
         recipientName: '',
@@ -20,6 +32,25 @@ const Checkout = () => {
         phoneNumber: '',
         email: ''
     });
+
+
+    // Update LGA options when state changes
+    useEffect(() => {
+        if (formData.state) {
+            const state = nigerianStatesWithLGAs.find(state => state.state === formData.state);
+
+            // Check if state is an object before mapping the lgas
+            if (isObject(state)) {
+                const lgaDropdownOptions = state.lgas.map(lga => ({
+                    label: lga,
+                    value: lga
+                }));
+                setLgaOptions(lgaDropdownOptions)
+            } else {
+                setLgaOptions([]);
+            }
+        }
+    }, [formData.state]);
 
     // Calculate totals
     const subtotal = cart.reduce((sum, item) => sum + (item.amount * (item.cartQuantity || 1)), 0);
@@ -34,10 +65,24 @@ const Checkout = () => {
         });
     };
 
-    const handleSubmit = () => {
-        console.log('Proceeding to payment...', formData);
-        // Add payment logic here
+    const handleStateChange = (value: string) => {
+        setFormData({
+            ...formData,
+            state: value
+        });
     };
+
+    const handleLGAChange = (value: string) => {
+        setFormData({
+            ...formData,
+            lga: value
+        });
+    };
+
+    // const () => navigate('/market/marketplace/cart/checkout/payment') = () => {
+    //     console.log('Proceeding to payment...', formData);
+    //     // Add payment logic here
+    // };
 
     return (
         <div className='w-full py-5 satoshi bg-lite min-h-screen'>
@@ -169,37 +214,38 @@ const Checkout = () => {
 
                                 {/* State and LGA */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
+                                    <div className='w-full'>
                                         <label className="block text-sm font-semibold  mb-2">
                                             State
                                         </label>
-                                        <select
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none bg-white"
-                                        >
-                                            <option value="">Lagos State</option>
-                                            <option value="lagos">Lagos</option>
-                                            <option value="abuja">Abuja</option>
-                                            <option value="rivers">Rivers</option>
-                                        </select>
+                                        <div className="w-full">
+                                            <CustomDropDown
+                                                searchable={true}
+                                                width='full'
+                                                value={formData.state}
+                                                options={statesArr}
+                                                onChange={handleStateChange}
+                                                placeholder="Select State"
+                                                searchholder='search states'
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
+                                    <div className='w-full'>
                                         <label className="block text-sm font-semibold  mb-2">
                                             Local Government Area
                                         </label>
-                                        <select
-                                            name="lga"
-                                            value={formData.lga}
-                                            onChange={handleInputChange}
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none bg-white"
-                                        >
-                                            <option value="">Ikeja</option>
-                                            <option value="ikeja">Ikeja</option>
-                                            <option value="lekki">Lekki</option>
-                                            <option value="yaba">Yaba</option>
-                                        </select>
+                                        <div className="w-full">
+                                            <CustomDropDown
+                                                searchable={true}
+                                                width='full'
+                                                value={formData.lga}
+                                                options={lgaOptions}
+                                                onChange={handleLGAChange}
+                                                placeholder="Select LGA"
+                                                searchholder='search lgas'
+                                                disabled={!formData.state}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -222,17 +268,21 @@ const Checkout = () => {
                                         <label className="block text-sm font-semibold  mb-2">
                                             Phone Number
                                         </label>
-                                        <div className="flex gap-2">
-                                            <div className="flex items-center gap-2 px-3 py-3 rounded-lg border border-gray-200 bg-gray-50">
-                                                {/* <span className="text-2xl">🇳🇬</span> */}
-                                                <span className="text-sm font-medium">+234</span>
+                                        <div className="flex gap-1 px-2 border-gray-200  focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all rounded-lg border  items-center">
+                                            <div className="">
+                                                <Image
+                                                    width={34}
+                                                    height={34}
+                                                    src={`/assets/images/flags/ng_flag.png`} alt={'nigerian flag'}
+                                                    className='rounded-full'
+                                                />
                                             </div>
                                             <input
                                                 type="tel"
                                                 name="phoneNumber"
                                                 value={formData.phoneNumber}
                                                 onChange={handleInputChange}
-                                                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                                className="flex-1 px-4 py-3 outline-none focus:outline-0 focus:border-0"
                                                 placeholder="080 123 456 789"
                                             />
                                         </div>
@@ -286,7 +336,7 @@ const Checkout = () => {
 
                                 {/* Submit Button */}
                                 <button
-                                    onClick={handleSubmit}
+                                    onClick={() => navigate('/market/marketplace/cart/checkout/payment')}
                                     className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                                 >
                                     Proceed to Payment
@@ -296,7 +346,7 @@ const Checkout = () => {
                     </div>
 
                     {/* Right Section - Order Summary */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-1 order-1 lg:order-2">
                         <div className="bg-[#edffed] rounded-2xl p-6 border border-litegreen shadow-2xl sticky top-24">
                             <h3 className="text-lg font-bold text-dark mb-4">
                                 Order Summary ({cart.length} Items)
