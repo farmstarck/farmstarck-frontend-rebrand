@@ -59,9 +59,18 @@ const Checkout = () => {
     const estimatedTotal = subtotal + shippingFee + vat;
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        if (name === 'phoneNumber') {
+            const numericValue = value.replace(/\D/g, '');
+            setFormData({
+                ...formData,
+                [name]: numericValue
+            });
+            return;
+        }
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
     };
 

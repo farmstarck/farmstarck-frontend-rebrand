@@ -8,7 +8,7 @@ import { useNavigate } from "@/hooks/useNavigate";
 
 export interface ProductsGridProps {
     products: productsProps[];
-    url: string
+    url?: string
 }
 
 export const ProductsGrid: React.FC<ProductsGridProps> = ({ products, url }) => {
@@ -74,13 +74,13 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({ products, url }) => 
             {products.map((product) => {
                 const idFound = cart.some(item => item.id === product.id);
                 const isWishlisted = wishlist.some(item => item.id === product.id);
-                
+
 
                 return (
                     <div
-                        className='bg-white satoshi pb-4 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
+                        className='bg-white satoshi pb-4  rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full '>
                         <div
-                            onClick={() => navigate(`${url}/${product.category}/${product.id}`)}
+                            onClick={() => navigate(`${url ? url : '/market/marketplace/product'}/${product.category}/${product.id}`)}
                             className="flex items-start cursor-pointer  flex-col ">
                             {/* Image Container */}
                             <div className='relative w-full h-72 lg:h-40'>

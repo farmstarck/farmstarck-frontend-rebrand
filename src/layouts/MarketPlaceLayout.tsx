@@ -1,3 +1,4 @@
+"use client";
 import MarketHeader from '@/components/common/MarketPlace/MarketHeader'
 import MarketPlaceFooter from '@/components/common/MarketPlace/MarketPlaceFooter'
 import React from 'react'

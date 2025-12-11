@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import BaseLoader from "@/Loaders/BaseLoader";
 import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
+import BuyerDashboardLayout from "@/layouts/BuyerDashboardLayout";
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -39,18 +40,49 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [router]);
 
-  const noLayoutRoutes =
-    ["/signin",
-      "/onboarding/signup",
-      "/onboarding/verify-email",
-      '/password/forgot-password',
-      '/password/reset-password'
-    ];
+  // Routes without any layout
+  const noLayoutRoutes = [
+    "/signin",
+    "/onboarding/signup",
+    "/onboarding/verify-email",
+    "/password/forgot-password",
+    "/password/reset-password",
+  ];
+
+  // Check if current route is a buyer route
+  const isBuyerRoute = router.pathname.startsWith("/auth/buyer");
   const isNoLayout = noLayoutRoutes.includes(router.pathname);
 
-  const getLayout =
-    PageComponent.getLayout ||
-    ((page: React.ReactNode) => <MainLayout>{page}</MainLayout>);
+  // Get the appropriate layout
+  const getLayout = () => {
+    // If page has custom layout, use it
+    if (PageComponent.getLayout) {
+      return PageComponent.getLayout(<PageComponent {...pageProps} />);
+    }
+
+    // If it's a no-layout route, render without layout
+    if (isNoLayout) {
+      return <PageComponent {...pageProps} />;
+    }
+
+    // If it's a buyer route, use BuyerDashboardLayout
+    if (isBuyerRoute) {
+      return (
+        // <div className="">
+          <BuyerDashboardLayout>
+            <PageComponent {...pageProps} />
+          </BuyerDashboardLayout>
+        // </div>
+      );
+    }
+
+    // Default to MainLayout for all other routes
+    return (
+      <MainLayout>
+        <PageComponent {...pageProps} />
+      </MainLayout>
+    );
+  };
 
   return (
     <>
@@ -60,13 +92,10 @@ export default function App({ Component, pageProps }: AppProps) {
         </div>
       )}
 
-      {/* ✅ Your pages and layouts */}
-      {isNoLayout
-        ? <PageComponent {...pageProps} />
-        : getLayout(<PageComponent {...pageProps} />)
-      }
+      {/* Pages with appropriate layouts */}
+      {getLayout()}
 
-      {/* ✅ Global Toast container */}
+      {/* Global Toast container */}
       <Toaster
         position="top-right"
         reverseOrder={false}

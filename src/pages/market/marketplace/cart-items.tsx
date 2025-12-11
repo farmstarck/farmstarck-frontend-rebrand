@@ -88,9 +88,9 @@ const CartItems = () => {
                                 </div>
 
                                 {/* Cart Items */}
-                                <div className="">
+                                <div className="flex flex-col gap-3">
                                     {cart.map((item) => (
-                                        <div key={item.id} className="border-b border-b-gray-200 px-4 md:px-6 py-4">
+                                        <div key={item.id} className="border-b border-b-gray-200  px-4 md:px-6 py-4">
                                             {/* Mobile Layout */}
                                             <div className="md:hidden space-y-4">
                                                 {/* Header Row */}

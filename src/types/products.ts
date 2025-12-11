@@ -23,3 +23,24 @@ export interface FilterGroup {
   groupName: string;
   items: string[];
 }
+
+
+
+export interface OrderItem {
+    productId: number;
+    title: string;
+    quantity: number;
+    price: number;
+    image: string;
+    size: string;
+}
+
+export interface Order {
+    id: string;
+    orderNumber: string;
+    items: OrderItem[];
+    totalAmount: number;
+    status: 'delivered' | 'ready to ship' | 'pending' | 'shipped' | 'cancelled';
+    date: string;
+    location: string;
+}
