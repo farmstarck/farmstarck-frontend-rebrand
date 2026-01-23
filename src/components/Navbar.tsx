@@ -1,8 +1,9 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown, ArrowRight, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useNavigate } from "@/hooks/useNavigate";
 
 type SubMenuItem = {
   img: string;
@@ -143,12 +144,17 @@ const Navbar = () => {
     };
   }, []);
 
+  const { navigate } = useNavigate()
+
+  const gotoMarket = () => {
+    navigate('/market/marketplace')
+  }
+
   return (
     <div className={`md:py-8 ${!isScrolled && "p-0 md:p-5"} bg-[#e4f9e4]`}>
       <nav
-        className={`shadow-md z-50 transition-all duration-300 bg-[var(--dark-primary)] py-5 md:py-1 ${
-          isScrolled ? " fixed top-0 w-full" : "max-w-6xl m-auto md:rounded-lg"
-        }`}
+        className={`shadow-md z-50 transition-all duration-300 bg-[var(--dark-primary)] py-5 md:py-1 ${isScrolled ? " fixed top-0 w-full" : "max-w-6xl m-auto md:rounded-lg"
+          }`}
       >
         <div className="relative max-w-6xl mx-auto px-4 flex justify-between items-center">
           {/* Logo */}
@@ -188,9 +194,8 @@ const Navbar = () => {
                 {/* Submenu: visible when openMenu === idx */}
                 {item.submenu && openMenu === idx && (
                   <div
-                    className={`absolute ${
-                      idx === 0 ? "lg:-left-[365px] w-[1200px]" : "lg:-left-[480px] w-[1100px]"
-                    } right-0 top-12 flex dark-primary-bg px-4 py-10 shadow-lg rounded-lg z-40`}
+                    className={`absolute ${idx === 0 ? "lg:-left-[365px] w-[1200px]" : "lg:-left-[480px] w-[1100px]"
+                      } right-0 top-12 flex dark-primary-bg px-4 py-10 shadow-lg rounded-lg z-40`}
                     onMouseEnter={handleSubmenuEnter}
                     onMouseLeave={handleSubmenuLeave}
                   >
@@ -273,7 +278,13 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div id="menu" className="flex lg:hidden flex-col items-start sm:self">
+          <div id="menu" className="flex  lg:hidden flex-row items-center gap-5 sm:self">
+            <div
+              onClick={gotoMarket}
+              className={`${mobileMenuOpen ? 'hidden' : ''}`}>
+              <ShoppingCart
+                className="text-white cursor-pointer" />
+            </div>
             <div className="w-full flex justify-end">
               <button
                 id="menu-btn"
@@ -308,9 +319,8 @@ const Navbar = () => {
                   )}
                   {item.submenu && (
                     <ChevronDown
-                      className={`transition-transform ${
-                        openAccordion === idx ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform ${openAccordion === idx ? "rotate-180" : ""
+                        }`}
                     />
                   )}
                 </button>

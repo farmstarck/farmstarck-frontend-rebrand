@@ -121,7 +121,7 @@ const PaymentPage = () => {
 
                         {/* Pay Button */}
                         <button
-                            onClick={() => setFailedPayment(true)}
+                            onClick={() =>  setSuccessPayment(true)}
                             className="mt-4 w-full bg-primary text-white py-3 rounded-lg font-semibold text-center">
                             Pay Now
                         </button>
