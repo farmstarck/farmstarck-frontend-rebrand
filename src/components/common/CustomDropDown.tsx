@@ -60,7 +60,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
     <div ref={refDiv} className={`relative w-${width} `}>
       {/* Trigger */}
       <div
-        className={`flex items-center gap-2 max-w-3xl px-3 py-2 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer shadow-sm`}
+        className={`flex items-center gap-2 max-w-3xl px-3 py-2 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer`}
         onClick={() => setOpen((prev) => !prev)}
       >
         {icon && <span className="text-gray-500">{icon}</span>}

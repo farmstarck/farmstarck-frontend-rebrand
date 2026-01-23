@@ -273,9 +273,10 @@ const CartItems = () => {
             </div>
 
             <ConfirmationModal
+                confirm_text='Clear All'
                 isOpen={showClearModal}
                 onConfirm={handleClearAll}
-                type='cart'
+                description='Are you sure you want to clear your cart?'
                 closeModal={() => setShowClearModal(false)}
             />
         </>

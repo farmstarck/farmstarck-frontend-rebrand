@@ -225,8 +225,9 @@ const WishListItems = () => {
             <ConfirmationModal
                 closeModal={() => setShowClearModal(false)}
                 isOpen={showClearModal}
+                confirm_text='Clear All'
                 onConfirm={handleClearAll}
-                type='wishlist'
+                description='Are you sure you want to clear your wishlist?'
             />
         </>
     );

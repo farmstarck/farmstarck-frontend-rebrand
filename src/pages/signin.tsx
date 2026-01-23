@@ -4,8 +4,10 @@ import { AuthInput } from '@/components/common/auth/AuthInput';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check } from 'lucide-react';
+import { useNavigate } from '@/hooks/useNavigate';
 
 const SignIn = () => {
+    const {navigate} = useNavigate()
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -15,6 +17,7 @@ const SignIn = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Sign in:', formData);
+        navigate('/auth/buyer/overview')
     };
 
     const handleGoogleSignIn = () => {

@@ -6,7 +6,7 @@ import { useNavigate } from '@/hooks/useNavigate';
 
 
 
-const NavigateButton = ({ label, href, kyc = false }: { label: string; href: string, kyc?: boolean }) => {
+export const NavigateButton = ({ label, href, kyc = false }: { label: string; href: string, kyc?: boolean }) => {
     const { navigate } = useNavigate();
     return (
 

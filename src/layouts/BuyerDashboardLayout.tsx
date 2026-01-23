@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useCartStore } from '@/store/Client/CartSlice';
 import { ShoppingCartIcon as ShoppingCartSolidIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from '@/hooks/useNavigate';
+import ConfirmationModal from '@/components/common/MarketPlace/ConfirmationModal';
+import ApiLoader from '@/components/common/ui/ApiLoader';
 
 interface BuyerDashboardLayoutProps {
     children: React.ReactNode;
@@ -18,17 +20,19 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
     // Check if cart and wishlist have items
     const hasItemsInCart = cart.length > 0
     const { navigate } = useNavigate()
+    const [logout, setLogout] = useState(false)
+    const [loggingOut, setLoggingOut] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const router = useRouter();
 
     const menuItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Overview', href: '/auth/buyer/overview',more:'#' },
-        { icon: <ShoppingBag size={20} />, label: 'My Orders', href: '/auth/buyer/orders',more:'/orders' },
-        { icon: <Heart size={20} />, label: 'My Wishlist', href: '/market/marketplace/wishlist-items',more:'#' },
-        { icon: <Wallet size={20} />, label: 'My Pocket', href: '/auth/buyer/my-pocket',more:'/wallet' },
-        { icon: <Bell size={20} />, label: 'Notifications', href: '/auth/buyer/notifications',more:'/notifications' },
-        { icon: <Settings size={20} />, label: 'Settings', href: '/auth/buyer/settings' ,more:'/settings'},
-        { icon: <HelpCircle size={20} />, label: 'Help/Support', href: '/auth/buyer/support',more:'/help' },
+        { icon: <LayoutDashboard size={20} />, label: 'Overview', href: '/auth/buyer/overview', more: '#' },
+        { icon: <ShoppingBag size={20} />, label: 'My Orders', href: '/auth/buyer/orders', more: '/orders' },
+        { icon: <Heart size={20} />, label: 'My Wishlist', href: '/market/marketplace/wishlist-items', more: '#' },
+        { icon: <Wallet size={20} />, label: 'My Pocket', href: '/auth/buyer/my-pocket', more: '/wallet' },
+        { icon: <Bell size={20} />, label: 'Notifications', href: '/auth/buyer/notifications', more: '/notifications' },
+        { icon: <Settings size={20} />, label: 'Settings', href: '/auth/buyer/settings', more: '/settings' },
+        { icon: <HelpCircle size={20} />, label: 'Help/Support', href: '/auth/buyer/support', more: '/support' },
     ];
 
     const menuToggle = () => {
@@ -46,8 +50,14 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
         if (isSidebarOpen) {
             setIsSidebarOpen(false);
         }
+        setLogout(false)
+        setLoggingOut(true)
+        setTimeout(() => {
+            router.push('/signin');
+            setLoggingOut(false)
+        }, 3000)
         // Add your logout logic here
-        router.push('/signin');
+
     };
 
     return (
@@ -127,7 +137,7 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
                     {/* Logout Button */}
                     <div className="p-6 border-t border-white/20">
                         <button
-                            onClick={handleLogout}
+                            onClick={() => setLogout(true)}
                             className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[#33d233] rounded-lg transition-colors"
                         >
                             <LogOutIcon size={20} />
@@ -158,12 +168,14 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
                         </button>
 
                         <div className="flex items-center gap-2">
-                            <button 
-                            onClick={()=> navigate('/auth/buyer/notifications')}
-                            className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                            <button
+                                onClick={() => navigate('/auth/buyer/notifications')}
+                                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
                                 <Bell size={16} className="text-primary fill-primary" />
                             </button>
-                            <button className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                            <button
+                                onClick={() => navigate('/auth/buyer/settings/profile')}
+                                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
                                 <User size={16} className="text-primary fill-primary" />
                             </button>
                         </div>
@@ -195,11 +207,15 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
                                     )}
                                 </div>
                             </button>
-                            <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite relative transition-colors">
+                            <button
+                                onClick={() => navigate('/auth/buyer/notifications')}
+                                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite relative transition-colors">
                                 <Bell size={20} className="text-primary fill-primary" />
                                 <p className='absolute w-2 h-2 bg-red-500 top-0 right-1 rounded-full'></p>
                             </button>
-                            <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite transition-colors">
+                            <button
+                                onClick={() => navigate('/auth/buyer/settings/profile')}
+                                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite transition-colors">
                                 <User size={20} className="text-primary fill-primary" />
                             </button>
                         </div>
@@ -213,6 +229,19 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({ children })
                     </div>
                 </main>
             </div>
+
+            <ConfirmationModal
+                closeModal={() => setLogout(false)}
+                title='Are you sure you want to logout'
+                isOpen={logout}
+                onConfirm={handleLogout}
+                deleteIcon={false}
+                confirm_text='Leave Anyway'
+            />
+
+            <ApiLoader
+                loading={loggingOut}
+            />
         </div>
     );
 };

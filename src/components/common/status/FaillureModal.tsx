@@ -6,8 +6,8 @@ import { useNavigate } from "@/hooks/useNavigate";
 type failedProps = {
     onClose: () => void
     isOpen: boolean
-    description: string
-    title: string
+    description?: string
+    title?: string
     payment?: boolean
 }
 const FailureModal = ({ onClose, isOpen, payment = false, title, description }: failedProps) => {

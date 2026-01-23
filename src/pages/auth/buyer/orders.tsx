@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Search, Filter, X, ChevronLeft, ChevronRight, ShoppingBasket } from 'lucide-react';
 import Image from 'next/image';
 import { useNavigate } from '@/hooks/useNavigate';
-import OrderFilter from '@/components/dashboard/buyer/OrderFilter';
 import { getStatusColor, orders } from '@/utils/PageUtils';
+import ReusableFilter from '@/components/dashboard/buyer/ReusableFilter';
 
 
 
@@ -19,7 +19,7 @@ const MyOrders = () => {
     const ordersPerPage = 5;
 
     // Sample orders data based on your products structure
-    
+
 
     const statusOptions = [
         { value: 'delivered', label: 'Delivered', color: 'primary' },
@@ -29,7 +29,7 @@ const MyOrders = () => {
         { value: 'cancelled', label: 'Cancelled', color: 'red' },
     ];
 
-    
+
 
     const handleStatusToggle = (status: string) => {
         setSelectedStatuses(prev =>
@@ -106,20 +106,18 @@ const MyOrders = () => {
                     </div>
                 </div>
 
-                {/* Filter Panel */}
-                {showFilters && (
-                    <OrderFilter
-                        selectedStatuses={selectedStatuses}
-                        setSelectedStatuses={setSelectedStatuses}
-                        dateFrom={dateFrom}
-                        dateTo={dateTo}
-                        setDateFrom={setDateFrom}
-                        setDateTo={setDateTo}
-                        onClear={handleClearFilters}
-                        onClose={() => setShowFilters(false)}
-                        statusOptions={statusOptions}
-                    />
-                )}
+                <ReusableFilter
+                    selectedStatuses={selectedStatuses}
+                    setSelectedStatuses={setSelectedStatuses}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    setDateFrom={setDateFrom}
+                    setDateTo={setDateTo}
+                    isOpen={showFilters}
+                    onClear={handleClearFilters}
+                    onClose={() => setShowFilters(false)}
+                    statusOptions={statusOptions}
+                />
 
                 {/* Orders List or Empty State */}
                 {currentOrders.length === 0 ? (
@@ -151,7 +149,7 @@ const MyOrders = () => {
                             {currentOrders.map((order) => (
                                 <div
                                     key={order.id}
-                                    onClick={()=> navigate(`orders/${order.id}`)}
+                                    onClick={() => navigate(`orders/${order.id}`)}
                                     className="p-4 lg:p-6 cursor-pointer border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
                                 >
                                     <div className="flex flex-col sm:flex-row gap-4">
