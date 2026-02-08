@@ -1,17 +1,18 @@
-import { productsProps } from "@/types/products";
+import { Product } from "@/types/prisma-schema-types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface CartItem extends productsProps {
- cartQuantity: number
+export interface CartItem extends Product {
+  cartQuantity: number;
 }
 
 interface CartState {
   cart: CartItem[];
-  addToCart: (item: productsProps) => void;
-  removeFromCart: (id: number) => void;
+  addToCart: (item: Product) => void;
+  removeFromCart: (id: string) => void;
   clearCart: () => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  hydrateCart: (items: CartItem[]) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -27,9 +28,7 @@ export const useCartStore = create<CartState>()(
         if (exists) {
           return set({
             cart: cart.map((p) =>
-              p.id === item.id
-                ? { ...p, cartQuantity: p.cartQuantity + 1 }
-                : p
+              p.id === item.id ? { ...p, cartQuantity: p.cartQuantity + 1 } : p,
             ),
           });
         }
@@ -43,7 +42,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, cartQuantity) =>
         set((state) => ({
           cart: state.cart.map((item) =>
-            item.id === id ? { ...item, cartQuantity } : item
+            item.id === id ? { ...item, cartQuantity } : item,
           ),
         })),
 
@@ -56,17 +55,20 @@ export const useCartStore = create<CartState>()(
         set(() => ({
           cart: [],
         })),
+      hydrateCart: (items) =>
+        set(() => ({
+          cart: items,
+        })),
     }),
-    { name: "cart-storage" }
-  )
+    { name: "cart-storage" },
+  ),
 );
-
 
 // ======= Wishlist Store =======
 interface WishlistState {
-  wishlist: productsProps[];
-  addToWishlist: (item: productsProps) => void;
-  removeFromWishlist: (id: number) => void;
+  wishlist: Product[];
+  addToWishlist: (item: Product) => void;
+  removeFromWishlist: (id: string) => void;
   clearWishlist: () => void;
 }
 
@@ -91,6 +93,6 @@ export const useWishlistStore = create<WishlistState>()(
           wishlist: [],
         })),
     }),
-    { name: "wishlist-storage" } 
-  )
+    { name: "wishlist-storage" },
+  ),
 );

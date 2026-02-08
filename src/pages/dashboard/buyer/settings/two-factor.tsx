@@ -6,8 +6,8 @@ import OtpVerification from "@/components/common/auth/OtpVerification";
 
 const TwoFactorSettings = () => {
   const router = useRouter();
-  const [verify, setVerify] = useState(false)
-  const [verified, setVerified] = useState(false)
+  const [verify, setVerify] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   const verifyOtp = (code: string) => {
     console.log("Phone OTP verified:", code);
@@ -15,10 +15,10 @@ const TwoFactorSettings = () => {
   };
   const resendOtp = () => {
     console.log("Phone OTP resent");
-  }
+  };
   const handleVerifyPhone = () => {
     // 👉 Trigger your OTP modal here
-    setVerify(true)
+    setVerify(true);
     console.log("Open phone verification modal");
   };
 
@@ -30,13 +30,13 @@ const TwoFactorSettings = () => {
           className="p-2 flex items-center gap-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ChevronLeft size={20} />
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-800">Two Factor Authentication</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
+            Two Factor Authentication
+          </h1>
         </button>
-
       </div>
 
       <div className="bg-white p-4 grid grid-cols-1 md:grid-cols-2 gap-5 w-full rounded-xl shadow-sm space-y-6">
-
         {/* Email Section */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -76,7 +76,6 @@ const TwoFactorSettings = () => {
         </div>
       </div>
 
-
       <OtpVerification
         isOpen={verify}
         onClose={() => setVerify(false)}
@@ -93,8 +92,8 @@ const TwoFactorSettings = () => {
         title="You have successfully verified your phone number"
         onClose={() => setVerified(false)}
         back_cta={true}
-        back_cta_title='Continue'
-        back_cta_url='/auth/buyer/settings'
+        back_cta_title="Continue"
+        back_cta_url="/dashboard/buyer/settings"
       />
     </div>
   );

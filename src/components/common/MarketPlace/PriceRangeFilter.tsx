@@ -1,7 +1,8 @@
+import { Product } from "@/types/prisma-schema-types";
 import React, { useState, useRef, useEffect } from "react";
 
 export interface PriceRangeFilterProps {
-  products: any[];
+  products: Product[];
   onFilter: (min: number, max: number) => void;
 }
 
@@ -9,8 +10,8 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
   products,
   onFilter,
 }) => {
-  const minPrice = Math.min(...products.map((p) => p.amount));
-  const maxPrice = Math.max(...products.map((p) => p.amount));
+  const minPrice = Math.min(...products.map((p) => p.pricePerUnit));
+  const maxPrice = Math.max(...products.map((p) => p.pricePerUnit));
 
   const [min, setMin] = useState(minPrice);
   const [max, setMax] = useState(maxPrice);
@@ -18,6 +19,11 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDraggingMin, setIsDraggingMin] = useState(false);
   const [isDraggingMax, setIsDraggingMax] = useState(false);
+
+  useEffect(() => {
+    setMin(minPrice);
+    setMax(maxPrice);
+  }, [minPrice, maxPrice]);
 
   const handleMinChange = (value: number) => {
     if (value <= max) {
@@ -39,7 +45,10 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
     if (!sliderRef.current) return minPrice;
 
     const rect = sliderRef.current.getBoundingClientRect();
-    const percentage = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const percentage = Math.max(
+      0,
+      Math.min(1, (clientX - rect.left) / rect.width),
+    );
     return Math.round(minPrice + percentage * (maxPrice - minPrice));
   };
 
@@ -59,15 +68,15 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
     };
 
     if (isDraggingMin || isDraggingMax) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "none";
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = '';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
     };
   }, [isDraggingMin, isDraggingMax, min, max]);
 
@@ -106,7 +115,6 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
         </div>
       </div>
 
-     
       {/* Custom Range Slider */}
       <div className="relative mb-6">
         {/* Track Background */}
@@ -161,7 +169,6 @@ export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
       <div className="mt-5 text-sm font-extrabold w-full ">
         Prices: ₦{min.toLocaleString()} - ₦{max.toLocaleString()}
       </div>
-
 
       {/* Apply Button */}
       <button
