@@ -27,6 +27,7 @@ import {
   removeFromWishlistAction,
   addToWishlistAction,
 } from "@/store/actions/wishlist.action";
+import { ProductFilter } from "@/hooks/useProductFilter";
 
 const ProductDetailPage = () => {
   const { cart } = useCartStore();
@@ -64,10 +65,13 @@ const ProductDetailPage = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
 
-    ProductService.getRelatedProducts(productId as string, {
-      page: 1,
-      limit: 5,
-    })
+    ProductService.getRelatedProducts(
+      productId as string,
+      {
+        page: 1,
+        size: 5,
+      } as ProductFilter,
+    )
       .then((res) => setRelatedProducts(res.data.data))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -169,7 +173,7 @@ const ProductDetailPage = () => {
                 Product Not Found
               </h2>
               <p className="text-gray-600 mb-6">
-                Sorry, we couldn't find the product you're looking for. It may
+                Sorry, we could not find the product you are looking for. It may
                 have been removed or the ID is incorrect.
               </p>
               <button
@@ -397,7 +401,9 @@ const ProductDetailPage = () => {
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <p className="text-gray-700 mb-1">"{review.comment}"</p>
+                    <p className="text-gray-700 mb-1">
+                      &quot;{review.comment}&quot;
+                    </p>
                     <div className="flex items-center gap-3">
                       <span className="font-semibold text-sm capitalize">
                         {review.author}

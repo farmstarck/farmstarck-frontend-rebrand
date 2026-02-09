@@ -1,3 +1,5 @@
+import { CategoryGroup } from "@/components/common/MarketPlace/CategoryFilter";
+
 export enum SignUpType {
   email = "email",
   google = "google",
@@ -264,7 +266,7 @@ export interface WalletTransaction {
   amount: number;
   type: TransactionType;
   reference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -279,7 +281,7 @@ export interface Category {
 
   subCategory?: SubCategory[];
   products?: Product[];
-  filters?: any[];
+  filters?: CategoryGroup[];
 }
 
 export interface SubCategory {
@@ -327,7 +329,7 @@ export interface Product {
   location: string;
 
   expiryDate?: string;
-  specifications?: Record<string, any>;
+  specifications?: Record<string, unknown>;
 
   ratingSum: number;
   popularity: number;
@@ -352,7 +354,7 @@ export interface Order {
   paymentMethod?: PaymentMethod;
   shippingMethod: ShippingMethod;
   addressId?: string;
-  trackingInfo?: Record<string, any>;
+  trackingInfo?: Record<string, unknown>;
 
   createdAt: string;
   updatedAt: string;

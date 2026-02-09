@@ -1,3 +1,4 @@
+import { ProductFilter } from "@/hooks/useProductFilter";
 import api from "@/lib/axios-client";
 import { buildProductFilterQuery } from "@/utils/buildProductFilterQuery";
 
@@ -34,7 +35,10 @@ const Services = {
     return response.data;
   },
 
-  getProductsByCategoryId: async (categoryId: string, filters: any) => {
+  getProductsByCategoryId: async (
+    categoryId: string,
+    filters: ProductFilter,
+  ) => {
     const params = buildProductFilterQuery(filters);
     const response = await api.get(`/api/category/products/${categoryId}`, {
       params,

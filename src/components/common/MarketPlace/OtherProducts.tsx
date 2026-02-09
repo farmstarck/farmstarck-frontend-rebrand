@@ -27,6 +27,7 @@ import {
   addToWishlistAction,
   removeFromWishlistAction,
 } from "@/store/actions/wishlist.action";
+import { ProductFilter } from "@/hooks/useProductFilter";
 
 const Features = [
   {
@@ -113,10 +114,9 @@ const ProductCard = ({ product }: { product: Product }) => {
       >
         {/* Image Container */}
         <div className="relative w-full h-72 lg:h-40">
-          <Image
+          <img
             src={product.imageUrl}
             alt={product.name}
-            fill
             className="object-contain pt-2"
           />
         </div>
@@ -198,19 +198,19 @@ const OtherProducts = () => {
 
   // Fetch products
   useEffect(() => {
-    ProductService.getAllProducts({ size: 10 })
+    ProductService.getAllProducts({ size: 10 } as ProductFilter)
       .then((res) => setProducts(res.data.data))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    ProductService.getMostViewedProducts({ size: 10 })
+    ProductService.getMostViewedProducts({ size: 10 } as ProductFilter)
       .then((res) => setMostViewedProducts(res.data.data))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    ProductService.getBestSellingProducts({ size: 5 })
+    ProductService.getBestSellingProducts({ size: 5 } as ProductFilter)
       .then((res) => setBestSellingProducts(res.data.data))
       .catch(console.error);
   }, []);
@@ -260,10 +260,10 @@ const OtherProducts = () => {
 
         <div className="w-full mt-10 bg-primary p-4  rounded-lg flex items-start lg:items-center gap-5 flex-col lg:flex-row">
           <div className="w-full h-72 lg:h-96 lg:w-1/2 relative">
-            <Image
+            <img
               src="/assets/images/marketplaces/foodVeges.png"
               alt="food image"
-              fill
+              className="object-contain"
             />
           </div>
           <div className="w-full lg:w-1/2 max-w-md flex items-start flex-col gap-5">

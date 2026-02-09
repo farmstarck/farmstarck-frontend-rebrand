@@ -21,7 +21,7 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ setIsModalOpen }) => {
   const [industry, setIndustry] = useState("");
   const [message, setMessage] = useState("");
 
-  const handlePhoneNumberChange = (newValue: any) => {
+  const handlePhoneNumberChange = (newValue: string) => {
     setValue(newValue);
     setPhoneError(false);
     if (newValue === undefined || newValue === null) {
@@ -116,8 +116,9 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ setIsModalOpen }) => {
                 className="w-full h-12  p-3 pl-10 relative  border rounded-md  bg-white font-light text-sm focus:outline-none placeholder-gray-500"
               />
               <Image
-               width={20} height={20}
-                src={'/assets/svg/mail-icon.svg'}
+                width={20}
+                height={20}
+                src={"/assets/svg/mail-icon.svg"}
                 alt=""
                 className="absolute top-4 left-3 w-3"
               />
@@ -133,7 +134,7 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ setIsModalOpen }) => {
               initialValueFormat="national"
               placeholder="Enter phone number"
               value={value}
-              onChange={handlePhoneNumberChange}
+              onChange={(value) => handlePhoneNumberChange(value as string)}
               className="w-full h-12  p-3 relative  border rounded-md  bg-white font-light text-sm focus:outline-none placeholder-gray-500"
               limitMaxLength
             />
@@ -164,8 +165,9 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ setIsModalOpen }) => {
                 className="w-full h-12  p-3 pl-10 relative  border rounded-md  bg-white font-light text-sm focus:outline-none placeholder-gray-500"
               />
               <Image
-               width={20} height={20}
-                src={'/assets/svg/mail-icon.svg'}
+                width={20}
+                height={20}
+                src={"/assets/svg/mail-icon.svg"}
                 alt=""
                 className="absolute top-4 left-3 w-3"
               />

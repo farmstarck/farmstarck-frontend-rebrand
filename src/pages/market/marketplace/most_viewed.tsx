@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import { ProductFilterLayout } from "@/components/common/MarketPlace/ProductFilterLayout";
-import { AllProducts } from "@/data/ProductsData";
+
 import { useProductFilters } from "@/hooks/useProductFilter";
 import { Product, SubCategory } from "@/types/prisma-schema-types";
 import ProductService from "@/services/product.service";
@@ -13,13 +13,19 @@ const MostViewedProductsPage = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[] | null>(
     null,
   );
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { filters, actions } = useProductFilters();
 
   // Fetch products
   useEffect(() => {
     ProductService.getMostViewedProducts(filters)
-      .then((res) => setProducts(res.data.data))
+      .then((res) => {
+        setProducts(res.data.data);
+        setTotalPages(res.data.pagination.totalPages);
+        setCurrentPage(res.data.pagination.currentPage);
+      })
       .catch(console.error);
   }, [filters]);
 
@@ -58,6 +64,8 @@ const MostViewedProductsPage = () => {
       actions={actions}
       hasActiveFilters={hasActiveFilters}
       totalActiveFilters={totalActiveFilters}
+      totalPages={totalPages}
+      currentPage={currentPage}
       showPagination={true}
     >
       {/* Optional: Add custom content for this page */}

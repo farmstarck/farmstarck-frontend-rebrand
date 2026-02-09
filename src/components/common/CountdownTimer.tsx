@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 
 type CountdownTimerProps = {
@@ -16,7 +16,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const [seconds, setSeconds] = useState(initialSeconds);
 
   useEffect(() => {
-    let countdownInterval = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       if (seconds > 0) {
         setSeconds(seconds - 1);
       } else {

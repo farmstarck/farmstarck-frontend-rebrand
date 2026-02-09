@@ -88,10 +88,9 @@ const AllProductsPage = () => {
               />
             </div>
             <div className="w-full lg:w-1/2 lg:h-96 h-72 relative">
-              <Image
+              <img
                 src="/assets/images/marketplaces/vegetables.png"
                 alt="veges image"
-                fill
                 className="object-contain"
               />
             </div>

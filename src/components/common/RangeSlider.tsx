@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import { Dispatch, SetStateAction } from "react";
 import { Range } from "react-range";
 
 type RangeSliderProps = {
   setByPrice: Dispatch<SetStateAction<string>>;
-  setValues: Dispatch<SetStateAction<any>>;
-  values: any;
+  setValues: Dispatch<SetStateAction<number[]>>;
+  values: number[];
 };
 
 const RangeSlider: React.FC<RangeSliderProps> = ({

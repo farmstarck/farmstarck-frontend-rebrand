@@ -1,33 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import CategoryService from "@/services/category.service";
 import { Category } from "@/types/prisma-schema-types";
-
-const categories = [
-  {
-    img: "/assets/images/marketplaces/food.png",
-    title: "Food",
-    slug: "foods",
-  },
-  {
-    img: "/assets/images/marketplaces/feeds.png",
-    title: "Animal Feed & Supplement",
-    slug: "animal-feeds",
-  },
-  {
-    img: "/assets/images/marketplaces/oil.png",
-    title: "Agro Chemicals",
-    slug: "agro-chemicals",
-  },
-  {
-    img: "/assets/images/marketplaces/tracktor.png",
-    title: "Machinery & Equipment",
-    slug: "machinery-and-equipments",
-  },
-];
 
 const ShopByCategory = () => {
   const [selectedCategory, setSelectedCategory] =

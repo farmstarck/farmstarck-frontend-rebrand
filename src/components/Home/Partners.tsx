@@ -1,11 +1,13 @@
-"use client"
+"use client";
+
+import Image from "next/image";
 
 const stats = [
-  { id: 1, value:'/assets/svg/wavetify.svg' },
-  { id: 2, value: '/assets/svg/arolana.svg' },
-  { id: 3, value: '/assets/svg/ibrand.svg' },
-  { id: 4, value: '/assets/svg/fuge.svg' },
-  { id: 5, value: '/assets/svg/koinwa.svg' },
+  { id: 1, value: "/assets/svg/wavetify.svg" },
+  { id: 2, value: "/assets/svg/arolana.svg" },
+  { id: 3, value: "/assets/svg/ibrand.svg" },
+  { id: 4, value: "/assets/svg/fuge.svg" },
+  { id: 5, value: "/assets/svg/koinwa.svg" },
 ];
 
 const Partners = () => {
@@ -19,7 +21,7 @@ const Partners = () => {
               key={stat.id}
               className="flex-shrink-0 snap-center mx-auto flex max-w-xs flex-col gap-y-4 justify-center"
             >
-              <img
+              <Image
                 src={stat.value}
                 alt=""
                 className="w-16 md:w-20"

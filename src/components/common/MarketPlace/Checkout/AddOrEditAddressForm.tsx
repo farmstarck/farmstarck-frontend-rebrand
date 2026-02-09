@@ -25,7 +25,6 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
   item,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [addressId, setAddressId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const [saveAddress, setSaveAddress] = useState(false);
@@ -167,7 +166,6 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
         email: item.email ?? "",
       });
       setIsEdit(true);
-      setAddressId(item.id);
     }
   }, [item]);
 
@@ -334,7 +332,7 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
           disabled={isDisabled}
           className={`w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98] ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          Add Address
+          {loading ? "Loading..." : isEdit ? "Update Address" : "Add Address"}
         </button>
       </div>
     </div>

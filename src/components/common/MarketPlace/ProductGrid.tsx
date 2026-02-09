@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { productsProps } from "@/types/products";
+import React from "react";
 import { Heart, ShoppingCart, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useCartStore, useWishlistStore } from "@/store/slices/cart.slice";
@@ -75,7 +74,7 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
           No Products Found
         </h3>
         <p className="text-gray-500 text-center max-w-md">
-          We couldn't find any products matching your filters. Try adjusting
+          We could not find any products matching your filters. Try adjusting
           your search criteria or browse all products.
         </p>
       </div>

@@ -21,8 +21,8 @@ const Ready = () => {
           </h2>
           <div className="flex flex-col gap-5 md:gap-12 w-full md:w-2/3">
             <p className="text-center text-xs md:text-sm text-white md:text-start">
-              If you're interested in partnering with Farmstark to drive change
-              in agriculture, contact us today. Together, we can make a
+              If you are interested in partnering with Farmstarck to drive
+              change in agriculture, contact us today. Together, we can make a
               difference.
             </p>
 
