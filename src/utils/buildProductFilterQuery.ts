@@ -1,5 +1,7 @@
-export function buildProductFilterQuery(filters: any) {
-  const query: Record<string, any> = {};
+import { ProductFilter } from "@/hooks/useProductFilter";
+
+export function buildProductFilterQuery(filters: ProductFilter) {
+  const query: Record<string, unknown> = {};
 
   // subcategory
   if (filters.subcategoryId) {

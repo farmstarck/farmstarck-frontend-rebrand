@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import Navigation from "@/components/common/MarketPlace/Navigation";
-import { Trash2, Heart, X, Trash2Icon, LucideTrash2 } from "lucide-react";
+import { Trash2Icon, LucideTrash2 } from "lucide-react";
 import { useWishlistStore } from "@/store/slices/cart.slice";
-import { useCartStore } from "@/store/slices/cart.slice";
 import Link from "next/link";
-import CustomButton from "@/components/common/CustomButton";
 import { SuccessMessage } from "@/utils/PageUtils";
 import Image from "next/image";
 import ConfirmationModal from "@/components/common/MarketPlace/ConfirmationModal";
@@ -18,7 +16,6 @@ import { Product } from "@/types/prisma-schema-types";
 
 const WishListItems = () => {
   const { wishlist } = useWishlistStore();
-  const { cart } = useCartStore();
   const [showClearModal, setShowClearModal] = useState(false);
 
   const handleAddToCart = (item: Product) => {

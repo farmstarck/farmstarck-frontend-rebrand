@@ -204,10 +204,9 @@ const DynamicCategories = () => {
             {products?.length === 0 ? (
               <div className="w-full text-center flex flex-col items-center">
                 <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
-                  <Image
+                  <img
                     src="/assets/images/marketplaces/notfound.png"
                     alt="not found"
-                    fill
                     className="object-contain"
                   />
                 </div>

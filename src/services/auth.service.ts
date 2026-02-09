@@ -1,4 +1,4 @@
-import api, { renderAxiosOrAuthError } from "@/lib/axios-client";
+import api from "@/lib/axios-client";
 
 type SignUpProps = {
   email: string;

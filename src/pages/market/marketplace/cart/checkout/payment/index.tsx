@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/slices/auth.slice";
 import { PaymentMethod, ShippingMethod } from "@/types/prisma-schema-types";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { ErrorMessage } from "@/utils/PageUtils";
+import Image from "next/image";
 
 const paymentMethods = [
   {
@@ -130,7 +131,7 @@ const PaymentPage = () => {
                 >
                   {/* Left */}
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={method.img}
                       alt={method.title}
                       width={40}

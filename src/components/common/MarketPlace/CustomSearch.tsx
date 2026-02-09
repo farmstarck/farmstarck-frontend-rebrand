@@ -2,7 +2,6 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { SearchIcon } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import ProductService from "@/services/product.service";
 import { useNavigate } from "@/hooks/useNavigate";
 
@@ -18,7 +17,7 @@ interface SearchProduct {
 
 const CustomSearch = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [modal, setModal] = useState(false);
+  const [_, setModal] = useState(false);
   const [results, setResults] = useState<SearchProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -140,10 +139,9 @@ const CustomSearch = () => {
             <div className="w-full text-center flex flex-col items-center ">
               {/* Replace src below with your PNG */}
               <div className="w-32 h-32 relative">
-                <Image
+                <img
                   src="/assets/images/marketplaces/notfound.png"
                   alt="not found"
-                  fill
                   className="object-contain "
                 />
               </div>

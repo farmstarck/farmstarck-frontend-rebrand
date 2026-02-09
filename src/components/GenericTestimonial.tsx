@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -57,7 +57,7 @@ const Testimonial = () => {
                   {/* Left side - Text */}
                   <div className="flex-1 flex flex-col gap-4 md:gap-10 items-center md:items-start">
                     <p className="text-lg text-gray-700 leading-relaxed text-center md:text-start">
-                      "{testimonial[current].text}"
+                      &quot;{testimonial[current].text}&quot;
                     </p>
                     <span className="font-bold primary-txt text-lg text-center md:text-start">
                       - {testimonial[current].author}
@@ -88,7 +88,7 @@ const Testimonial = () => {
                   <div className="flex-shrink-0">
                     <iframe
                       width="100%"
-                        // height="400"
+                      // height="400"
                       className="w-full md:w-96 h-80 object-cover rounded-2xl border-4"
                       src={testimonial[current].videoUrl}
                       title="YouTube video player"

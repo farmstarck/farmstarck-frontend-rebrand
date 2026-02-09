@@ -1,4 +1,4 @@
-"use client"
+"use client";
 type Style = {
   white: string;
   green: string;
@@ -7,7 +7,8 @@ type Style = {
 interface CustomButtonProps {
   color: keyof Style; // Restrict color to valid keys of Style
   text: string; // Text to be displayed on the button
-  [key: string]: any; // Allow additional props
+  onClick?: () => void;
+  // [key: string]: any; // Allow additional props
 }
 
 export const CustomButton: React.FC<CustomButtonProps> = ({

@@ -1,11 +1,9 @@
 // pages/verify-email.tsx
 import React, { useState, useRef, useEffect } from "react";
-import { X, Mail } from "lucide-react";
 import { useRouter } from "next/router";
 import { useNavigate } from "@/hooks/useNavigate";
 import Image from "next/image";
 import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
-import SuccessModal from "@/components/common/status/SuccessModal";
 import AuthService from "@/services/auth.service";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import ButtonSpinner from "@/components/common/ButtonSpinner";
@@ -15,7 +13,6 @@ import ApiLoader from "@/components/common/ui/ApiLoader";
 const OTP_DURATION = 5 * 60;
 
 const VerifyEmail = () => {
-  const router = useRouter();
   const { navigate } = useNavigate();
   const pendingEmail = useAuthStore((state) => state.unVerifiedEmail);
   const finishEmailVerification = useAuthStore(
@@ -24,7 +21,6 @@ const VerifyEmail = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(OTP_DURATION);
   const [isExpired, setIsExpired] = useState(false);
-  const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [email, setEmail] = useState<string>("");
@@ -224,8 +220,8 @@ const VerifyEmail = () => {
 
         {/* Resend Link */}
         <div className="mt-6 text-center text-sm text-dark">
-          Didn't receive the OTP code ? Please check your spam folder or try to
-          resend the OTP code{" "}
+          Didn&apos;t receive the OTP code ? Please check your spam folder or
+          try to resend the OTP code{" "}
           <button
             onClick={handleResend}
             className="text-primary hover:underline font-semibold underline"

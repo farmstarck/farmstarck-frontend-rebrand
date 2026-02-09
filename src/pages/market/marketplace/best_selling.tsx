@@ -13,13 +13,19 @@ const BestSellingProductsPage = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[] | null>(
     null,
   );
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { filters, actions } = useProductFilters();
 
   // Fetch products
   useEffect(() => {
     ProductService.getBestSellingProducts(filters)
-      .then((res) => setProducts(res.data.data))
+      .then((res) => {
+        setProducts(res.data.data);
+        setTotalPages(res.data.pagination.totalPages);
+        setCurrentPage(res.data.pagination.currentPage);
+      })
       .catch(console.error);
   }, [filters]);
 
@@ -58,6 +64,8 @@ const BestSellingProductsPage = () => {
       actions={actions}
       hasActiveFilters={hasActiveFilters}
       totalActiveFilters={totalActiveFilters}
+      totalPages={totalPages}
+      currentPage={currentPage}
       showPagination={true}
     />
   );

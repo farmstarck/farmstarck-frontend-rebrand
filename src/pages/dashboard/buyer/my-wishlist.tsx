@@ -4,7 +4,7 @@ import {
   clearWishlistAction,
   removeFromWishlistAction,
 } from "@/store/actions/wishlist.action";
-import { useCartStore, useWishlistStore } from "@/store/slices/cart.slice";
+import { useWishlistStore } from "@/store/slices/cart.slice";
 import { Product } from "@/types/prisma-schema-types";
 import { SuccessMessage } from "@/utils/PageUtils";
 import { LucideTrash2, Trash2Icon } from "lucide-react";

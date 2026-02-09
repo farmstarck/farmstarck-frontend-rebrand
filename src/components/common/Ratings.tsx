@@ -1,5 +1,6 @@
-"use client"
-import Rating from "react-rating";
+"use client";
+import Rating, { RatingComponentProps } from "react-rating";
+import { ComponentType } from "react";
 
 type RatingsProps = {
   initialRating: number;
@@ -7,7 +8,7 @@ type RatingsProps = {
 };
 
 const Ratings: React.FC<RatingsProps> = ({ initialRating, readonly }) => {
-  const RatingComponent = Rating as any;
+  const RatingComponent = Rating as ComponentType<RatingComponentProps>;
   return (
     <RatingComponent
       initialRating={initialRating}

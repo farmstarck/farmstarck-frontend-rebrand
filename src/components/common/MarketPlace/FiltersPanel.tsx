@@ -1,17 +1,21 @@
 import { PriceRangeFilter } from "@/components/common/MarketPlace/PriceRangeFilter";
 import { LocationFilter } from "@/components/common/MarketPlace/LocationFilter";
-import { IndependentFilter } from "@/components/common/MarketPlace/Categories/IndependentFilter";
+import {
+  CategoryGroup,
+  IndependentFilter,
+} from "@/components/common/MarketPlace/Categories/IndependentFilter";
+import { Product } from "@/types/prisma-schema-types";
 
 interface FiltersPanelProps {
-  products: any[];
+  products: Product[];
   locations: string[];
-  additionalFilters: any[];
+  additionalFilters: CategoryGroup[];
 
-  selectedLocations: string[];
-  setSelectedLocations: (v: string[]) => void;
+  selectedLocations?: string[];
+  setSelectedLocations?: (v: string[]) => void;
 
-  selectedFilters: string[];
-  setSelectedFilters: (v: string[]) => void;
+  selectedFilters?: string[];
+  setSelectedFilters?: (v: string[]) => void;
 
   onPriceChange: (min: number, max: number) => void;
 
@@ -67,8 +71,8 @@ export const FiltersPanel = ({
       {locations.length > 0 && (
         <LocationFilter
           locations={locations}
-          selected={selectedLocations}
-          setSelected={setSelectedLocations}
+          selected={selectedLocations || []}
+          setSelected={setSelectedLocations || (() => {})}
         />
       )}
 
@@ -76,8 +80,8 @@ export const FiltersPanel = ({
       {additionalFilters.length > 0 && (
         <IndependentFilter
           categoryGroups={additionalFilters}
-          selected={selectedFilters}
-          setSelected={setSelectedFilters}
+          selected={selectedFilters || []}
+          setSelected={setSelectedFilters || (() => {})}
         />
       )}
     </div>

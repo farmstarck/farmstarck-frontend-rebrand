@@ -1,9 +1,29 @@
 import { useState } from "react";
 
+export interface ProductFilter {
+  subcategoryId: string | undefined;
+  sortBy: string | undefined;
+  priceRange: { min: number; max: number } | undefined;
+  locations: string[];
+  attributes: string[];
+  page: number;
+  size: number;
+}
+
+export interface ProductFilterActions {
+  setSubCategoryId: (id?: string) => void;
+  setSortBy: (sort: string) => void;
+  setPriceRange: (min: number, max: number) => void;
+  setLocations: (locations: string[]) => void;
+  setAttributes: (attributes: string[]) => void;
+  setPage: (page: number) => void;
+  clearAll: () => void;
+}
+
 export const useProductFilters = () => {
-  const [filters, setFilters] = useState({
-    subcategoryId: undefined as string | undefined,
-    sortBy: undefined as string | undefined,
+  const [filters, setFilters] = useState<ProductFilter>({
+    subcategoryId: undefined,
+    sortBy: undefined,
     priceRange: undefined as { min: number; max: number } | undefined,
     locations: [] as string[],
     attributes: [] as string[],

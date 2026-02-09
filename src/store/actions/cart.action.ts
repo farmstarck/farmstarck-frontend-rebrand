@@ -2,6 +2,11 @@ import CartService from "@/services/cart.service";
 import { Product } from "@/types/prisma-schema-types";
 import { CartItem, useCartStore } from "@/store/slices/cart.slice";
 import { useAuthStore } from "@/store/slices/auth.slice";
+import { CartItem as CartItemType } from "@/types/prisma-schema-types";
+
+interface NewCartItem extends CartItemType {
+  cartQuantity: number;
+}
 
 /* ================= ADD TO CART ================= */
 export const addToCartAction = async (item: Product) => {
@@ -90,10 +95,13 @@ export const hydrateCartOnLoginAction = async () => {
   });
 
   // Merge remote
-  remoteCart?.cartItem?.forEach((item: any) => {
+  remoteCart?.cartItem?.forEach((item: CartItemType) => {
     const existing = merged.get(item?.product?.id);
-    if (!existing || item.cartQuantity > existing.cartQuantity) {
-      merged.set(item?.product?.id, item);
+    if (!existing || item.quantity > existing.cartQuantity) {
+      merged.set(item.product.id, {
+        ...item.product,
+        cartQuantity: item.quantity,
+      });
     }
   });
 

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { ProductsTopBar } from "@/components/common/MarketPlace/ProductsTopBar";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
 import { NavigationButtons } from "@/components/common/Navigation/NavigationButton";
@@ -8,11 +8,7 @@ import CategoriesImageFilters from "./Categories/CategoriesImageFilters";
 import { Product, SubCategory } from "@/types/prisma-schema-types";
 import { CategoryHeader } from "./Categories/CategoryHeader";
 import { FiltersPanel } from "./FiltersPanel";
-
-interface Route {
-  name: string;
-  href: string;
-}
+import { ProductFilter, ProductFilterActions } from "@/hooks/useProductFilter";
 
 export interface FilterGroup {
   groupName: string;
@@ -25,8 +21,8 @@ interface ProductFilterLayoutProps {
   products: Product[];
   subCategories?: SubCategory[];
   locations: string[];
-  filters?: any;
-  actions?: any;
+  filters?: ProductFilter;
+  actions?: ProductFilterActions;
   children?: React.ReactNode;
   hasActiveFilters: boolean;
   totalActiveFilters: number;
@@ -82,12 +78,12 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
   const closeFilter = () => setIsFilterOpen(false);
 
-  const additionalFilters: any = useMemo(() => {
-    if (!filters.subcategoryId) return generalFilters;
+  const additionalFilters: FilterGroup[] = useMemo(() => {
+    if (!filters?.subcategoryId) return generalFilters;
     const sub = subCategories?.find((s) => s.id === filters.subcategoryId);
 
     return sub?.category?.filters ?? generalFilters;
-  }, [filters.subcategoryId, subCategories]);
+  }, [filters?.subcategoryId, subCategories]);
 
   return (
     <div className="w-full py-5 relative bg-lite min-h-screen">
@@ -101,15 +97,15 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
         {/* Category Image Filters */}
         <CategoriesImageFilters
           subCategories={subCategories ?? []}
-          selectedSlug={filters.subcategoryId}
-          onSelect={actions.setSubCategoryId}
+          selectedSlug={filters?.subcategoryId}
+          onSelect={actions?.setSubCategoryId as (id?: string) => void}
         />
 
         {/* Top Bar with Sort & Count */}
         <ProductsTopBar
           total={products?.length ?? 0}
-          sort={filters.sortBy ?? ""}
-          setSort={actions.setSortBy}
+          sort={filters?.sortBy ?? ""}
+          setSort={actions?.setSortBy as (sort: string) => void}
         />
 
         {/* Mobile Filter Button */}
@@ -177,13 +173,19 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               products={products ?? []}
               locations={locations}
               additionalFilters={additionalFilters}
-              selectedLocations={filters.locations}
-              setSelectedLocations={actions.setLocations}
-              selectedFilters={filters.attributes}
-              setSelectedFilters={actions.setAttributes}
-              onPriceChange={actions.setPriceRange}
+              selectedLocations={filters?.locations}
+              setSelectedLocations={
+                actions?.setLocations as (locations: string[]) => void
+              }
+              selectedFilters={filters?.attributes}
+              setSelectedFilters={
+                actions?.setAttributes as (attributes: string[]) => void
+              }
+              onPriceChange={
+                actions?.setPriceRange as (min: number, max: number) => void
+              }
               hasActiveFilters={hasActiveFilters}
-              onClearAll={actions.clearAll}
+              onClearAll={actions?.clearAll as () => void}
             />
           </div>
 
@@ -205,13 +207,19 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               products={products ?? []}
               locations={locations}
               additionalFilters={additionalFilters}
-              selectedLocations={filters.locations}
-              setSelectedLocations={actions.setLocations}
-              selectedFilters={filters.attributes}
-              setSelectedFilters={actions.setAttributes}
-              onPriceChange={actions.setPriceRange}
+              selectedLocations={filters?.locations}
+              setSelectedLocations={
+                actions?.setLocations as (locations: string[]) => void
+              }
+              selectedFilters={filters?.attributes}
+              setSelectedFilters={
+                actions?.setAttributes as (attributes: string[]) => void
+              }
+              onPriceChange={
+                actions?.setPriceRange as (min: number, max: number) => void
+              }
               hasActiveFilters={hasActiveFilters}
-              onClearAll={actions.clearAll}
+              onClearAll={actions?.clearAll as () => void}
             />
           </div>
 
@@ -220,10 +228,9 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
             {products?.length === 0 ? (
               <div className="w-full text-center flex flex-col items-center">
                 <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
-                  <Image
+                  <img
                     src="/assets/images/marketplaces/notfound.png"
                     alt="not found"
-                    fill
                     className="object-contain"
                   />
                 </div>
@@ -242,8 +249,8 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
         {showPagination && (
           <div className="my-5 w-full flex items-center justify-between">
             <NavigationButtons
-              onPrevious={() => actions.setPage(currentPage - 1)}
-              onNext={() => actions.setPage(currentPage + 1)}
+              onPrevious={() => actions?.setPage(currentPage - 1)}
+              onNext={() => actions?.setPage(currentPage + 1)}
               previousDisabled={currentPage === 1}
               nextDisabled={currentPage === totalPages}
               currentPage={currentPage}

@@ -1,5 +1,5 @@
 import WishlistService from "@/services/wishlist.service";
-import { Product } from "@/types/prisma-schema-types";
+import { Product, WishlistItem } from "@/types/prisma-schema-types";
 import { useWishlistStore } from "@/store/slices/cart.slice";
 import { useAuthStore } from "../slices/auth.slice";
 
@@ -65,15 +65,24 @@ export const hydrateWishlistOnLoginAction = async () => {
 
   const merged = new Map<string, Product>();
 
-  wishlist.forEach((p: Product) => merged.set(p.id, p));
-  remoteWishlist?.wishlistItem?.forEach((p: any) =>
-    merged.set(p.product.id, p.product),
-  );
+  // Local wishlist first
+  wishlist.forEach((product) => {
+    merged.set(product.id, product);
+  });
 
+  // Merge backend wishlist
+  remoteWishlist?.wishlistItem?.forEach((item: WishlistItem) => {
+    if (item.product) {
+      merged.set(item.product.id, item.product);
+    }
+  });
+
+  // Replace store in one go
   clearWishlist();
-  Array.from(merged.values()).forEach(addToWishlist);
+  merged.forEach((product) => addToWishlist(product));
 
+  // Sync merged wishlist back to backend
   await WishlistService.bulkSync(
-    Array.from(merged.keys()).map((id) => ({ productId: id })),
+    Array.from(merged.keys()).map((productId) => ({ productId })),
   );
 };

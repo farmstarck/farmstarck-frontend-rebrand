@@ -1,12 +1,12 @@
 type ContainerProps = {
-  tag: String;
-  headerOne: String;
-  textOne: String;
-  headerTwo: String;
-  textTwo: String;
-  headerThree: String;
-  textThree: String;
-  subHeaderThree: String;
+  tag: string;
+  headerOne: string;
+  textOne: string;
+  headerTwo: string;
+  textTwo: string;
+  headerThree: string;
+  textThree: string;
+  subHeaderThree: string;
 };
 
 const Container: React.FC<ContainerProps> = ({
