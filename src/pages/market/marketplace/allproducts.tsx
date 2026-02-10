@@ -30,7 +30,7 @@ const AllProductsPage = () => {
       .catch(console.error);
   }, [filters]);
 
-  // Fetch subcategories
+  // Fetch subcategorie
   useEffect(() => {
     CategoryService.getAllSubCategories()
       .then((res) => setSubCategories(res.data.data))
