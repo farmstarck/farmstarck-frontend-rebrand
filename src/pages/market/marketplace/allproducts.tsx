@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import { ProductFilterLayout } from "@/components/common/MarketPlace/ProductFilterLayout";
 import Button from "@/ui/Button";
-import Image from "next/image";
 import ProductService from "@/services/product.service";
 import CategoryService from "@/services/category.service";
 import { Product, SubCategory } from "@/types/prisma-schema-types";
@@ -30,7 +29,7 @@ const AllProductsPage = () => {
       .catch(console.error);
   }, [filters]);
 
-  // Fetch subcategorie
+  // Fetch subcategories
   useEffect(() => {
     CategoryService.getAllSubCategories()
       .then((res) => setSubCategories(res.data.data))
