@@ -299,7 +299,7 @@ const Checkout = () => {
                       <div className="font-bold text-dark">
                         ₦{item.pricePerUnit.toLocaleString()}
                       </div>
-                      {item.discountPerUnit && (
+                      {item.discountPerUnit && item.discountPerUnit > 0 && (
                         <div className="text-xs text-gray-400 line-through">
                           ₦{item.discountPerUnit.toLocaleString()}
                         </div>
