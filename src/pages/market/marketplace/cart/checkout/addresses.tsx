@@ -19,7 +19,7 @@ const Addresses = () => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [reload, setReload] = useState<string>("");
+  const [reload, setReload] = useState<number>(0);
 
   // Handle closing modal
   const handleModalClose = () => {
@@ -39,6 +39,10 @@ const Addresses = () => {
   // Fetch User Addresses
 
   useEffect(() => {
+    console.log("::::::::::RELOAD CHECKER", addresses);
+  }, [reload]);
+
+  useEffect(() => {
     AddressService.getUserAddresses()
       .then((res) => setAddresses(res.data))
       .catch(console.error);
@@ -53,11 +57,16 @@ const Addresses = () => {
     }
   }, [addresses]);
 
+  useEffect(() => {
+    if (!selectedAddress) return;
+    setUserSelectedAddress(selectedAddress);
+  }, [selectedAddress]);
+
   const handleDeleteAddress = async (addressId: string) => {
     try {
       await AddressService.deleteAddress(addressId);
       SuccessMessage("Address deleted successfully");
-      setReload(Date.now().toString());
+      setReload((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       const msg = renderAxiosOrAuthError(error);
@@ -69,7 +78,7 @@ const Addresses = () => {
     try {
       await AddressService.setDefaultAddress(addressId);
       SuccessMessage("Address set as default successfully");
-      setReload(Date.now().toString());
+      setReload((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       const msg = renderAxiosOrAuthError(error);

@@ -15,7 +15,7 @@ import { Address } from "@/types/prisma-schema-types";
 
 type AddOrEditAddressFormProps = {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-  setReload: Dispatch<SetStateAction<string>>;
+  setReload: Dispatch<SetStateAction<number>>;
   item?: Address | null;
 };
 
@@ -115,11 +115,11 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
       if (item) {
         await AddressService.updateAddress(formData);
         SuccessMessage("Address updated successfully");
-        setReload(Date.now().toString());
+        setReload((prev) => prev + 1);
       } else {
         await AddressService.addAddress(formData);
         SuccessMessage("Address added successfully");
-        setReload(Date.now().toString());
+        setReload((prev) => prev + 1);
       }
     } catch (error) {
       console.error(error);
@@ -242,15 +242,15 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
           <div>
             <label className="block text-sm font-semibold  mb-2">
               Landmark/Bustop{" "}
-              <span className="text-xs text-gray-400">(optional)</span>
+              <span className="text-xs text-gray-300">(optional)</span>
             </label>
             <input
               type="text"
               name="landmark"
               value={formData.landmark}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-              placeholder="Near Spar Mall (Port Street)"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400"
+              placeholder="e.g Near Spar Mall (Port Street)"
             />
           </div>
           <div>
@@ -272,8 +272,8 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className="flex-1 px-4 py-3 outline-none focus:outline-0 focus:border-0"
-                placeholder="080 123 456 789"
+                className="flex-1 px-4 py-3 outline-none focus:outline-0 focus:border-0 placeholder:text-gray-400"
+                placeholder="e.g 08012345678"
               />
             </div>
           </div>

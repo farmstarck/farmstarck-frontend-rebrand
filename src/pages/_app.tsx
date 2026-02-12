@@ -19,20 +19,9 @@ export default function App({ Component, pageProps }: AppProps) {
   const hydrate = useAuthStore((state) => state.hydrate);
   const { isAuthenticated, isLoading } = useAuthStore();
 
-  const shouldBlockRender =
-    !isLoading && isAuthenticated && router.pathname === "/";
-
   useEffect(() => {
     hydrate();
   }, [hydrate]);
-
-  // useEffect(() => {
-  //   if (isLoading) return;
-
-  //   if (isAuthenticated && router.pathname === "/") {
-  //     router.replace("/market/marketplace");
-  //   }
-  // }, [isAuthenticated, isLoading, router.pathname]);
 
   useEffect(() => {
     const handleStart = (url: string) => {

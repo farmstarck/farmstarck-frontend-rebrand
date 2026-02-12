@@ -10,22 +10,25 @@ export default function GoogleCallback() {
   useEffect(() => {
     const { token, redirect } = router.query;
 
-    const handleRedirect = async () => {
-      if (!token) return;
+    if (!router.isReady) return;
+    if (!token) return;
 
+    const processAuth = async () => {
       localStorage.setItem("accessToken", token as string);
       localStorage.setItem("auth:lastMethod", "google");
 
       await login();
+
+      const redirectTo =
+        localStorage.getItem("redirectAfterAuth") ||
+        redirect ||
+        "/market/marketplace";
+
+      router.replace(redirectTo as string);
     };
-    const redirectTo = localStorage.getItem("redirectAfterAuth") || redirect;
 
-    handleRedirect();
-
-    // hydrate user
-
-    router.replace((redirectTo as string) || "/market/marketplace");
-  }, [router.query]);
+    processAuth();
+  }, [router.isReady, router.query]);
 
   return <ApiLoader loading={true} />;
 }

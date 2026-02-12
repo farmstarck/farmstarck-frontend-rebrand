@@ -27,7 +27,7 @@ const Checkout = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
-  const [reload, setReload] = useState<string>("");
+  const [reload, setReload] = useState<number>(0);
 
   // Handle closing modal
   const handleModalClose = () => {
@@ -44,7 +44,7 @@ const Checkout = () => {
         setUserSelectedAddress(res.data);
       })
       .catch(console.error);
-  }, [selectedAddress]);
+  }, [reload, selectedAddress]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
