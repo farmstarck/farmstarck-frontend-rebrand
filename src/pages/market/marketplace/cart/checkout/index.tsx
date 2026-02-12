@@ -243,7 +243,7 @@ const Checkout = () => {
               onClick={() =>
                 navigate("/market/marketplace/cart/checkout/payment")
               }
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98] disabled:bg-primary/50 disabled:cursor-not-allowed"
             >
               Proceed to Payment
             </button>

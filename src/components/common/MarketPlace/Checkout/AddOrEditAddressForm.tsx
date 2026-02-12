@@ -100,24 +100,21 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
   };
 
   const handleSubmitAddress = async () => {
-    if (
-      !formData.recipientName ||
-      !formData.street ||
-      !formData.state ||
-      !formData.city ||
-      !formData.phoneNumber
-    ) {
-      ErrorMessage("Please fill in all required fields");
-      return;
-    }
+    if (!validateForm()) return;
     try {
       setLoading(true);
       if (item) {
-        await AddressService.updateAddress(formData);
+        await AddressService.updateAddress(item.id, {
+          ...formData,
+          isDefault: saveAddress,
+        });
         SuccessMessage("Address updated successfully");
         setReload((prev) => prev + 1);
       } else {
-        await AddressService.addAddress(formData);
+        await AddressService.addAddress({
+          ...formData,
+          isDefault: saveAddress,
+        });
         SuccessMessage("Address added successfully");
         setReload((prev) => prev + 1);
       }
@@ -165,9 +162,53 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
         phoneNumber: item.phoneNumber ?? "",
         email: item.email ?? "",
       });
+      setSaveAddress(item.isDefault);
       setIsEdit(true);
     }
   }, [item]);
+
+  const validateForm = () => {
+    const { recipientName, street, state, city, phoneNumber } = formData;
+
+    if (!recipientName || !street || !state || !city || !phoneNumber) {
+      ErrorMessage("Please fill in all required fields");
+      return false;
+    }
+
+    // Recipient name validation
+    if (recipientName.trim().length < 3) {
+      ErrorMessage("Recipient name must be at least 3 characters");
+      return false;
+    }
+
+    if (recipientName.trim().length > 50) {
+      ErrorMessage("Recipient name is too long");
+      return false;
+    }
+
+    // Street validation
+    if (street.trim().length < 5) {
+      ErrorMessage("Street address must be at least 5 characters");
+      return false;
+    }
+
+    if (street.trim().length > 120) {
+      ErrorMessage("Street address is too long");
+      return false;
+    }
+
+    // Nigerian phone validation
+    const normalizedPhone = phoneNumber.replace(/\s+/g, "");
+
+    const nigeriaPhoneRegex = /^(?:\+234|234|0)(7|8|9)(0|1)\d{8}$/;
+
+    if (!nigeriaPhoneRegex.test(normalizedPhone)) {
+      ErrorMessage("Please enter a valid Nigerian phone number");
+      return false;
+    }
+
+    return true;
+  };
 
   return (
     <div className="bg-white rounded-2xl">
@@ -273,7 +314,7 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
                 className="flex-1 px-4 py-3 outline-none focus:outline-0 focus:border-0 placeholder:text-gray-400"
-                placeholder="e.g 08012345678"
+                placeholder="e.g 234 or 08012345678"
               />
             </div>
           </div>
