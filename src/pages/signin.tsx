@@ -1,4 +1,3 @@
-// pages/signin.tsx
 import React, { useEffect, useState } from "react";
 import { AuthInput } from "@/components/common/auth/AuthInput";
 import Link from "next/link";
