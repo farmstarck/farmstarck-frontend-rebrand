@@ -1,6 +1,8 @@
 import api, { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { ErrorMessage } from "@/utils/PageUtils";
 import { create } from "zustand";
+import { useCartStore, useWishlistStore } from "./cart.slice";
+import { useCheckoutStore } from "./checkout.slice";
 
 export type User = {
   id: string;
@@ -75,6 +77,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: false,
         isLoading: false,
       });
+      useCartStore.getState().clearCart();
+      useWishlistStore.getState().clearWishlist();
+      useCheckoutStore.getState().resetCheckout();
     } catch {
       ErrorMessage("Logout failed");
     }
