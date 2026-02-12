@@ -32,8 +32,8 @@ const Services = {
     return response.data;
   },
 
-  updateAddress: async (data: AddressProps) => {
-    const response = await api.put("/api/address", data);
+  updateAddress: async (id: string, data: AddressProps) => {
+    const response = await api.put(`/api/address/${id}`, data);
     return response.data;
   },
 

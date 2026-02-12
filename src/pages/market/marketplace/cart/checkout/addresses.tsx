@@ -13,12 +13,12 @@ import { useCheckoutStore } from "@/store/slices/checkout.slice";
 
 const Addresses = () => {
   const { navigate } = useNavigate();
-  const { setUserSelectedAddress } = useCheckoutStore();
+  const { setUserSelectedAddress, selectedAddress } = useCheckoutStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [pickedAddress, setPickedAddress] = useState<Address | null>(null);
   const [reload, setReload] = useState<number>(0);
 
   // Handle closing modal
@@ -39,10 +39,6 @@ const Addresses = () => {
   // Fetch User Addresses
 
   useEffect(() => {
-    console.log("::::::::::RELOAD CHECKER", addresses);
-  }, [reload]);
-
-  useEffect(() => {
     AddressService.getUserAddresses()
       .then((res) => setAddresses(res.data))
       .catch(console.error);
@@ -53,20 +49,24 @@ const Addresses = () => {
 
     const defaultAddress = addresses.find((address) => address.isDefault);
     if (defaultAddress) {
-      setSelectedAddress(defaultAddress);
+      setPickedAddress(defaultAddress);
     }
   }, [addresses]);
 
   useEffect(() => {
-    if (!selectedAddress) return;
-    setUserSelectedAddress(selectedAddress);
-  }, [selectedAddress]);
+    if (!pickedAddress) return;
+    setUserSelectedAddress(pickedAddress);
+  }, [pickedAddress]);
 
   const handleDeleteAddress = async (addressId: string) => {
     try {
       await AddressService.deleteAddress(addressId);
       SuccessMessage("Address deleted successfully");
       setReload((prev) => prev + 1);
+      const isSelectedAddressDeleted = selectedAddress?.id === addressId;
+      if (isSelectedAddressDeleted) {
+        setUserSelectedAddress(null);
+      }
     } catch (error) {
       console.error(error);
       const msg = renderAxiosOrAuthError(error);
@@ -121,11 +121,11 @@ const Addresses = () => {
                 addresses.map((address) => (
                   <button
                     key={address.id}
-                    onClick={() => setSelectedAddress(address)}
+                    onClick={() => setPickedAddress(address)}
                     className={`
                               relative text-left p-4 w-full rounded-xl border-2 transition-all duration-300
                                 ${
-                                  selectedAddress?.id === address.id
+                                  pickedAddress?.id === address.id
                                     ? "border-primary bg-primary/5"
                                     : "border-gray-200 hover:border-primary/50"
                                 }
@@ -144,13 +144,13 @@ const Addresses = () => {
                           className={`
                             w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5
                             ${
-                              address.id === selectedAddress?.id
+                              address.id === pickedAddress?.id
                                 ? "border-primary"
                                 : "border-gray-300"
                             }
                        `}
                         >
-                          {address.id === selectedAddress?.id && (
+                          {address.id === pickedAddress?.id && (
                             <div className="w-3 h-3 rounded-full bg-primary"></div>
                           )}
                         </div>
@@ -217,12 +217,12 @@ const Addresses = () => {
 
             {/* Submit Button */}
             <button
-              disabled={!selectedAddress}
+              disabled={!pickedAddress || addresses.length === 0}
               onClick={() => {
-                setUserSelectedAddress(selectedAddress!);
+                setUserSelectedAddress(pickedAddress!);
                 navigate("/market/marketplace/cart/checkout");
               }}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]   disabled:bg-primary/50 disabled:cursor-not-allowed"
             >
               Select Address
             </button>

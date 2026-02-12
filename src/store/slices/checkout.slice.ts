@@ -23,7 +23,7 @@ interface CheckoutState {
 
   paymentDetails: PaymentDetails;
   setItems: (items: CheckoutItem[]) => void;
-  setUserSelectedAddress: (address: Address) => void;
+  setUserSelectedAddress: (address: Address | null) => void;
   setShipping: (method: ShippingMethod, fee: number) => void;
   setPaymentDetails: (details: PaymentDetails) => void;
 
