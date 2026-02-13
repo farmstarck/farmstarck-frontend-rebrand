@@ -16,7 +16,7 @@ export function buildProductFilterQuery(filters: ProductFilter) {
 
   // locations (array → backend)
   if (filters.locations?.length) {
-    query.locations = filters.locations; // 👈 backend change coming
+    query.location = filters.locations[0];
   }
 
   // size
@@ -71,8 +71,29 @@ export function buildProductFilterQuery(filters: ProductFilter) {
       case "Dozen":
         query.countType = "dozen";
         break;
+      case "Kilogram":
+        query.countType = "kilogram";
+        break;
+      case "Carton":
+        query.countType = "carton";
+        break;
       case "Bag":
         query.countType = "bag";
+        break;
+      case "Basket":
+        query.countType = "basket";
+        break;
+      case "Crate":
+        query.countType = "crate";
+        break;
+      case "Liter":
+        query.countType = "liter";
+        break;
+      case "Pack":
+        query.countType = "pack";
+        break;
+      case "Each":
+        query.countType = "each";
         break;
 
       default:

@@ -100,7 +100,7 @@ const CustomSearch = () => {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-10 left-0 w-full bg-white shadow-lg rounded-md max-h-80 overflow-y-auto z-50 p-4">
+        <div className="absolute top-12 -left-3 w-[calc(100vw-2rem)] px-5 md:w-full md:left-0 bg-white shadow-lg rounded-md max-h-80 overflow-y-auto z-50 p-4">
           {loading ? (
             <p className="text-center text-sm text-gray-500">Searching...</p>
           ) : results.length > 0 ? (
