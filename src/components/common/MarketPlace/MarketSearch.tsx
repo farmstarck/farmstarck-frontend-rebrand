@@ -38,7 +38,7 @@ const MarketSearch = () => {
   }, []);
 
   return (
-    <div className="bg-dark-primary w-full p-5  text-white flex items-center justify-between">
+    <div className="relative bg-dark-primary w-full p-5  text-white flex items-center justify-between">
       <Image
         src="/assets/svg/logo-primary.svg"
         alt="farmstarck logo"
