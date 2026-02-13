@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import { ProductFilterLayout } from "@/components/common/MarketPlace/ProductFilterLayout";
-import { AllProducts } from "@/data/ProductsData";
 import ProductService from "@/services/product.service";
 import CategoryService from "@/services/category.service";
 import { useProductFilters } from "@/hooks/useProductFilter";
