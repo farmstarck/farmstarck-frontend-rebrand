@@ -8,7 +8,7 @@ export const ErrorMessage = (
 ) => {
   return toast.error(message, {
     position: "top-right",
-    duration: 4000,
+    duration: 3000,
     style: {
       backgroundColor:
         bg === "red" ? "#dc2626" : bg === "orange" ? "#ea580c" : "#dc2626",
@@ -21,7 +21,7 @@ export const ErrorMessage = (
 export const SuccessMessage = (message: string) => {
   return toast.success(message, {
     position: "top-right",
-    duration: 4000,
+    duration: 3000,
     style: {
       backgroundColor: "white",
       color: "#00c700",
