@@ -3,21 +3,6 @@ import Image from "next/image";
 import { useNavigate } from "@/hooks/useNavigate";
 
 type failedProps = {
-<<<<<<< HEAD
-    onClose: () => void
-    isOpen: boolean
-    description?: string
-    title?: string
-    payment?: boolean
-}
-const FailureModal = ({ onClose, isOpen, payment = false, title, description }: failedProps) => {
-    const { navigate } = useNavigate()
-    return (
-        <>
-            {isOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999]">
-                    <div className="bg-white w-[330px] md:w-[380px] rounded-2xl p-6 text-center relative shadow-xl">
-=======
   onClose: () => void;
   isOpen: boolean;
   description: string;
@@ -49,7 +34,6 @@ const FailureModal = ({
                 height={24}
               />
             </button>
->>>>>>> 1fc775851ccecae74e4d11e9b6624d7d04dbc202
 
             {/* Error Icon */}
             <div className="flex justify-center mb-4">
