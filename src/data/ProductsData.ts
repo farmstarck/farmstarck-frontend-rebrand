@@ -1,7 +1,5 @@
 import { FilterGroup, productsProps } from "@/types/products";
 
-
-
 export const AllProducts: productsProps[] = [
   {
     size: "Tuber",
@@ -15,7 +13,7 @@ export const AllProducts: productsProps[] = [
     subCategory: "Tubers",
     type: "Fresh/Raw Food",
     quantityType: "Unit",
-    weight: "1 - 3kg"
+    weight: "1 - 3kg",
   },
   {
     size: "Bag",
@@ -30,7 +28,7 @@ export const AllProducts: productsProps[] = [
     subCategory: "Grains",
     type: "Processed Food",
     quantityType: "Bulk",
-    weight: "More than 10kg"
+    weight: "More than 10kg",
   },
   {
     size: "Crate",
@@ -44,7 +42,7 @@ export const AllProducts: productsProps[] = [
     category: "Food",
     subCategory: "Livestock",
     type: "Fresh/Raw Food",
-    quantityType: "Bulk"
+    quantityType: "Bulk",
   },
   {
     size: "Each",
@@ -57,7 +55,7 @@ export const AllProducts: productsProps[] = [
     category: "Food",
     subCategory: "Livestock",
     type: "Fresh/Raw Food",
-    quantityType: "Unit"
+    quantityType: "Unit",
   },
   {
     size: "Carton",
@@ -72,7 +70,7 @@ export const AllProducts: productsProps[] = [
     subCategory: "Fruits",
     type: "Fresh/Raw Food",
     quantityType: "Bulk",
-    weight: "5 - 1kg"
+    weight: "5 - 1kg",
   },
   {
     size: "Bag",
@@ -88,7 +86,7 @@ export const AllProducts: productsProps[] = [
     type: "Feeds",
     quantityType: "Bulk",
     brand: "Topfeeds",
-    weight: "More than 10kg"
+    weight: "More than 10kg",
   },
   {
     size: "Kilogram",
@@ -103,7 +101,7 @@ export const AllProducts: productsProps[] = [
     subCategory: "Livestock",
     type: "Processed Food",
     quantityType: "Bulk",
-    weight: "More than 10kg"
+    weight: "More than 10kg",
   },
   {
     size: "Each",
@@ -116,7 +114,7 @@ export const AllProducts: productsProps[] = [
     category: "Agro Chemicals",
     subCategory: "Fertilizers",
     quantityType: "Unit",
-    brand: "Olam"
+    brand: "Olam",
   },
   {
     size: "Kilogram",
@@ -131,7 +129,7 @@ export const AllProducts: productsProps[] = [
     subCategory: "Vegetables",
     type: "Fresh/Raw Food",
     quantityType: "Bulk",
-    weight: "5 - 1kg"
+    weight: "5 - 1kg",
   },
   {
     size: "Each",
@@ -145,108 +143,167 @@ export const AllProducts: productsProps[] = [
     subCategory: "Others",
     condition: "Brand New",
     quantityType: "Unit",
-    type: "Others"
+    type: "Others",
   },
 ];
 
-// export const categoryGroups = [
-//   {
-//     groupName: "Food",
-//     items: ["Vegetables", "Grains", "Livestock", "Seed/Nut", "Tubers", "Fruits", "Raw Food", "Processed Food", "Others"]
-//   },
-//   {
-//     groupName: "Animal Feed & Supplement",
-//     items: ["Roughages", "Concentrates", "Mixed Feeds", "Meal Feeds", "Additives", "Nutrient Feed Supplement", "Non-Nutrient Feed Supplement"]
-//   },
-//   {
-//     groupName: "Agro Chemicals",
-//     items: ["Fertilizers", "Herbicides", "Fungicides", "Veterinary Chemicals", "Others"]
-//   },
-//   {
-//     groupName: "Farm Machine & Equipment",
-//     items: ["Planting Equipment", "Harvesting Equipment", "Irrigation Equipment", "Cultivation Equipment", "Crop/Poultry Equipment", "Others"]
-//   }
-// ];
-
-
+export const categoryGroups = [
+  {
+    groupName: "Food",
+    items: [
+      "Vegetables",
+      "Grains",
+      "Livestock",
+      "Seed/Nut",
+      "Tubers",
+      "Fruits",
+      "Raw Food",
+      "Processed Food",
+      "Others",
+    ],
+  },
+  {
+    groupName: "Animal Feed & Supplement",
+    items: [
+      "Roughages",
+      "Concentrates",
+      "Mixed Feeds",
+      "Meal Feeds",
+      "Additives",
+      "Nutrient Feed Supplement",
+      "Non-Nutrient Feed Supplement",
+    ],
+  },
+  {
+    groupName: "Agro Chemicals",
+    items: [
+      "Fertilizers",
+      "Herbicides",
+      "Fungicides",
+      "Veterinary Chemicals",
+      "Others",
+    ],
+  },
+  {
+    groupName: "Farm Machine & Equipment",
+    items: [
+      "Planting Equipment",
+      "Harvesting Equipment",
+      "Irrigation Equipment",
+      "Cultivation Equipment",
+      "Crop/Poultry Equipment",
+      "Others",
+    ],
+  },
+];
 
 // Food Category Filters
 export const foodFilters: FilterGroup[] = [
   {
     groupName: "Type",
-    items: ["Show All", "Fresh/Raw Food", "Processed Food"]
+    items: ["Show All", "Fresh/Raw Food", "Processed Food"],
   },
   {
     groupName: "Quantity",
-    items: ["Show All", "Bulk", "Unit"]
+    items: ["Show All", "Bulk", "Unit"],
   },
   {
     groupName: "Count",
-    items: ["Show All", "Pieces", "Dozen", "Kilogram", "Carton", "Bag", "Crate", "Each", "Basket"]
+    items: [
+      "Show All",
+      "Pieces",
+      "Dozen",
+      "Kilogram",
+      "Carton",
+      "Bag",
+      "Crate",
+      "Each",
+      "Basket",
+    ],
   },
   {
     groupName: "Weight",
-    items: ["Show All", "100 - 1000g", "1 - 3kg", "3 - 5kg", "5 - 1kg", "More than 10kg"]
+    items: [
+      "Show All",
+      "100 - 1000g",
+      "1 - 3kg",
+      "3 - 5kg",
+      "5 - 1kg",
+      "More than 10kg",
+    ],
   },
   {
     groupName: "Volume",
-    items: ["Show All", "5 - 10ltr", "10 - 50ltr", "More than 50ltr"]
+    items: ["Show All", "5 - 10ltr", "10 - 50ltr", "More than 50ltr"],
   },
   {
     groupName: "Discount",
-    items: ["Show All", "With Discount", "Without Discount"]
-  }
+    items: ["Show All", "With Discount", "Without Discount"],
+  },
 ];
 
 // Animal Feed & Supplement Filters
 export const animalFeedFilters: FilterGroup[] = [
   {
     groupName: "Type",
-    items: ["Show All", "Feeds", "Supplements"]
+    items: ["Show All", "Feeds", "Supplements"],
   },
   {
     groupName: "Quantity",
-    items: ["Show All", "Bulk", "Unit"]
+    items: ["Show All", "Bulk", "Unit"],
   },
   {
     groupName: "Brand",
-    items: ["Show All", "Topfeeds", "Vital", "Happy Feed", "Olam", "Others"]
+    items: ["Show All", "Topfeeds", "Vital", "Happy Feed", "Olam", "Others"],
   },
   {
     groupName: "Weight",
-    items: ["Show All", "100 - 1000g", "1 - 3kg", "3 - 5kg", "5 - 1kg", "More than 10kg"]
+    items: [
+      "Show All",
+      "100 - 1000g",
+      "1 - 3kg",
+      "3 - 5kg",
+      "5 - 1kg",
+      "More than 10kg",
+    ],
   },
   {
     groupName: "Discount",
-    items: ["Show All", "With Discount", "Without Discount"]
-  }
+    items: ["Show All", "With Discount", "Without Discount"],
+  },
 ];
 
 // Agro Chemicals Filters
 export const agroChemicalsFilters: FilterGroup[] = [
   {
     groupName: "Brand",
-    items: ["Show All", "Olam", "Mamizo", "VRM", "Sygent", "Others"]
+    items: ["Show All", "Olam", "Mamizo", "VRM", "Sygent", "Others"],
   },
   {
     groupName: "Quantity",
-    items: ["Show All", "Bulk", "Unit"]
+    items: ["Show All", "Bulk", "Unit"],
   },
   {
     groupName: "Discount",
-    items: ["Show All", "With Discount", "Without Discount"]
-  }
+    items: ["Show All", "With Discount", "Without Discount"],
+  },
 ];
 
 // Farm Machinery & Equipment Filters
 export const farmMachineryFilters: FilterGroup[] = [
   {
     groupName: "Condition",
-    items: ["Show All", "Brand New", "Fairly Used", "Seller Refurbished", "Manufacturer Refurbished"]
+    items: [
+      "Show All",
+      "Brand New",
+      "Fairly Used",
+      "Seller Refurbished",
+      "Manufacturer Refurbished",
+    ],
   },
   {
     groupName: "Quantity",
-    items: ["Show All", "Bulk", "Unit"]
+    items: ["Show All", "Bulk", "Unit"],
   },
   {
     groupName: "Type",
@@ -264,11 +321,11 @@ export const farmMachineryFilters: FilterGroup[] = [
       "Incubators",
       "Irrigation Hoses",
       "Irrigation Sprinklers",
-      "Others"
-    ]
+      "Others",
+    ],
   },
   {
     groupName: "Brand",
-    items: ["Show All", "With Discount", "Without Discount"] 
-  }
+    items: ["Show All", "With Discount", "Without Discount"],
+  },
 ];

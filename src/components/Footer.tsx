@@ -1,9 +1,58 @@
-"use client"
+"use client";
 import Link from "next/link";
 import FootAccordion from "./common/FooterAccordion";
 import Image from "next/image";
+import { useState } from "react";
+import CommunityService from "@/services/community.service";
+import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
+import { renderAxiosOrAuthError } from "@/lib/axios-client";
 
 const Footer = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { email, message } = formData;
+    if (!email || !message) {
+      ErrorMessage("All fields are required");
+      return;
+    }
+
+    const body = {
+      email,
+      message,
+    };
+    try {
+      setLoading(true);
+      await CommunityService.contactUs(body);
+      SuccessMessage("Message sent successfully");
+    } catch (error) {
+      console.error(error);
+      const msg = renderAxiosOrAuthError(error);
+      ErrorMessage(msg);
+    } finally {
+      setLoading(false);
+      setFormData({
+        email: "",
+        message: "",
+      });
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const accordionItems = [
     {
       title: "Company",
@@ -83,23 +132,6 @@ const Footer = () => {
     },
   ];
 
-  //  // Toggle button visibility on scroll
-  //  useEffect(() => {
-  //   const toggleVisibility = () => {
-  //     if (window.scrollY > 300) {
-  //       setIsVisible(true);
-  //     } else {
-  //       setIsVisible(false);
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", toggleVisibility);
-
-  //   return () => {
-  //     window.removeEventListener("scroll", toggleVisibility);
-  //   };
-  // }, []);
-
   // Scroll to top function
   const scrollToTop = () => {
     window.scrollTo({
@@ -121,32 +153,44 @@ const Footer = () => {
               feedback, or partnership opportunities. Get in touch today
             </p>
           </div>
-          <form className=" flex flex-col gap-4 w-full  md:w-2/3 ">
+          <form
+            className=" flex flex-col gap-4 w-full  md:w-2/3 "
+            onSubmit={handleSubmit}
+          >
             <div className="flex flex-col gap-4 md:space-y-5">
               <div className="flex flex-col justify-between gap-5  w-full md:gap-5">
                 <input
                   type="email"
                   placeholder="Email Address"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full h-10  p-3 rounded-md bg-white text-gray-700 font-light text-sm placeholder-gray-700 focus:outline-none "
                 />
                 <textarea
                   placeholder="Your Message"
-                  className="h-30 w-full p-3 rounded-xl  bg-white text-white font-light text-sm placeholder-gray-700 focus:outline-none"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="h-30 w-full p-3 rounded-xl  bg-white text-gray-700 font-light text-sm placeholder-gray-700 focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <button className="w-full hover:bg-white bg-[var(--primary)]  text-white hover:text-[var(--primary)] px-12 py-2 md:py-4 text-base rounded-xl font-btnBody transition-all duration-300 !hover:bg-[#fff] ">
-                Send
+              <button
+                disabled={loading}
+                className="w-full hover:bg-white bg-[var(--primary)]  text-white hover:text-[var(--primary)] px-12 py-2 md:py-4 text-base rounded-xl font-btnBody transition-all duration-300 !hover:bg-[#fff] disabled:opacity-50 disabled:cursor-not-allowed "
+              >
+                {loading ? "Sending..." : "Send"}
               </button>
             </div>
-          </form> 
+          </form>
         </div>
         <div className="space-y-4 flex flex-col gap-10 items-center border-t-2 border-b-2 primary-border justify-center py-10 md:justify-between md:space-y-8 md:flex-row">
           <div className="space-y-5 w-full flex flex-col items-center md:items-start md:w-2/3">
             <Link href="/">
               <Image
-                src={'/assets/svg/logo-primary.svg'}
+                src={"/assets/svg/logo-primary.svg"}
                 width={100}
                 height={100}
                 alt="farmstarck-logo"
@@ -271,18 +315,18 @@ const Footer = () => {
                 <Image
                   width={200}
                   height={200}
-                  src={'/assets/images/apple-logo.png'}
+                  src={"/assets/images/apple-logo.png"}
                   alt="connect to app store"
-                // className="w-1/2"
+                  // className="w-1/2"
                 />
               </Link>
               <Link href="/">
                 <Image
                   width={200}
                   height={200}
-                  src={'/assets/images/playstore-logo.png'}
+                  src={"/assets/images/playstore-logo.png"}
                   alt="connect to google play"
-                // className="w-1/2"
+                  // className="w-1/2"
                 />
               </Link>
             </div>

@@ -6,6 +6,7 @@ import BaseLoader from "@/Loaders/BaseLoader";
 import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import BuyerDashboardLayout from "@/layouts/BuyerDashboardLayout";
+import { useAuthStore } from "@/store/slices/auth.slice";
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -15,6 +16,12 @@ export default function App({ Component, pageProps }: AppProps) {
   const PageComponent = Component as NextPageWithLayout;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const hydrate = useAuthStore((state) => state.hydrate);
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
 
   useEffect(() => {
     const handleStart = (url: string) => {
@@ -50,7 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
   ];
 
   // Check if current route is a buyer route
-  const isBuyerRoute = router.pathname.startsWith("/auth/buyer");
+  const isBuyerRoute = router.pathname.startsWith("/dashboard/buyer");
   const isNoLayout = noLayoutRoutes.includes(router.pathname);
 
   // Get the appropriate layout
@@ -69,9 +76,9 @@ export default function App({ Component, pageProps }: AppProps) {
     if (isBuyerRoute) {
       return (
         // <div className="">
-          <BuyerDashboardLayout>
-            <PageComponent {...pageProps} />
-          </BuyerDashboardLayout>
+        <BuyerDashboardLayout>
+          <PageComponent {...pageProps} />
+        </BuyerDashboardLayout>
         // </div>
       );
     }
@@ -84,9 +91,17 @@ export default function App({ Component, pageProps }: AppProps) {
     );
   };
 
+  // if (shouldBlockRender) {
+  //   return (
+  //     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+  //       <BaseLoader />
+  //     </div>
+  //   );
+  // }
+
   return (
     <>
-      {loading && (
+      {(loading || isLoading) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
           <BaseLoader />
         </div>

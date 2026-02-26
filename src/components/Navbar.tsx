@@ -1,8 +1,10 @@
-"use client"
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ArrowRight, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuthStore } from "@/store/slices/auth.slice";
+import { getInitials } from "@/utils/PageUtils";
 import { useNavigate } from "@/hooks/useNavigate";
 
 type SubMenuItem = {
@@ -58,10 +60,26 @@ const menuItems: MenuItem[] = [
   {
     title: "Your Journey",
     submenu: [
-      { img: "/assets/images/journey-menu1.png", title: "Farmer", link: "/marketing/farm_empowerment" },
-      { img: "/assets/images/journey-menu2.png", title: "Merchant", link: "/marketing/become_merchant" },
-      { img: "/assets/images/journey-menu3.png", title: "Business", link: "/marketing/business_journey" },
-      { img: "/assets/images/journey-menu4.png", title: "Investment", link: "/marketing/investment" },
+      {
+        img: "/assets/images/journey-menu1.png",
+        title: "Farmer",
+        link: "/marketing/farm_empowerment",
+      },
+      {
+        img: "/assets/images/journey-menu2.png",
+        title: "Merchant",
+        link: "/marketing/become_merchant",
+      },
+      {
+        img: "/assets/images/journey-menu3.png",
+        title: "Business",
+        link: "/marketing/business_journey",
+      },
+      {
+        img: "/assets/images/journey-menu4.png",
+        title: "Investment",
+        link: "/marketing/investment",
+      },
     ],
   },
   {
@@ -73,6 +91,9 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const { user, isAuthenticated, logout } = useAuthStore();
 
   // Desktop submenu state
   const [openMenu, setOpenMenu] = useState<number | null>(null);
@@ -132,6 +153,12 @@ const Navbar = () => {
     setOpenAccordion(null);
     setOpenMenu(null);
   };
+
+  useEffect(() => {
+    const close = () => setProfileOpen(false);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -194,8 +221,11 @@ const Navbar = () => {
                 {/* Submenu: visible when openMenu === idx */}
                 {item.submenu && openMenu === idx && (
                   <div
-                    className={`absolute ${idx === 0 ? "lg:-left-[365px] w-[1200px]" : "lg:-left-[480px] w-[1100px]"
-                      } right-0 top-12 flex dark-primary-bg px-4 py-10 shadow-lg rounded-lg z-40`}
+                    className={`absolute ${
+                      idx === 0
+                        ? "lg:-left-[365px] w-[1200px]"
+                        : "lg:-left-[480px] w-[1100px]"
+                    } right-0 top-12 flex dark-primary-bg px-4 py-10 shadow-lg rounded-lg z-40`}
                     onMouseEnter={handleSubmenuEnter}
                     onMouseLeave={handleSubmenuLeave}
                   >
@@ -262,7 +292,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Buttons */}
-          <div className="hidden lg:flex gap-4">
+          {/* <div className="hidden lg:flex gap-4">
             <Link
               href="/signin"
               className="px-7 py-2 bg-[var(--primary)] text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
@@ -275,25 +305,86 @@ const Navbar = () => {
             >
               Create Account
             </Link>
+          </div> */}
+          <div className="hidden lg:flex items-center gap-4 relative">
+            {!isAuthenticated ? (
+              <>
+                <Link
+                  href="/signin"
+                  className="px-7 py-2 bg-[var(--primary)] text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)]"
+                >
+                  Sign In
+                </Link>
+
+                <Link
+                  href="/onboarding/signup"
+                  className="px-7 py-2 bg-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-[var(--primary)] hover:text-white text-[var(--primary)]"
+                >
+                  Create Account
+                </Link>
+              </>
+            ) : (
+              <div className="relative">
+                {/* Avatar */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProfileOpen((p) => !p);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white  text-dark-primary flex items-center justify-center font-extrabold"
+                >
+                  {getInitials(user?.fullName)}
+                </button>
+
+                {/* Dropdown */}
+                {profileOpen && (
+                  <div className="absolute right-0 mt-3 w-44 bg-white rounded-md shadow-lg overflow-hidden z-50">
+                    <Link
+                      href="/dashboard/buyer"
+                      onClick={() => setProfileOpen(false)}
+                      className="block px-4 py-2 font-bold text-gray-700 hover:bg-gray-100"
+                    >
+                      Dashboard
+                    </Link>
+
+                    <button
+                      onClick={async () => {
+                        setProfileOpen(false);
+                        await logout();
+                      }}
+                      className="w-full text-left px-4 py-2 font-bold  text-red-600 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div id="menu" className="flex  lg:hidden flex-row items-center gap-5 sm:self">
-            <div
-              onClick={gotoMarket}
-              className={`${mobileMenuOpen ? 'hidden' : ''}`}>
-              <ShoppingCart
-                className="text-white cursor-pointer" />
-            </div>
+          <div
+            id="menu"
+            className="flex lg:hidden flex-col items-start sm:self"
+          >
             <div className="w-full flex justify-end">
               <button
                 id="menu-btn"
                 className=" block hamburger focus:outline-none"
                 onClick={menuToggle}
               >
-                <span className="hamburger-top" style={{ background: "#fff" }}></span>
-                <span className="hamburger-middle" style={{ background: "#fff" }}></span>
-                <span className="hamburger-bottom" style={{ background: "#fff" }}></span>
+                <span
+                  className="hamburger-top"
+                  style={{ background: "#fff" }}
+                ></span>
+                <span
+                  className="hamburger-middle"
+                  style={{ background: "#fff" }}
+                ></span>
+                <span
+                  className="hamburger-bottom"
+                  style={{ background: "#fff" }}
+                ></span>
               </button>
             </div>
           </div>
@@ -390,21 +481,47 @@ const Navbar = () => {
             ))}
 
             {/* Mobile Buttons */}
-            <div className="pt-4  mt-4 flex flex-col gap-3">
-              <Link
-                href="signin"
-                onClick={handleLinkClick}
-                className="  w-full px-4 py-3 text-center bg-primary text-white text-base rounded-md font-btnBody transition-all duration-300 hover:bg-white hover:text-primary"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/onboarding/signup"
-                onClick={handleLinkClick}
-                className="w-full px-4 py-3 text-center text-primary bg-white text-base rounded-md font-btnBody transition-all duration-300 hover:text-white hover:bg-primary"
-              >
-                Create Account
-              </Link>
+
+            <div className="pt-4 mt-4 flex flex-col gap-3">
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/signin"
+                    onClick={handleLinkClick}
+                    className="w-full px-4 py-3 text-center bg-primary text-white rounded-md font-btnBody"
+                  >
+                    Sign In
+                  </Link>
+
+                  <Link
+                    href="/onboarding/signup"
+                    onClick={handleLinkClick}
+                    className="w-full px-4 py-3 text-center bg-white text-primary rounded-md font-btnBody"
+                  >
+                    Create Account
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/dashboard/buyer"
+                    onClick={handleLinkClick}
+                    className="w-full px-4 py-3 text-center bg-white text-primary rounded-md font-btnBody"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <button
+                    onClick={async () => {
+                      handleLinkClick();
+                      await logout();
+                    }}
+                    className="w-full px-4 py-3 text-center bg-red-600 text-white rounded-md font-btnBody"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
-import CustomButton from "../../common/CustomButton";
+import Link from "next/link";
+import CustomButton from "../../CustomButton";
+import Image from "next/image";
 
 type InsightSectionProps = {
   section: string;
@@ -33,7 +34,7 @@ const Insight: React.FC<InsightSectionProps> = ({
             {paragraph}
           </p>
           <Link
-            to={url}
+            href={url}
             className="w-full border block border-solid border-secondary-dark rounded-full sm:w-5/6 md:w-2/3"
           >
             <CustomButton color="green" text={btn} />

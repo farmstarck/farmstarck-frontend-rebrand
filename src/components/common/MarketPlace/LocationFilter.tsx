@@ -65,14 +65,11 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
       {isExpanded && (
         <div className="px-2 pb-4 space-y-2">
           {/* Show All Option */}
-          <label
-            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors border-t border-gray-100 mt-2 pt-3"
-          >
+          <label className="flex capitalize items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors border-t border-gray-100 mt-2 pt-3">
             <div
-              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isShowAllActive
-                ? "border-primary bg-white"
-                : "border-gray-300"
-                }`}
+              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                isShowAllActive ? "border-primary bg-white" : "border-gray-300"
+              }`}
             >
               {isShowAllActive && (
                 <div className="w-2 h-2 rounded-full bg-primary"></div>
@@ -85,9 +82,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
               checked={isShowAllActive}
               onChange={() => handleLocationSelect("Show All")}
             />
-            <span className="text-sm text-primary font-medium">
-              Show All
-            </span>
+            <span className="text-sm text-primary font-medium">Show All</span>
           </label>
 
           {/* Individual Locations - Checkboxes for multi-select */}
@@ -97,10 +92,11 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
               className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
             >
               <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected.includes(location)
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                  selected.includes(location)
                     ? "border-primary bg-white"
                     : "border-gray-300"
-                  }`}
+                }`}
               >
                 {selected.includes(location) && (
                   <div className="w-2 h-2 rounded-full bg-primary"></div>
@@ -112,7 +108,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
                 checked={selected.includes(location)}
                 onChange={() => handleLocationSelect(location)}
               />
-              <span className="text-sm text-dark">{location}</span>
+              <span className="text-sm capitalize text-dark">{location}</span>
             </label>
           ))}
         </div>

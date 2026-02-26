@@ -3,6 +3,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import LightPagination from "@/components/common/LightPagination";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const benefitItems = [
   {

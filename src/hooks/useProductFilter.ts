@@ -1,103 +1,68 @@
+import { useState } from "react";
 
-import { productsProps } from '@/types/products';
-import { useMemo, useState } from 'react';
-
-export type SortOption = "bulk" | "price_low" | "price_high" | "newest" | "popular";
-
-
-interface CategoryGroup {
-    groupName: string;
-    items: string[];
+export interface ProductFilter {
+  subcategoryId: string | undefined;
+  sortBy: string | undefined;
+  priceRange: { min: number; max: number } | undefined;
+  locations: string[];
+  attributes: string[];
+  page: number;
+  size: number;
 }
 
-interface UseProductFilterProps {
-    products: productsProps[];
-    categoryGroups: CategoryGroup[];
+export interface ProductFilterActions {
+  setSubCategoryId: (id?: string) => void;
+  setSortBy: (sort: string) => void;
+  setPriceRange: (min: number, max: number) => void;
+  setLocations: (locations: string[]) => void;
+  setAttributes: (attributes: string[]) => void;
+  setPage: (page: number) => void;
+  clearAll: () => void;
 }
 
-export const useProductFilter = ({ products, categoryGroups }: UseProductFilterProps) => {
-    const [sort, setSort] = useState<SortOption>("bulk");
-    const [selectedCats, setSelectedCats] = useState<string[]>([]);
-    const [priceRange, setPriceRange] = useState<{ min: number; max: number } | null>(null);
+export const useProductFilters = () => {
+  const [filters, setFilters] = useState<ProductFilter>({
+    subcategoryId: undefined,
+    sortBy: undefined,
+    priceRange: undefined as { min: number; max: number } | undefined,
+    locations: [] as string[],
+    attributes: [] as string[],
+    page: 1,
+    size: 10,
+  });
 
-    // Helper to determine main vs subcategories
-    const getSelectedCategoriesAndSubcategories = () => {
-        const mainCategories: string[] = [];
-        const subCategories: string[] = [];
+  const actions = {
+    setSubCategoryId: (id?: string) =>
+      setFilters((f) => {
+        const subcategoryId = id === f.subcategoryId ? undefined : id;
+        return { ...f, subcategoryId, page: 1 };
+      }),
 
-        selectedCats.forEach((selected) => {
-            const isMainCategory = categoryGroups.some(group => group.groupName === selected);
+    setSortBy: (sort: string) =>
+      setFilters((f) => ({ ...f, sortBy: sort, page: 1 })),
 
-            if (isMainCategory) {
-                mainCategories.push(selected);
-            } else {
-                subCategories.push(selected);
-            }
-        });
+    setPriceRange: (min: number, max: number) =>
+      setFilters((f) => ({ ...f, priceRange: { min, max }, page: 1 })),
 
-        return { mainCategories, subCategories };
-    };
+    setLocations: (locations: string[]) =>
+      setFilters((f) => ({ ...f, locations, page: 1 })),
 
-    // Apply price filter
-    const applyPriceFilter = (min: number, max: number) => {
-        setPriceRange({ min, max });
-    };
+    setAttributes: (attributes: string[]) =>
+      setFilters((f) => ({ ...f, attributes, page: 1 })),
 
-    // Clear all filters
-    const clearFilters = () => {
-        setSelectedCats([]);
-        setPriceRange(null);
-        setSort("bulk");
-    };
+    setPage: (page: number) => setFilters((f) => ({ ...f, page })),
 
-    // Main filtering logic
-    const filteredProducts = useMemo(() => {
-        let result = [...products];
+    clearAll: () =>
+      setFilters({
+        subcategoryId: undefined,
+        sortBy: undefined,
+        priceRange: undefined,
+        locations: [],
+        attributes: [],
+        page: 1,
+        size: 10,
+      }),
+  };
 
-        // 1. Apply price filter
-        if (priceRange) {
-            result = result.filter(
-                (p) => p.amount >= priceRange.min && p.amount <= priceRange.max
-            );
-        }
-
-        // 2. Apply category filter
-        if (selectedCats.length) {
-            const { mainCategories, subCategories } = getSelectedCategoriesAndSubcategories();
-
-            result = result.filter((product) => {
-                const mainCategoryMatch = mainCategories.includes(product.category || "");
-                const subCategoryMatch = subCategories.includes(product.subCategory || "");
-                return mainCategoryMatch || subCategoryMatch;
-            });
-        }
-
-        // 3. Apply sorting
-        if (sort === "price_low") {
-            result.sort((a, b) => a.amount - b.amount);
-        } else if (sort === "price_high") {
-            result.sort((a, b) => b.amount - a.amount);
-        }
-        // Add more sort options as needed
-
-        return result;
-    }, [products, selectedCats, sort, priceRange]);
-
-    return {
-        // State
-        sort,
-        selectedCats,
-        priceRange,
-        filteredProducts,
-        
-        // Actions
-        setSort,
-        setSelectedCats,
-        applyPriceFilter,
-        clearFilters,
-        
-        // Computed
-        hasActiveFilters: selectedCats.length > 0 || priceRange !== null,
-        totalFiltered: filteredProducts.length,
-    };
+  return { filters, actions };
 };
