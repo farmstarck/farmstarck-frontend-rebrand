@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useNavigate } from "@/hooks/useNavigate";
-import OrderFilter from "@/components/dashboard/buyer/OrderFilter";
+// import OrderFilter from "@/components/dashboard/buyer/OrderFilter";
 import { getStatusColor, orders } from "@/utils/PageUtils";
 
 const MyOrders = () => {
@@ -103,20 +103,7 @@ const MyOrders = () => {
           </div>
         </div>
 
-        {/* Filter Panel */}
-        {showFilters && (
-          <OrderFilter
-            selectedStatuses={selectedStatuses}
-            setSelectedStatuses={setSelectedStatuses}
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            setDateFrom={setDateFrom}
-            setDateTo={setDateTo}
-            onClear={handleClearFilters}
-            onClose={() => setShowFilters(false)}
-            statusOptions={statusOptions}
-          />
-        )}
+        
 
         {/* Orders List or Empty State */}
         {currentOrders.length === 0 ? (
@@ -234,3 +221,25 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
+
+
+
+
+
+
+
+
+
+
+
+
+          //   selectedStatuses={selectedStatuses}
+          //   setSelectedStatuses={setSelectedStatuses}
+          //   dateFrom={dateFrom}
+          //   dateTo={dateTo}
+          //   setDateFrom={setDateFrom}
+          //   setDateTo={setDateTo}
+          //   onClear={handleClearFilters}
+          //   onClose={() => setShowFilters(false)}
+          //   statusOptions={statusOptions}
+          // />

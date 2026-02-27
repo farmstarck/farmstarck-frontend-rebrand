@@ -136,17 +136,6 @@ const WishListItems = () => {
                       </button>
                     </div>
 
-<<<<<<< HEAD
-            <ConfirmationModal
-                closeModal={() => setShowClearModal(false)}
-                isOpen={showClearModal}
-                confirm_text='Clear All'
-                onConfirm={handleClearAll}
-                description='Are you sure you want to clear your wishlist?'
-            />
-        </>
-    );
-=======
                     {/* Details Row */}
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
@@ -295,11 +284,9 @@ const WishListItems = () => {
         closeModal={() => setShowClearModal(false)}
         isOpen={showClearModal}
         onConfirm={handleClearAll}
-        type="wishlist"
       />
     </>
   );
->>>>>>> 1fc775851ccecae74e4d11e9b6624d7d04dbc202
 };
 
 WishListItems.getLayout = (page: React.ReactNode) => (

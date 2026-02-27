@@ -303,17 +303,6 @@ const CartItems = () => {
               </div>
             </div>
 
-<<<<<<< HEAD
-            <ConfirmationModal
-                confirm_text='Clear All'
-                isOpen={showClearModal}
-                onConfirm={handleClearAll}
-                description='Are you sure you want to clear your cart?'
-                closeModal={() => setShowClearModal(false)}
-            />
-        </>
-    );
-=======
             {/* Order Summary */}
             <div className="w-full lg:w-1/3">
               <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-4">
@@ -374,12 +363,10 @@ const CartItems = () => {
       <ConfirmationModal
         isOpen={showClearModal}
         onConfirm={handleClearAll}
-        type="cart"
         closeModal={() => setShowClearModal(false)}
       />
     </>
   );
->>>>>>> 1fc775851ccecae74e4d11e9b6624d7d04dbc202
 };
 
 CartItems.getLayout = (page: React.ReactNode) => (
