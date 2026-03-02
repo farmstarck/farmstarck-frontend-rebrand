@@ -6,7 +6,7 @@ type successprops = {
     onClose: () => void
     payment?: boolean
     isOpen: boolean
-    title: string
+    title?: string
     description?: string
     cta?: boolean
     back_cta?: boolean
@@ -53,7 +53,7 @@ const SuccessModal =
 
                             {/* Title */}
                             <h2 className="text-lg font-bold">{title}</h2>
-                            {description && <p className="text-gray-600 text-sm mt-1">
+                            {description && <p className=" font-medium text-base mt-1">
                                 {description}
                             </p>}
 

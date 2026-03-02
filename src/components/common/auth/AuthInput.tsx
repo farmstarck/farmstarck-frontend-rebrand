@@ -7,13 +7,21 @@ interface AuthInputProps {
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
-  icon?: 'user' | 'email' | 'lock';
+  rounded?: string
+  icon?: 'user' | 'email' | 'lock' | 'other';
+  IconToShow?: React.ElementType<any>;
+  auth?: boolean;
+  colored?: boolean;
 }
 
 export const AuthInput: React.FC<AuthInputProps> = ({
   label,
   type,
   placeholder,
+  colored = false,
+  rounded = "rounded-full",
+  IconToShow,
+  auth = true,
   value,
   onChange,
   icon = 'user'
@@ -31,6 +39,8 @@ export const AuthInput: React.FC<AuthInputProps> = ({
         return <Mail className={iconClasses} />;
       case 'lock':
         return <Lock className={iconClasses} />;
+      case 'other':
+        return IconToShow ? <IconToShow className={iconClasses} /> : null;
       default:
         return null;
     }
@@ -42,21 +52,20 @@ export const AuthInput: React.FC<AuthInputProps> = ({
         {label}
       </label>
       <div className="relative">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+        {auth && <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
           {renderIcon()}
-        </div>
+        </div>}
         <input
           type={inputType}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="
-            w-full pl-12 pr-12 py-3.5 
-            border border-gray-300 rounded-full
+          className={`
+            w-full ${auth ? 'pl-12' : 'pl-4'} pr-12 py-3.5 
+            border border-gray-300
             text-sm text-gray-900 placeholder:text-gray-400
-            focus:outline-none focus:border-gray-400
-            transition-colors
-          "
+            focus:outline-none ${colored ? 'focus:border-primary' : 'focus:border-gray-400'}
+            transition-colors ${rounded} `}
         />
         {isPassword && (
           <button

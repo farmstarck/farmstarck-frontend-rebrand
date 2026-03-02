@@ -284,7 +284,6 @@ const WishListItems = () => {
         closeModal={() => setShowClearModal(false)}
         isOpen={showClearModal}
         onConfirm={handleClearAll}
-        type="wishlist"
       />
     </>
   );

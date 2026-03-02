@@ -363,7 +363,6 @@ const CartItems = () => {
       <ConfirmationModal
         isOpen={showClearModal}
         onConfirm={handleClearAll}
-        type="cart"
         closeModal={() => setShowClearModal(false)}
       />
     </>

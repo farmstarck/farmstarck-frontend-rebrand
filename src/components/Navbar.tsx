@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown, ArrowRight, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuthStore } from "@/store/slices/auth.slice";
 import { getInitials } from "@/utils/PageUtils";
+import { useNavigate } from "@/hooks/useNavigate";
 
 type SubMenuItem = {
   img: string;
@@ -170,12 +171,17 @@ const Navbar = () => {
     };
   }, []);
 
+  const { navigate } = useNavigate()
+
+  const gotoMarket = () => {
+    navigate('/market/marketplace')
+  }
+
   return (
     <div className={`md:py-8 ${!isScrolled && "p-0 md:p-5"} bg-[#e4f9e4]`}>
       <nav
-        className={`shadow-md z-50 transition-all duration-300 bg-[var(--dark-primary)] py-5 md:py-1 ${
-          isScrolled ? " fixed top-0 w-full" : "max-w-6xl m-auto md:rounded-lg"
-        }`}
+        className={`shadow-md z-50 transition-all duration-300 bg-[var(--dark-primary)] py-5 md:py-1 ${isScrolled ? " fixed top-0 w-full" : "max-w-6xl m-auto md:rounded-lg"
+          }`}
       >
         <div className="relative max-w-6xl mx-auto px-4 flex justify-between items-center">
           {/* Logo */}
@@ -404,9 +410,8 @@ const Navbar = () => {
                   )}
                   {item.submenu && (
                     <ChevronDown
-                      className={`transition-transform ${
-                        openAccordion === idx ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform ${openAccordion === idx ? "rotate-180" : ""
+                        }`}
                     />
                   )}
                 </button>

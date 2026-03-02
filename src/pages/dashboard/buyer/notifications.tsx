@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Package, Bell, Activity, CheckCircle, Trash2 } from 'lucide-react';
 import DeleteConfirmationModal from '@/components/common/DeleteConfirmationModal';
+import Image from 'next/image';
 
 interface Notification {
     id: string;
-    type: 'notification' | 'service' | 'activity';
+    type: 'notification' | 'service' | 'activity' |'none';
     category: 'order' | 'service' | 'activity' | 'promotion';
     title: string;
     message: string;
@@ -15,7 +16,7 @@ interface Notification {
 }
 
 const Notifications = () => {
-    const [activeTab, setActiveTab] = useState<'notification' | 'services' | 'activities'>('notification');
+    const [activeTab, setActiveTab] = useState<'notification' | 'services' | 'activities'|'none'>('notification');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [notificationToDelete, setNotificationToDelete] = useState<string | null>(null);
 
@@ -132,6 +133,7 @@ const Notifications = () => {
         if (activeTab === 'notification') return notif.type === 'notification';
         if (activeTab === 'services') return notif.type === 'service';
         if (activeTab === 'activities') return notif.type === 'activity';
+        if (activeTab === 'none') return notif.type === 'none';
         return true;
     });
 
@@ -172,14 +174,30 @@ const Notifications = () => {
                     >
                         Activities
                     </button>
+                    <button
+                        onClick={() => setActiveTab('none')}
+                        className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
+                            activeTab === 'none'
+                                ? 'bg-primary text-white'
+                                : 'bg-white text-gray-700 border border-primary hover:bg-primary/10'
+                        }`}
+                    >
+                        None
+                    </button>
                 </div>
 
                 {/* Notifications List */}
                 <div className="space-y-4">
                     {filteredNotifications.length === 0 ? (
-                        <div className="bg-white rounded-2xl p-8 text-center">
-                            <Bell size={48} className="mx-auto text-gray-300 mb-4" />
-                            <p className="text-gray-500">No notifications yet</p>
+                        <div className="bg-white flex items-center flex-col gap-5 rounded-2xl p-8 text-center">
+                            <Image 
+                            src='/assets/images/dashboard/buyer/notify.png'
+                            alt='notice img' 
+                            lazyBoundary='100'
+                             width={200} 
+                             height={200} 
+                             />
+                            <p className="text-gray-500">You do not have any notification yet. Check back later</p>
                         </div>
                     ) : (
                         filteredNotifications.map((notif) => (

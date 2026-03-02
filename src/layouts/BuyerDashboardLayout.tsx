@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Bell,
   User,
-  ShoppingCart,
   LogOutIcon,
   LayoutDashboard,
   ShoppingCartIcon,
