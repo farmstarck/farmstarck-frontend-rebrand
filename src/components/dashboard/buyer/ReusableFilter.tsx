@@ -13,6 +13,7 @@ interface Props {
   /** Main toggle */
   isOpen: boolean;
   onClose: () => void;
+  statusText?:string;
 
   /** Status filter (required) */
   statusOptions?: FilterOption[];
@@ -45,6 +46,7 @@ const ReusableFilter = ({
   priorityOptions = [],
   selectedPriorities = [],
   setSelectedPriorities,
+  statusText ="Status",
   dateFrom,
   dateTo,
   setDateFrom,
@@ -114,7 +116,7 @@ const ReusableFilter = ({
             {statusOptions.length > 0 && setSelectedStatuses && (
               <div>
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Filter by Status
+                  Filter by {statusText}
                 </h3>
                 <div className="space-y-2">
                   {statusOptions.map((opt) => (

@@ -140,7 +140,7 @@ const MyOrders = () => {
                 >
                   <div className="flex flex-col sm:flex-row gap-4">
                     {/* First Item Image */}
-                    <div className="w-full sm:w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                    <div className="w-full sm:w-24 h-24 bg-gray-100 rounded-lg shrink-0 overflow-hidden relative">
                       <Image
                         src={order.items[0].image}
                         alt={order.items[0].title}

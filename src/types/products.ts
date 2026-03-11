@@ -14,7 +14,7 @@ export interface productsProps {
   brand?: string;
   weight?: string;
   volume?: string;
-  discount?: string;
+  discount?: string;  
   condition?: string;
 }
 

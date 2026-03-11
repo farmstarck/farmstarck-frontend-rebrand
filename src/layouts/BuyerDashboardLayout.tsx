@@ -12,6 +12,7 @@ import {
   LogOutIcon,
   LayoutDashboard,
   ShoppingCartIcon,
+  HistoryIcon,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -57,15 +58,21 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
     },
     {
       icon: <Wallet size={20} />,
-      label: "My Pocket",
-      href: "/dashboard/buyer/my-pocket",
-      more: "/wallet",
+      label: "My Wallet",
+      href: "/dashboard/buyer/my-wallet",
+      more: "/my-wallet",
     },
     {
       icon: <Bell size={20} />,
       label: "Notifications",
       href: "/dashboard/buyer/notifications",
       more: "/notifications",
+    },
+    {
+      icon: <HistoryIcon size={20} />,
+      label: "Transactions",
+      href: "/dashboard/buyer/transaction_history",
+      more: "/transaction_history",
     },
     {
       icon: <Settings size={20} />,

@@ -33,7 +33,7 @@ const SuccessModal =
         return (
             <>
                 {isOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-[9999]">
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-9999">
                         <div className="bg-white w-11/12 mx-auto md:max-w-xl lg:max-w-md rounded-2xl p-14 text-center relative shadow-xl">
 
                             {/* Close button */}
