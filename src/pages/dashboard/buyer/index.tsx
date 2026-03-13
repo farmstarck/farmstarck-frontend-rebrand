@@ -5,54 +5,53 @@ import { AllProducts } from "@/data/ProductsData";
 import ProductService from "@/services/product.service";
 import { ProductFilter } from "@/hooks/useProductFilter";
 import { Product } from "@/types/prisma-schema-types";
+import { ListOrdered, Timer, Wallet } from "lucide-react";
 
 const BuyerOverview: React.FC = () => {
   const [products, setProducts] = useState<Product[] | null>(null);
 
   const recentActivities = [
     {
-      type: "payment",
-      title: "Payment for Order",
-      time: "4 month ago",
-      status: "inactive",
-      color: "red",
+      title: "Order Delivered",
+      desc: "Your order #ORD1023 was delivered successfully",
+      time: "16-03-2026   10:15AM",
+      icon: <ListOrdered size={18} />,
+      bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
     {
-      type: "delivery",
-      title: "Delivery Completed",
-      time: "5 seconds ago",
-      status: "active",
-      color: "green",
+      title: "Payment Processed",
+      desc: "Payment of N25,000 was successful",
+      time: "16-03-2026   10:15AM",
+      icon: <Timer size={18} />,
+      bg: "bg-red-100",
+      iconColor: "text-red-500",
     },
     {
-      type: "reward",
-      title: "Redeemed Staroks Point",
-      time: "5 seconds ago",
-      status: "pending",
-      color: "yellow",
+      title: "Deposit",
+      desc: "N5,000 has been deposited to your wallet",
+      time: "16-03-2026   10:15AM",
+      icon: <Wallet size={18} />,
+      bg: "bg-yellow-100",
+      iconColor: "text-yellow-600",
     },
     {
-      type: "vault",
-      title: "Food Vault Created",
-      time: "5 seconds ago",
-      status: "active",
-      color: "green",
+      title: "Review",
+      desc: "You reviewed Organic Maize",
+      time: "16-03-2026   10:15AM",
+      icon: <ListOrdered size={18} />,
+      bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
     {
-      type: "payment",
-      title: "Payment for Order",
-      time: "2 month ago",
-      status: "inactive",
-      color: "red",
+      title: "Refund Created",
+      desc: "Refund for order #ORD1023 has been processed",
+      time: "16-03-2026   10:15AM",
+      icon: <Wallet size={18} />,
+      bg: "bg-gray-100",
+      iconColor: "text-gray-500",
     },
-    {
-      type: "delivery",
-      title: "Delivery Completed",
-      time: "8 seconds ago",
-      status: "active",
-      color: "green",
-    },
-  ];
+  ]
 
   useEffect(() => {
     ProductService.getBestSellingProducts({
@@ -83,43 +82,24 @@ const BuyerOverview: React.FC = () => {
 
       {/* Recent Activity Section */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
-        <h2 className="text-lg font-bold text-gray-800 mb-6">
-          Recent Activity
-        </h2>
-        <div className="space-y-4">
+        <h2 className="text-lg font-bold text-gray-800 mb-6">Recent Activity</h2>
+        <div className="space-y-1">
           {recentActivities.map((activity, index) => (
             <div
               key={index}
-              className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors rounded-lg px-2"
+              className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0"
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    activity.color === "green"
-                      ? "bg-green-500"
-                      : activity.color === "red"
-                        ? "bg-red-500"
-                        : "bg-yellow-500"
-                  }`}
-                />
-                <div>
-                  <p className="font-medium text-gray-800 text-sm">
-                    {activity.title}
-                  </p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
-                </div>
+              {/* Icon circle */}
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${activity.bg}`}>
+                <span className={activity.iconColor}>{activity.icon}</span>
               </div>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                  activity.status === "active"
-                    ? "bg-green-100 text-green-700"
-                    : activity.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                }`}
-              >
-                {activity.status}
-              </span>
+
+              {/* Text */}
+              <div className="flex flex-col gap-0.5">
+                <p className="text-sm md:text-base font-semibold text-gray-800">{activity.title}</p>
+                <p className="text-xs md:text-sm text-gray-500">{activity.desc}</p>
+                <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -138,7 +118,7 @@ const BuyerOverview: React.FC = () => {
             Go to Marketplace
           </Link>
         </div>
-        <div className="w-full   gap-6">
+        <div className="w-full gap-6">
           <ProductsGrid products={products ?? []} />
         </div>
       </div>

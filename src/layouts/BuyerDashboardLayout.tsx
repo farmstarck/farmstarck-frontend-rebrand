@@ -219,6 +219,9 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
             </button>
 
             <div className="flex items-center gap-2">
+              <button onClick={() => navigate("/market/marketplace/")}>
+                <ShoppingCartSolidIcon className="w-6 h-6 text-white" />
+              </button>
               <button
                 onClick={() => navigate("/dashboard/buyer/notifications")}
                 className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"

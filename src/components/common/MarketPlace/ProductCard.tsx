@@ -73,8 +73,8 @@ const ProductCard = ({ product }: { product: Product }) => {
           />
         </div>
         {/* Content */}
-        <div className="px-2 pt-2 flex flex-col flex-grow relative">
-          <div className="w-fit capitalize flex items-center gap-1 bg-[#a5faa5] text-primary py-1 text-[10px] font-medium px-3 rounded-full">
+        <div className="px-2 pt-2 flex flex-col grow relative">
+          <div className="w-fit capitalize flex items-center gap-1 bg-litegreen text-primary py-1 text-[10px] font-medium px-3 rounded-full">
             <Image
               width={8}
               height={8}

@@ -26,21 +26,36 @@ export interface FilterGroup {
 
 
 
+// types/products.ts
+export type OrderStatus =
+  | "delivered"
+  | "shipped"
+  | "pending"
+  | "partially_shipped"
+  | "partially_delivered"
+  | "cancelled"
+
 export interface OrderItem {
-    productId: number;
-    title: string;
-    quantity: number;
-    price: number;
-    image: string;
-    size: string;
+  productId: number
+  title: string
+  quantity: number
+  price: number
+  image: string
+  size: string
+  sku: string
+  available: boolean  
 }
 
 export interface Order {
-    id: string;
-    orderNumber: string;
-    items: OrderItem[];
-    totalAmount: number;
-    status: 'delivered' | 'ready to ship' | 'pending' | 'shipped' | 'cancelled';
-    date: string;
-    location: string;
+  id: string
+  orderNumber: string
+  items: OrderItem[]
+  totalAmount: number
+  itemsTotal: number       
+  deliveryFee: number      
+  serviceCharge: number    
+  paymentMethod: string    
+  status: OrderStatus
+  date: string
+  location: string
 }
