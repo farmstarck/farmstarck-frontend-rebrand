@@ -46,12 +46,12 @@ const Checkout = () => {
       .catch(console.error);
   }, [reload, selectedAddress]);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      localStorage.setItem("redirectAfterAuth", router.asPath);
-      router.replace("/signin");
-    }
-  }, [isAuthenticated, isLoading]);
+  // useEffect(() => {
+  //   if (!isLoading && !isAuthenticated) {
+  //     localStorage.setItem("redirectAfterAuth", router.asPath);
+  //     router.replace("/signin");
+  //   }
+  // }, [isAuthenticated, isLoading]);
 
   useEffect(() => {
     const checkoutItems = cart.map((item) => ({

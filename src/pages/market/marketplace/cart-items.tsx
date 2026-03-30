@@ -38,16 +38,16 @@ const CartItems = () => {
     }, 0);
   };
 
-  const vat = 0;
+  const service_charge = 0;
   const subtotal = calculateSubtotal();
-  const total = subtotal + vat;
+  const total = subtotal + service_charge;
 
   const handleClearAll = () => {
     clearCartAction();
     setShowClearModal(false);
   };
 
-  if (cart.length === 0) {
+  if (cart.length > 10) {
     return (
       <div className="w-full py-5 bg-lite">
         <div className="w-11/12 lg:max-w-7xl mx-auto">
@@ -317,14 +317,14 @@ const CartItems = () => {
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
+                    <span className="text-sm">Subtotal</span>
                     <span className="font-semibold">
                       N{subtotal?.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>VAT</span>
-                    <span className="font-semibold">N{vat.toFixed(2)}</span>
+                    <span className="text-sm">Service Charge</span>
+                    <span className="font-semibold">N{service_charge.toFixed(2)}</span>
                   </div>
 
                   <div className="border-t border-t-gray-200 pt-4">

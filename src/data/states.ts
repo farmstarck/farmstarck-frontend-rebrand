@@ -1,10 +1,9 @@
 export interface lgaTypes{
     lgas:string[]
 }
-export interface statesTypes {
+export interface statesTypes extends lgaTypes {
     state:string
     capital:string
-    lgas:string[]
 }
 
 export const nigerianStatesWithLGAs:statesTypes[] = [

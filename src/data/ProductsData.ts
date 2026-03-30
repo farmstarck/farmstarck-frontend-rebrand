@@ -329,3 +329,27 @@ export const farmMachineryFilters: FilterGroup[] = [
     items: ["Show All", "With Discount", "Without Discount"],
   },
 ];
+
+
+
+
+export const mockProduct = [
+  {
+    id: 1,
+    size: '20',
+    title: "Mango",
+    amount: 2000,
+    quantity: "two",
+    location: "Lagos",
+    image: "/assets/images/marketplaces/dispenser.png",
+    category: "farm_machinery",
+    subCategory: "tracktor",
+    type: "boss",
+    quantityType: "many",
+    brand: "nike",
+    weight: "20kg",
+    volume: "10l",
+    discount: "none",
+    condition: "good"
+  }
+]
