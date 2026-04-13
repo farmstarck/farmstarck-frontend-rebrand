@@ -333,23 +333,232 @@ export const farmMachineryFilters: FilterGroup[] = [
 
 
 
-export const mockProduct = [
+// export const mockProduct = [
+//   {
+//     id: 1,
+//     size: '20',
+//     title: "Mango",
+//     amount: 2000,
+//     quantity: "two",
+//     location: "Lagos",
+//     image: "/assets/images/marketplaces/dispenser.png",
+//     category: "farm_machinery",
+//     subCategory: "tracktor",
+//     type: "boss",
+//     quantityType: "many",
+//     brand: "nike",
+//     weight: "20kg",
+//     volume: "10l",
+//     discount: "none",
+//     condition: "good"
+//   }
+// ]
+
+const productImgPath="/assets/images/marketplaces"
+
+export const MerchantProducts:merchantProductProps[] = [
   {
-    id: 1,
-    size: '20',
-    title: "Mango",
-    amount: 2000,
-    quantity: "two",
+    id: "prod_1",
+    name: "Fresh Tomatoes Basket",
+    description: "Farm-fresh tomatoes harvested daily.",
+    pricePerUnit: 5000,
+    discountPerUnit: 500,
+    stockQuantity: 120,
+    categoryId: "cat_agric",
+    subcategoryId: "sub_fruits",
+    countType: "basket",
+    weightRange: "5-7kg",
+    volumeRange: null,
+    brand: null,
+    quantityType: "bulk",
+    condition: "new",
+    status: "active",
+    produceType: "Fresh",
+    quantityPerUnit: 50,
+    sku: "TOM-BSK-001",
+    imageUrl: `${productImgPath}/chicken.png`,
+    images: [`${productImgPath}/eggs.png`, `${productImgPath}/food.png`],
     location: "Lagos",
-    image: "/assets/images/marketplaces/dispenser.png",
-    category: "farm_machinery",
-    subCategory: "tracktor",
-    type: "boss",
-    quantityType: "many",
-    brand: "nike",
-    weight: "20kg",
-    volume: "10l",
-    discount: "none",
-    condition: "good"
-  }
-]
+    expiryDate: new Date("2026-04-10"),
+    specifications: null,
+    ratingSum: 45,
+    popularity: 80,
+    soldCount: 150,
+    viewCount: 500,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    userId: "user_1",
+  },
+  {
+    id: "prod_2",
+    name: "Organic Fertilizer",
+    description: "Eco-friendly fertilizer for improved crop yield.",
+    pricePerUnit: 12000,
+    discountPerUnit: 1000,
+    stockQuantity: 60,
+    categoryId: "cat_agric",
+    subcategoryId: "sub_chemicals",
+    countType: "bag",
+    weightRange: "25kg",
+    volumeRange: null,
+    brand: "AgroPlus",
+    quantityType: "unit",
+    condition: "new",
+    status: "active",
+    produceType: null,
+    quantityPerUnit: 1,
+    sku: "FERT-ORG-002",
+   imageUrl: `${productImgPath}/meat.png`,
+    images: [`${productImgPath}/soya.png`, `${productImgPath}/rice.png`],
+    location: "Abuja",
+    expiryDate: new Date("2027-01-01"),
+    specifications: { composition: "NPK 20-10-10" },
+    ratingSum: 30,
+    popularity: 50,
+    soldCount: 70,
+    viewCount: 200,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    userId: "user_2",
+  },
+  {
+    id: "prod_3",
+    name: "Irrigation Water Pump",
+    description: "High-performance water pump for irrigation systems.",
+    pricePerUnit: 85000,
+    discountPerUnit: 5000,
+    stockQuantity: 15,
+    categoryId: "cat_equipment",
+    subcategoryId: "sub_machinery",
+    countType: null,
+    weightRange: null,
+    volumeRange: null,
+    brand: "PumpMaster",
+    quantityType: "unit",
+    condition: "new",
+    status: "active",
+    produceType: null,
+    quantityPerUnit: 1,
+    sku: "PUMP-IRR-003",
+    imageUrl: `${productImgPath}/categories/foods/fruits.png`,
+    images: [`${productImgPath}/categories/foods/grains.png`, `${productImgPath}/categories/foods/livestock.png`],
+    location: "Kano",
+    expiryDate: null,
+    specifications: { horsepower: "5HP", material: "Steel" },
+    ratingSum: 20,
+    popularity: 40,
+    soldCount: 25,
+    viewCount: 120,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    userId: "user_3",
+  },
+  {
+    id: "prod_4",
+    name: "Processed Palm Oil",
+    description: "High-quality processed palm oil for cooking.",
+    pricePerUnit: 8000,
+    discountPerUnit: 800,
+    stockQuantity: 200,
+    categoryId: "cat_agric",
+    subcategoryId: "sub_processed",
+    countType: "keg",
+    weightRange: null,
+    volumeRange: "10L",
+    brand: null,
+    quantityType: "bulk",
+    condition: "new",
+    status: "active",
+    produceType: "Processed",
+    quantityPerUnit: 1,
+    sku: "PALM-OIL-004",
+    imageUrl: `${productImgPath}/ginger.png`,
+    images: [`${productImgPath}/feeds.png`, `${productImgPath}/meat.png`],
+    location: "Port Harcourt",
+    expiryDate: new Date("2026-12-31"),
+    specifications: null,
+    ratingSum: 60,
+    popularity: 90,
+    soldCount: 220,
+    viewCount: 600,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    userId: "user_4",
+  },
+  {
+    id: "prod_5",
+    name: "Maize Grain Sack",
+    description: "Dry maize grains suitable for feed and consumption.",
+    pricePerUnit: 15000,
+    discountPerUnit: 1500,
+    stockQuantity: 90,
+    categoryId: "cat_agric",
+    subcategoryId: "sub_grains",
+    countType: "sack",
+    weightRange: "50kg",
+    volumeRange: null,
+    brand: null,
+    quantityType: "bulk",
+    condition: "new",
+    status: "active",
+    produceType: "Fresh",
+    quantityPerUnit: 1,
+    sku: "MAIZE-SCK-005",
+   imageUrl: `${productImgPath}/apples.png`,
+    images: [`${productImgPath}/dispenser.png`, `${productImgPath}/ginger.png`],
+    location: "Kaduna",
+    expiryDate: new Date("2026-09-01"),
+    specifications: null,
+    ratingSum: 25,
+    popularity: 55,
+    soldCount: 110,
+    viewCount: 300,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    userId: "user_5",
+  },
+];
+
+
+
+export interface merchantProductProps {
+  id: string;
+  name: string;
+  description: string;
+  pricePerUnit: number;
+  discountPerUnit: number;
+  stockQuantity: number;
+  categoryId: string;
+  subcategoryId: string;
+  countType: string | null;
+  weightRange: string | null;
+  volumeRange: string | null;
+  brand: string | null;
+  quantityType: string;
+  condition: string;
+  status: string;
+  produceType: string | null;
+  quantityPerUnit: number;
+  sku: string;
+  imageUrl: string;
+  images: string[];
+  location: string;
+  expiryDate: Date | null;
+  specifications: Record<string, string> | null;
+  ratingSum: number;
+  popularity: number;
+  soldCount: number;
+  viewCount: number;
+  isActive: boolean;
+  deletedAt: Date | null;
+  createdAt: Date;
+  userId: string;
+}
+
+
+ 

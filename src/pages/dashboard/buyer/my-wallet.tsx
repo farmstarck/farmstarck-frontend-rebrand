@@ -4,9 +4,7 @@ import { useState } from 'react'
 import { EyeOff, ChevronRight, WalletMinimal, ShoppingCart } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import TitleHeader from '@/components/dashboard/buyer/TitleHeader'
-import { navigate } from 'next/dist/client/components/segment-cache/navigation'
 import { useNavigate } from '@/hooks/useNavigate'
-import ModalLayout from '@/layouts/ModalLayout'
 import FundWallet from '@/components/dashboard/buyer/FundWallet'
 
 const recentTransactions = [

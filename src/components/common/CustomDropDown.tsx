@@ -8,18 +8,20 @@ interface DropdownProps {
   placeholder?: string;
   icon?: React.ReactNode;
   textclass?: string;
-  width?: string
-  searchholder?:string
-  disabled?:boolean
+  autoSelectFirst?: boolean;
+  width?: string;
+  searchholder?: string;
+  disabled?: boolean;
   searchable?: boolean;
 }
 
 export const CustomDropDown: React.FC<DropdownProps> = ({
   value,
   onChange,
-  disabled  = false,
+  disabled = false,
   options,
   width = 32,
+  autoSelectFirst = true,
   textclass,
   searchholder,
   placeholder = "Select an option",
@@ -30,16 +32,18 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
   const [search, setSearch] = useState("");
   const refDiv = useRef<HTMLDivElement | null>(null);
 
-  // 👉 Auto-select first option if value is empty
+  //  Auto-select first option if value is empty
   useEffect(() => {
-    if (!value && options.length > 0) {
-      onChange(options[0].value.toString());
+    if (autoSelectFirst) {
+      if (!value && options.length > 0) {
+        onChange(options[0].value.toString());
+      }
     }
   }, [value, options, onChange]);
 
   // Filter options
   const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().startsWith(search.toLowerCase())
+    opt.label.toLowerCase().startsWith(search.toLowerCase()),
   );
 
   // Close when clicking outside
@@ -60,30 +64,32 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
     <div ref={refDiv} className={`relative w-${width} `}>
       {/* Trigger */}
       <div
-        className={`flex items-center gap-2 max-w-3xl px-3 py-2 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer`}
+        className={`flex items-center gap-2 max-w-3xl px-3 py-3 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer`}
         onClick={() => setOpen((prev) => !prev)}
       >
         {icon && <span className="text-gray-500">{icon}</span>}
-        <span className={`flex-1 text-sm ${!value ? "text-gray-400" : "text-gray-700"}`}>
+        <span
+          className={`flex-1 text-sm ${!value ? "text-gray-400" : "text-gray-700"}`}
+        >
           {selected || placeholder}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 transition-transform ${open ? "rotate-180" : ""
-            }`}
+          className={`w-4 h-4 text-gray-500 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
         />
       </div>
 
       {/* Options */}
       {open && !disabled && (
-        <div className="absolute max-h-72 left-0 overflow-y-auto mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-
+        <div className="absolute max-h-72 left-0 overflow-y-auto mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
           {/* Search */}
           {searchable && (
             <div className="sticky top-0 bg-white border-b border-gray-100 flex items-center px-3 py-2">
               <Search className="w-4 h-4 text-gray-400 mr-2" />
               <input
                 type="text"
-                placeholder={searchholder || 'search...'}
+                placeholder={searchholder || "search..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full  outline-none text-sm text-gray-700 placeholder-gray-400"
@@ -101,10 +107,11 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
                   setOpen(false);
                   setSearch("");
                 }}
-                className={`px-4 py-2 text-sm cursor-pointer transition-all ${value === option.value
+                className={`px-4 py-2 text-sm cursor-pointer transition-all ${
+                  value === option.value
                     ? "bg-[var(--primary)] text-white"
                     : "hover:bg-lite text-gray-700"
-                  }`}
+                }`}
               >
                 {option.label}
               </div>

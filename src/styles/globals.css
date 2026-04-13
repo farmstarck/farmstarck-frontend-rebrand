@@ -348,7 +348,7 @@ body {
 /* Width */
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 5px;
     /* vertical */
     height: 8px;
     /* horizontal */
@@ -366,7 +366,7 @@ body {
 /* Handle */
 
 ::-webkit-scrollbar-thumb {
-    background: #00c700;
+    background: grey;
     /* scrollbar color */
     border-radius: 8px;
 }

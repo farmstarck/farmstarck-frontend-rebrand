@@ -34,7 +34,7 @@ const ModalLayout: React.FC<ModalLayoutProps> = ({
             onClick={handleOutsideClick}
         >
             <div
-                className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg"
+                className="bg-white rounded-sm p-6 w-full max-w-md lg:max-w-xl overflow-auto max-h-[95dvh] shadow-lg"
                 onClick={(e) => e.stopPropagation()}
             >
                 {children}

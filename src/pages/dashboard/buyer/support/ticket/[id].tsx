@@ -6,7 +6,7 @@ import AddComment from '@/components/dashboard/buyer/AddComment';
 import { ErrorMessage } from '@/utils/PageUtils';
 import SuccessModal from '@/components/common/status/SuccessModal';
 import SelectableList from '@/components/dashboard/buyer/SelectableList';
-import ProceedOrCancelModal from '@/components/dashboard/ProceedOrCancelModal';
+import ProceedOrCancelModal from '@/components/dashboard/ui/ProceedOrCancelModal';
 
 interface TicketData {
   id: string;

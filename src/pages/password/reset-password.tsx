@@ -4,7 +4,7 @@ import { ErrorMessage } from "@/utils/PageUtils";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AuthService from "@/services/auth.service";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import ButtonSpinner from "@/components/common/ButtonSpinner";

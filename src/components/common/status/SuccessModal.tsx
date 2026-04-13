@@ -77,7 +77,7 @@ const SuccessModal =
                                 <button
                                     onClick={() => {
                                         onClose();
-                                        navigate(cta_url!)
+                                       cta_url && navigate(cta_url!)
                                     }}
                                     className="border w-full mt-6 rounded-full hover:bg-primary hover:text-white border-primary text-primary py-3  font-semibold">
                                     {cta_title}

@@ -201,7 +201,7 @@ const SignIn = () => {
             {/* Sign In Button */}
             <button
               type="button"
-              onClick={()=> navigate('dashboard/buyer')}
+              onClick={()=> navigate('dashboard/merchant')}
               className=" w-full py-3.5 rounded-full bg-primary hover:bg-[#00DD00] text-white font-semibold transition-colors shadow-sm hover:shadow-md "
             >
               Log In

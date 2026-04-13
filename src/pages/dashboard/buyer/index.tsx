@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
-import { AllProducts } from "@/data/ProductsData";
 import ProductService from "@/services/product.service";
 import { ProductFilter } from "@/hooks/useProductFilter";
 import { Product } from "@/types/prisma-schema-types";

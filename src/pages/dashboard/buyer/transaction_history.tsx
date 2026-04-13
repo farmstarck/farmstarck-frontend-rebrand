@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Filter, ChevronLeft, ChevronRight, WalletMinimal, ShoppingCart } from 'lucide-react'
+import { ChevronLeft, ChevronRight, WalletMinimal, ShoppingCart } from 'lucide-react'
 import TitleHeader from '@/components/dashboard/buyer/TitleHeader'
-import ReusableFilter from '@/components/dashboard/buyer/ReusableFilter'
+import SearchAndFilter from '@/components/common/ui/SearchAndFilter'
 
 type TxType = 'deposit' | 'debit'
 
@@ -106,7 +106,6 @@ function Pagination({ page, total, onChange }: { page: number; total: number; on
 const TransactionHistory = () => {
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
-    const [filterOpen, setFilterOpen] = useState(false)
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
@@ -149,31 +148,26 @@ const TransactionHistory = () => {
             <div className=" py-4 flex flex-col gap-4 text-dark">
 
                 {/* Search + Filter */}
-                <div className="flex items-center gap-2">
-                    <div className="relative w-3/4">
-                        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={e => { setSearch(e.target.value); setPage(1) }}
-                            placeholder="Search by issue title"
-                            className="w-full bg-white border border-white/10 rounded-xl pl-8 pr-3 py-3 text-base  placeholder:text-gray-600 focus:outline-none focus:border-green-500 transition-colors"
-                        />
-                    </div>
-
-                    <button
-                        onClick={() => setFilterOpen(true)}
-                        className="relative flex w-1/4 justify-center items-center gap-1.5 px-3 py-3 bg-white border border-white/10 rounded-xl text-base font-bold transition-colors"
-                    >
-                        <Filter size={13} /> Filter
-                        {(selectedStatuses.length > 0 || dateFrom || dateTo) && (
-                            <span className="w-2.5 h-2.5 relative inline-flex ml-1">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                                <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-green-500" />
-                            </span>
-                        )}
-                    </button>
-                </div>
+                <SearchAndFilter 
+                    search={search}
+                    onSearchChange={val => { setSearch(val); setPage(1) }}
+                    searchPlaceholder="Search by issue title"
+                    statusText=""
+                    statusOptions={[
+                        { value: 'today', label: 'Today' },
+                        { value: 'this_week', label: 'This Week' },
+                        { value: 'this_month', label: 'This Month' },
+                        { value: 'deposit', label: 'Deposit' },
+                        { value: 'debit', label: 'Debit' },
+                    ]}
+                    selectedStatuses={selectedStatuses}
+                    setSelectedStatuses={(v) => { setSelectedStatuses(v); setPage(1) }}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    setDateFrom={setDateFrom}
+                    setDateTo={setDateTo}
+                    onClearFilters={() => { setSelectedStatuses([]); setDateFrom(''); setDateTo(''); setPage(1) }}
+                />
 
                 {/* Transaction List */}
                 <div className="bg-white rounded-2xl py-5">
@@ -211,25 +205,6 @@ const TransactionHistory = () => {
 
             </div>
 
-            <ReusableFilter
-                isOpen={filterOpen}
-                statusText={""}
-                onClose={() => setFilterOpen(false)}
-                statusOptions={[
-                    { value: 'today', label: 'Today' },
-                    { value: 'this_week', label: 'This Week' },
-                    { value: 'this_month', label: 'This Month' },
-                    { value: 'deposit', label: 'Deposit' },
-                    { value: 'debit', label: 'Debit' },
-                ]}
-                selectedStatuses={selectedStatuses}
-                setSelectedStatuses={(v) => { setSelectedStatuses(v); setPage(1) }}
-                dateFrom={dateFrom}
-                dateTo={dateTo}
-                setDateFrom={setDateFrom}
-                setDateTo={setDateTo}
-                onClear={() => { setSelectedStatuses([]); setDateFrom(''); setDateTo(''); setPage(1) }}
-            />
         </div>
     )
 }
