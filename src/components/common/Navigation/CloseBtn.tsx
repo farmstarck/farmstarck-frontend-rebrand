@@ -3,8 +3,10 @@ import Image from "next/image"
 
 type btnprops = {
     onClose: () => void
+    width?: number
+    height?: number
 }
-const CloseBtn = ({onClose}: btnprops) => {
+const CloseBtn = ({onClose,width=20,height=20}: btnprops) => {
     return (
         <button
             onClick={onClose}
@@ -13,8 +15,8 @@ const CloseBtn = ({onClose}: btnprops) => {
             <Image 
             src={'/assets/images/status/cancel.png'} 
             alt="cancel img" 
-            width={20} 
-            height={20} />
+            width={width} 
+            height={height} />
         </button>
     )
 }

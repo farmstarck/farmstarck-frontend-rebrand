@@ -6,6 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import TitleHeader from '@/components/dashboard/buyer/TitleHeader'
 import { useNavigate } from '@/hooks/useNavigate'
 import FundWallet from '@/components/dashboard/buyer/FundWallet'
+import WithdrawModal from '@/components/dashboard/merchant/WithdrawModal'
 
 const recentTransactions = [
     { id: 1, type: 'deposit', label: 'Deposit', sub: 'From Paystack Titan MFB', date: 'Jan 21st 2025  ·  15:35pm', amount: 150450.0 },
@@ -15,7 +16,7 @@ const recentTransactions = [
 
 const chartData = [
     { name: 'Deposit', value: 70, color: '#00c700' },
-    { name: 'Purchase Debit', value: 30, color: '#ffbb28' },
+    { name: 'Withdrawal/Debit', value: 30, color: '#ffbb28' },
 ]
 
 const fmt = (n: number) =>
@@ -25,6 +26,7 @@ const MyWallet = () => {
     const { navigate } = useNavigate()
     const [viewBal, setViewBal] = useState(true)
     const [fundWallet, setFundWallet] = useState(false)
+    const [withdrawOpen,setWithdrawOpen] = useState(false)
 
     return (
         <div className="max-w-6xl mx-auto ">
@@ -43,12 +45,20 @@ const MyWallet = () => {
                             <EyeOff size={17} className="text-gray-500" />
                         </button>
                     </div>
-                    <button
+                    <div className="flex items-center justify-between gap-10">
+                        <button
                         onClick={() => setFundWallet(true)}
-                        className="w-full py-3 bg-(--primary) active:scale-[0.98] transition-all text-white text-sm md:text-base font-semibold rounded-full"
+                        className="w-1/2 py-3 bg-(--primary) active:scale-[0.98] transition-all text-white text-sm md:text-base font-semibold rounded-full"
                     >
                         Fund Wallet
                     </button>
+                    <button
+                        onClick={() => setWithdrawOpen(true)}
+                        className="w-1/2 py-3 bg-yellowish active:scale-[0.98] transition-all text-white text-sm md:text-base font-semibold rounded-full"
+                    >
+                        Withdraw
+                    </button>
+                    </div>
                 </div>
 
                 {/* Transaction History Preview */}
@@ -56,7 +66,7 @@ const MyWallet = () => {
                     <div className="flex px-5 items-center justify-between mb-4">
                         <p className="text-base md:text-xl font-bold">Transaction History</p>
                         <button
-                            onClick={() => navigate('/dashboard/buyer/transaction-history')}
+                            onClick={() => navigate('/dashboard/merchant/transaction-history')}
                             className="text-[14px] md:text-base flex items-center gap-0.5 hover:text-dark/50 transition-colors"
                         >
                             See all <ChevronRight size={12} />
@@ -136,11 +146,12 @@ const MyWallet = () => {
                 </div>
 
             </div>
+            {withdrawOpen && (
+                <WithdrawModal open={withdrawOpen} onOpenChange={()=>setWithdrawOpen(false)} balance={178050} />
+            )}
 
             {fundWallet && (
-                // <ModalLayout onClose={() => setFundWallet(false)}>
                     <FundWallet onClose={() => setFundWallet(false)} />
-                // </ModalLayout>
             )}
         </div>
     )

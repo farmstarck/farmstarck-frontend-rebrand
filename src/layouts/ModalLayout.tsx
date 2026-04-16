@@ -1,46 +1,78 @@
-"use client"
-import React, { useEffect } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 
 interface ModalLayoutProps {
-    children: React.ReactNode;
-    onClose: () => void;
-    closeOnOutsideClick?: boolean;
+  children: React.ReactNode;
+  onClose: () => void;
+  closeOnOutsideClick?: boolean;
+  maxWidth?: string;
 }
 
 const ModalLayout: React.FC<ModalLayoutProps> = ({
-    children,
-    onClose,
-    closeOnOutsideClick = true,
+  children,
+  onClose,
+  closeOnOutsideClick = true,
+  maxWidth = "max-w-md",
 }) => {
-    // Close on ESC key
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
-        };
-        window.addEventListener("keydown", handleEsc);
+  // Drive the enter/exit animation
+  const [visible, setVisible] = useState(false);
 
-        return () => window.removeEventListener("keydown", handleEsc);
-    }, [onClose]);
+  // Trigger enter on mount
+  useEffect(() => {
+    // Small rAF so the browser paints the "hidden" state first, then transitions in
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
-    const handleOutsideClick = () => {
-        if (closeOnOutsideClick) {
-            onClose();
-        }
+  // ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
     };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
-    return (
-        <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50"
-            onClick={handleOutsideClick}
-        >
-            <div
-                className="bg-white rounded-sm p-6 w-full max-w-md lg:max-w-xl overflow-auto max-h-[95dvh] shadow-lg"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {children}
-            </div>
+  // Animate out then call onClose
+  function handleClose() {
+    setVisible(false);
+    setTimeout(onClose, 300); // match transition duration
+  }
+
+  return (
+    // Backdrop
+    <div
+      className={`
+        fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center
+        transition-[background-color] duration-300
+        ${visible ? "bg-black/80" : "bg-black/0"}
+      `}
+      onClick={closeOnOutsideClick ? handleClose : undefined}
+    >
+      {/* Panel */}
+      <div
+        className={`
+          w-full ${maxWidth} bg-white
+          rounded-t-2xl sm:rounded-2xl sm:mx-4
+          overflow-auto max-h-[95dvh] shadow-lg
+          transition-[transform,opacity] duration-300 ease-out will-change-transform
+          ${visible ? "translate-y-0" : "translate-y-full"}
+          ${visible
+            ? "sm:translate-y-0 sm:scale-100 sm:opacity-100"
+            : "sm:translate-y-4 sm:scale-95 sm:opacity-0"
+          }
+        `}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Drag handle — mobile only */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
         </div>
-    );
+
+        {children}
+      </div>
+    </div>
+  );
 };
 
 export default ModalLayout;

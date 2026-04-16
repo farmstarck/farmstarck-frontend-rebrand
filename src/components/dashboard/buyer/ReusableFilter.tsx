@@ -295,22 +295,23 @@ const ReusableFilter = ({
 
           {/* ACTION BUTTONS */}
           <div className="mt-8 space-y-3">
-            {hasActiveFilters && (
-              <button
-                onClick={() => {
-                  onClear();
-                }}
-                className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
-              >
-                Clear Filters
-              </button>
-            )}
             <button
               onClick={onClose}
               className="w-full px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
             >
               Apply Filters
             </button>
+
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  onClear();
+                }}
+                className="w-full px-4 py-2.5 border border-primary text-primary rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
       </div>

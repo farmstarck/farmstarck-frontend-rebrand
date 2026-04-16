@@ -241,7 +241,7 @@ const menuItems = [
 
         {/* Desktop Header - Fixed */}
         <header
-          className="hidden lg:block fixed top-0 right-0 bg-white border-b border-gray-200 z-30"
+          className="hidden lg:block fixed  top-0 right-0 bg-white border-b border-gray-200 z-30"
           style={{ left: "16rem" }}
         >
           <div className="flex items-center justify-between px-10        py-4">

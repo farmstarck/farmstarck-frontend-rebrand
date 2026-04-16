@@ -71,8 +71,8 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
     {
       icon: <HistoryIcon size={20} />,
       label: "Transactions",
-      href: "/dashboard/buyer/transaction_history",
-      more: "/transaction_history",
+      href: "/dashboard/buyer/transaction-history",
+      more: "/transaction-history",
     },
     {
       icon: <Settings size={20} />,
