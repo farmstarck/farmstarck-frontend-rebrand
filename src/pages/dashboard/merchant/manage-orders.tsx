@@ -157,7 +157,7 @@ const ManageOrders: React.FC = () => {
             {(search || selectedStatuses.length > 0 || dateFrom || dateTo) && (
               <button
                 onClick={handleClear}
-                className="text-sm text-primary font-semibold hover:underline"
+                className="text-sm text-white rounded-full font-semibold px-4 py-1.5 bg-primary"
               >
                 Clear filters
               </button>

@@ -275,7 +275,7 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
 
         {/* Main Content - Scrollable */}
         <main className="pt-16 bg-[#ecf6ee] lg:pt-20 min-h-screen">
-          <div className="p-4 lg:pl-10">{children}</div>
+          <div className="px-2 pt-4 lg:pl-10">{children}</div>
         </main>
       </div>
     </div>

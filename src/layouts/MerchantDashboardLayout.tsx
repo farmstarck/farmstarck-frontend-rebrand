@@ -67,13 +67,13 @@ const menuItems = [
     more: "/my-wallet",
   },
   {
-    icon: <Heart size={20} />, // ✅ correct here
+    icon: <Heart size={20} />, 
     label: "My Wishlist",
     href: "/market/marketplace/wishlist-items",
     more: "#",
   },
   {
-    icon: <ClipboardList size={20} />, // 🔥 clearer than HistoryIcon
+    icon: <ClipboardList size={20} />, 
     label: "My Orders",
     href: "/dashboard/merchant/my-orders",
     more: "/my_orders",
@@ -279,7 +279,7 @@ const menuItems = [
 
         {/* Main Content - Scrollable */}
         <main className="pt-16 bg-[#ecf6ee] lg:pt-20 min-h-screen">
-          <div className="p-4 lg:pl-10">{children}</div>
+          <div className="px-2 pt-4 lg:pl-10">{children}</div>
         </main>
       </div>
     </div>

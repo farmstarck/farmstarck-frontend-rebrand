@@ -27,7 +27,7 @@ const MyWallet = () => {
     const [fundWallet, setFundWallet] = useState(false)
 
     return (
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto ">
             <TitleHeader title="My Wallet" />
 
             <div className="px-4 py-4 bg-[#fbfbfb] flex flex-col gap-4 rounded-2xl">

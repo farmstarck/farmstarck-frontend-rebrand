@@ -28,7 +28,7 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
       className="w-full flex flex-col sm:flex-row items-start gap-4 bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:shadow-md hover:border-gray-300 transition-all duration-200 group"
     >
       {/* Product thumbnail */}
-      <div className="relative w-full sm:w-24 h-[30dvh] sm:h-24 shrink-0 rounded-lg overflow-hidden bg-[#d0dad1]">
+      <div className="relative w-full sm:w-24 h-[40dvh] sm:h-24 shrink-0 rounded-lg overflow-hidden bg-[#d0dad1]">
         <Image
           src="/assets/images/dashboard/buyer/empty_order.png"
           alt={firstItem.productName}
