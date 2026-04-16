@@ -3,12 +3,14 @@ import { ChevronLeft, Trash2, Edit } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { MerchantProducts, merchantProductProps } from '@/data/ProductsData';
 import ProductModal from "@/components/dashboard/merchant/ProductModal";
+import ConfirmDeletion from '@/components/dashboard/ui/ConfirmDeletion';
 
 const SingleProduct = () => {
   const router = useRouter();
   const { id } = router.query;
   const [productData, setProductData] = useState<merchantProductProps | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal,setShowDeleteModal] = useState(false);
 
   // Gallery and Lightbox state
   const [displayImages, setDisplayImages] = useState<string[]>([]);
@@ -56,6 +58,11 @@ const SingleProduct = () => {
     }, 2000); // simulate 2s API upload
   };
 
+
+  const handleConfirm = () =>{
+    console.log("clicked")
+  }
+
   if (loading) {
     return (
       <div className="w-full flex justify-center py-20">
@@ -90,7 +97,9 @@ const SingleProduct = () => {
             <h1 className="text-base sm:text-lg font-bold text-gray-900">Product Details</h1>
           </div>
           
-          <button className="flex items-center justify-center gap-1.5 bg-[#ef4444] hover:bg-red-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 sm:py-2.5 rounded-lg transition-colors">
+          <button 
+          onClick={()=> setShowDeleteModal(true)}
+          className="flex items-center justify-center gap-1.5 bg-[#ef4444] hover:bg-red-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 sm:py-2.5 rounded-lg transition-colors">
             <Trash2 size={16} />
             Delete
           </button>
@@ -237,6 +246,19 @@ const SingleProduct = () => {
           </div>
         </div>
       )}
+      {/* DELETE MODAL */}
+      {showDeleteModal && (
+        <ConfirmDeletion 
+        closeModal={setShowDeleteModal}
+        isOpen={showDeleteModal}
+        onConfirm={handleConfirm}
+        message="Are you sure you want to delete this product?"
+        cancelText="No, go back"
+        confirmText="Yes, Continue"
+        />
+      )}
+
+
 
       {/* Success Simulation Modal */}
       {showTransitions && (

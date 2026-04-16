@@ -65,13 +65,13 @@ const SearchAndFilter = ({
                         value={search}
                         onChange={e => onSearchChange(e.target.value)}
                         placeholder={searchPlaceholder}
-                        className="w-full bg-white border rounded-xl pl-8 pr-3 py-3 text-base placeholder:text-gray-600  focus:outline-none border-gray-600 transition-colors"
+                        className="w-full bg-white border rounded-xl pl-8 pr-3 py-3 text-base placeholder:text-gray-600  focus:outline-none border-gray-400 transition-colors"
                     />
                 </div>
 
                 <button
                     onClick={handleFilterClick}
-                    className="relative flex w-1/4 justify-center items-center gap-1.5 px-3 py-3 bg-white border border-gray-600 rounded-xl text-base font-bold transition-colors"
+                    className="relative flex w-1/4 justify-center items-center gap-1.5 px-3 py-3 bg-white border border-gray-400 rounded-xl text-base font-bold transition-colors"
                 >
                     <Filter size={13} /> Filter
                     {isActive && (

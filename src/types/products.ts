@@ -59,3 +59,44 @@ export interface Order {
   date: string
   location: string
 }
+
+// ============ MERCHANT ORDER TYPES ============
+
+export type MerchantOrderStatus =
+  | "pending"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+
+export interface MerchantOrderItem {
+  productId: string
+  productName: string
+  sku: string
+  imageUrl: string
+  quantity: number
+  pricePerUnit: number
+  totalPrice: number
+  countType: string | null
+  itemStatus: MerchantOrderStatus
+}
+
+export interface MerchantOrder {
+  id: string
+  orderNumber: string
+  buyerName: string
+  buyerPhone: string
+  buyerEmail: string
+  items: MerchantOrderItem[]
+  totalAmount: number
+  itemsTotal: number
+  deliveryFee: number
+  serviceCharge: number
+  paymentMethod: string
+  status: MerchantOrderStatus
+  date: string
+  location: string
+  deliveryAddress: string
+  notes?: string
+}

@@ -57,7 +57,7 @@ const menuItems = [
   {
     icon: <Package size={20} />, 
     label: "Manage Orders",
-    href: "/dashboard/merchant/manage_orders",
+    href: "/dashboard/merchant/manage-orders",
     more: "/orders",
   },
   {
@@ -75,7 +75,7 @@ const menuItems = [
   {
     icon: <ClipboardList size={20} />, // 🔥 clearer than HistoryIcon
     label: "My Orders",
-    href: "/dashboard/merchant/my_orders",
+    href: "/dashboard/merchant/my-orders",
     more: "/my_orders",
   },
   {
