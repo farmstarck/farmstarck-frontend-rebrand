@@ -1,12 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import {
-  allStates,
-  fetchLGAs,
-  nigerianStatesWithLGAs,
-  type lgaTypes,
-} from "@/data/states";
 import { CustomDropDown } from "@/components/common/CustomDropDown";
-import { isObject } from "framer-motion";
+import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 import Image from "next/image";
 import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
 import AddressService from "@/services/address.service";
@@ -28,14 +22,6 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const [saveAddress, setSaveAddress] = useState(false);
-  const [lgaOptions, setLgaOptions] = useState<
-    Array<{ value: string; label: string }>
-  >([]);
-
-  const statesArr = allStates.map((state) => ({
-    label: state,
-    value: state,
-  }));
   // Form states
   const [formData, setFormData] = useState({
     recipientName: "",
@@ -46,26 +32,9 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
     phoneNumber: "",
     email: "",
   });
-
-  // Update LGA options when state changes
-  useEffect(() => {
-    if (formData.state) {
-      const state = nigerianStatesWithLGAs.find(
-        (state) => state.state === formData.state,
-      );
-
-      // Check if state is an object before mapping the lgas
-      if (isObject(state)) {
-        const lgaDropdownOptions = state.lgas.map((lga) => ({
-          label: lga,
-          value: lga,
-        }));
-        setLgaOptions(lgaDropdownOptions);
-      } else {
-        setLgaOptions([]);
-      }
-    }
-  }, [formData.state]);
+  const { stateOptions, lgaOptions } = useStatesAndLgas({
+    selectedState: formData.state,
+  });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -89,6 +58,7 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
     setFormData({
       ...formData,
       state: value,
+      city: "",
     });
   };
 
@@ -252,7 +222,7 @@ const AddOrEditAddressForm: React.FC<AddOrEditAddressFormProps> = ({
                 searchable={true}
                 width="full"
                 value={formData.state}
-                options={statesArr}
+                options={stateOptions}
                 onChange={handleStateChange}
                 placeholder="Select State"
                 searchholder="search states"

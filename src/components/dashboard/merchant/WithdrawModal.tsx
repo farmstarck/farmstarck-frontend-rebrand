@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import Image from "next/image";
 import ModalLayout from "@/layouts/ModalLayout";
 import CloseBtn from "@/components/common/Navigation/CloseBtn";
@@ -34,7 +34,7 @@ const DEFAULT_BANK: SavedBank = {
   logoText: "GTBank",
 };
 
-const NIGERIAN_BANKS = [
+export const NIGERIAN_BANKS = [
   { label: "Access Bank", value: "Access Bank" },
   { label: "First Bank", value: "First Bank" },
   { label: "Guaranty Trust Bank", value: "Guaranty Trust Bank" },
@@ -94,7 +94,6 @@ function EnterDetailsStep({
   const [saveDefault, setSaveDefault] = useState(true);
 
   const amount = parseCurrency(rawAmount);
-  const isMax = amount >= balance;
 
   function handleAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const digits = e.target.value.replace(/[^0-9]/g, "");
@@ -368,15 +367,22 @@ function ConfirmSendStep({
 
 // ── Step 4: Success ───────────────────────────────────────────────────────────
 
-function SuccessStep({
-  amount,
-  recipientName,
-  onContinue,
-}: {
-  amount: number;
-  recipientName: string;
+export interface SuccessStepProps {
+  amount?: number;
+  recipientName?: string;
+  title?: string;
+  message?: ReactNode;
+  buttonText?: string;
   onContinue: () => void;
-}) {
+}
+
+export function SuccessStep({
+  title,
+  message,
+  buttonText = "Continue",
+  onContinue,
+}: SuccessStepProps) {
+
   return (
     <div className="flex flex-col items-center gap-4 py-2">
       <div className="mt-2">
@@ -387,18 +393,19 @@ function SuccessStep({
           alt="success img"
         />
       </div>
-      <p className="text-center text-[15px] text-gray-800 leading-relaxed">
-        You have successfully sent{" "}
-        <span className="font-bold">
-          NGN{amount.toLocaleString("en-NG")}.00
-        </span>{" "}
-        to <span className="font-bold">{recipientName}</span>
-      </p>
+      {title && (
+        <h3 className="text-center text-[18px] font-semibold text-gray-900">
+          {title}
+        </h3>
+      )}
+        <p className="text-center text-[15px] text-gray-800 leading-relaxed">
+          {message}
+        </p>
       <button
         onClick={onContinue}
         className="w-full bg-primary text-white rounded-xl py-3.5 text-[15px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all mt-2"
       >
-        Continue
+        {buttonText}
       </button>
     </div>
   );
@@ -466,7 +473,7 @@ export default function WithdrawModal({
 
 
   // Simulate success/failure toggle for testing
-  const [simulateFailure, setSimulateFailure] = useState(false);
+  const simulateFailure = false;
 
   // Reset step when modal closes
   useEffect(() => {
@@ -489,13 +496,7 @@ export default function WithdrawModal({
     };
   }, [open]);
 
-  function handleEnterNext(
-    amount: number,
-    _bank: string,
-    _account: string,
-    _name: string,
-    _save: boolean,
-  ) {
+  function handleEnterNext(amount: number) {
     setWithdrawAmount(amount);
     setStep("confirm-bank");
   }

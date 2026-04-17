@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ProductInputField from "./ProductInputField";
-import { allStates } from "@/data/states";
+import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 import {
   productBrands,
   productCategories,
@@ -10,7 +10,6 @@ import {
   productSubCategories,
 } from "@/utils/productRequirements";
 import { ProductImageUpload } from "./ProductImageUpload";
-import { ErrorMessage } from "@/utils/PageUtils";
 import ProductModal from "./ProductModal";
 
 interface props{
@@ -46,10 +45,7 @@ const UploadProduct = ({setOpenModal}:props) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const statesArr = allStates.map((state) => ({
-    label: state,
-    value: state,
-  }));
+  const { stateOptions } = useStatesAndLgas();
 
   const productTypes = [
     { value: "fresh", label: "Fresh Produce" },
@@ -107,7 +103,7 @@ const UploadProduct = ({setOpenModal}:props) => {
           value={form.location}
           onChange={(val) => handleChange("location", val)}
           placeholder="Select your location"
-          options={statesArr}
+          options={stateOptions}
         />
 
         {/* Category */}

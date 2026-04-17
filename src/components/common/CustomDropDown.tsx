@@ -9,7 +9,7 @@ interface DropdownProps {
   icon?: React.ReactNode;
   textclass?: string;
   autoSelectFirst?: boolean;
-  width?: string;
+  width?: string | number;
   searchholder?: string;
   disabled?: boolean;
   searchable?: boolean;
@@ -39,7 +39,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
         onChange(options[0].value.toString());
       }
     }
-  }, [value, options, onChange]);
+  }, [autoSelectFirst, value, options, onChange]);
 
   // Filter options
   const filteredOptions = options.filter((opt) =>
@@ -59,13 +59,23 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
 
   // Find selected label
   const selected = options.find((opt) => opt.value === value)?.label;
+  const wrapperClass = width === "full" ? "w-full" : "";
+  const wrapperStyle =
+    typeof width === "number" ? { width: `${width / 4}rem` } : undefined;
 
   return (
-    <div ref={refDiv} className={`relative w-${width} `}>
+    <div ref={refDiv} className={`relative ${wrapperClass}`} style={wrapperStyle}>
       {/* Trigger */}
       <div
-        className={`flex items-center gap-2 max-w-3xl px-3 py-3 ${textclass} w-full bg-white border border-gray-200 rounded-lg hover:border-[var(--primary)] transition-all duration-200 cursor-pointer`}
-        onClick={() => setOpen((prev) => !prev)}
+        className={`flex items-center gap-2 max-w-3xl px-3 py-3 ${textclass} w-full border border-gray-200 rounded-lg transition-all duration-200 ${
+          disabled
+            ? "cursor-not-allowed bg-gray-100 text-gray-400"
+            : "cursor-pointer bg-white hover:border-[var(--primary)]"
+        }`}
+        onClick={() => {
+          if (disabled) return;
+          setOpen((prev) => !prev);
+        }}
       >
         {icon && <span className="text-gray-500">{icon}</span>}
         <span

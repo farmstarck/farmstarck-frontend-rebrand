@@ -4,6 +4,13 @@ import NotificationToggle from '@/components/common/toggle/NotificationToggle';
 import CollapsibleSection from '@/components/common/toggle/CollapsibleSection';
 import { useNavigate } from '@/hooks/useNavigate';
 
+const notificationItems = [
+    { label: "Order Updates", key: "orderUpdates" },
+    { label: "Delivery Tracking", key: "deliveryTracking" },
+    { label: "Promotions & Discounts", key: "promotions" },
+    { label: "Payment Activities", key: "paymentActivities" }
+] as const;
+
 
 
 export const NavigateButton = ({ label, href, kyc = false }: { label: string; href: string, kyc?: boolean }) => {
@@ -87,18 +94,13 @@ const Settings = () => {
                     onToggle={() => toggleSection("notifications")}
                 >
                     <div className="space-y-3">
-                        {[
-                            { label: "Order Updates", key: "orderUpdates" },
-                            { label: "Delivery Tracking", key: "deliveryTracking" },
-                            { label: "Promotions & Discounts", key: "promotions" },
-                            { label: "Payment Activities", key: "paymentActivities" }
-                        ].map(item => (
+                        {notificationItems.map(item => (
                             <div key={item.key} className="flex items-center justify-between py-2">
                                 <span className="text-gray-700">{item.label}</span>
                                 <NotificationToggle
-                                    notificationSettings={notificationSettings}
-                                    toggleNotification={toggleNotification}
-                                    type={item.key as keyof typeof notificationSettings}
+                                    checked={notificationSettings[item.key]}
+                                    onToggle={() => toggleNotification(item.key)}
+                                    ariaLabel={`Toggle ${item.label}`}
                                 />
                             </div>
                         ))}

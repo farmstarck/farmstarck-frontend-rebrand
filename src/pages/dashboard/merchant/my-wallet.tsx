@@ -35,7 +35,7 @@ const MyWallet = () => {
             <div className="px-4 py-4 bg-[#fbfbfb] flex flex-col gap-4 rounded-2xl">
 
                 {/* Balance Card */}
-                <div className="bg-white text-dark rounded-2xl p-5">
+                <div className="bg-white text-dark rounded-2xl px-5 py-10">
                     <p className="text-base md:text-lg  mb-1">Available Funds</p>
                     <div className="flex items-center justify-between mb-5">
                         <h1 className="text-2xl font-bold tracking-tight">
