@@ -15,7 +15,7 @@ const SuccessConfirmationModal = ({ boldTitle,title,message ,onClose,maxWidth="m
     <>
      <ModalLayout onClose={onClose} maxWidth={maxWidth}>
           <div className="relative px-5 pt-5 pb-6">
-            <CloseBtn onClose={onClose} />
+            <CloseBtn width={20} height={20} onClose={onClose} />
             <SuccessStep
               title={title}
               message={

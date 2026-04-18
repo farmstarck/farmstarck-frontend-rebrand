@@ -1,14 +1,13 @@
-import { Trash2, X } from 'lucide-react'
 import Image from 'next/image';
 
 interface DeleteModalProps {
     closeModal: (val: boolean) => void;
     isOpen: boolean;
-    title?: string;
     message?: string;
     onConfirm: () => void;
     confirmText?: string;
     cancelText?: string;
+    closeAfterConfirm?: boolean;
 }
 
 const ConfirmDeletion = ({
@@ -17,12 +16,15 @@ const ConfirmDeletion = ({
     onConfirm,
     message = "Are you sure you want to delete this product?",
     confirmText = "Yes, continue",
-    cancelText = "No, go back"
+    cancelText = "No, go back",
+    closeAfterConfirm = true,
 }: DeleteModalProps) => {
 
     const handleConfirm = () => {
         onConfirm();
-        closeModal(false);
+        if (closeAfterConfirm) {
+            closeModal(false);
+        }
     };
 
     return (
@@ -37,19 +39,19 @@ const ConfirmDeletion = ({
                             <Image src={'/assets/images/status/cancel.png'} alt="cancel img" width={20} height={20} />
                         </button>
 
-                        <div className="flex flex-col gap-10 mt-5 items-center text-center">
+                        <div className="flex flex-col gap-7 mt-5 items-center text-center">
                             <h3 className="text-base  font-bold text-gray-900 mb-2">{message}</h3>
 
 
                             <div className="gap-3 w-full flex flex-col items-center justify-between">
                                 <button
-                                    onClick={() => closeModal(false)}
+                                    onClick={handleConfirm}
                                     className='w-full text-gray-700 border border-primary rounded-full hover:bg-primary hover:text-white py-2 px-5 font-medium transition-colors'
                                 >
                                     {confirmText}
                                 </button>
                                 <button
-                                    onClick={handleConfirm}
+                                    onClick={()=>closeModal(false)}
                                     className='w-full text-white rounded-full bg-red-500 hover:bg-red-600 py-2 px-5 font-medium transition-colors'
                                 >
                                     {cancelText}

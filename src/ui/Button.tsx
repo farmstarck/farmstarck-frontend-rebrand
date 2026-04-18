@@ -31,7 +31,8 @@ const Button = ({
 
     return (
       <button
-      onClick={onClick}
+        onClick={onClick}
+        type="button"
         className={`${textClass} ${bg} hover:bg-primary/90 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2`}
       >
         <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white text-primary">
@@ -44,7 +45,9 @@ const Button = ({
 
   return (
     <button
-      className={`${textClass} ${bg} over:bg-primary/90 text-white px-4 py-2 rounded-md`}
+      onClick={onClick}
+      type="button"
+      className={`${textClass} ${bg} hover:bg-primary/90 text-white px-4 py-2 rounded-md`}
     >
       {label}
     </button>
