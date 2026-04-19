@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CustomDropDown } from "@/components/common/CustomDropDown";
 import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 import SuccessModal from "@/components/common/status/SuccessModal";
+import DashBoardWrapper from "@/components/dashboard/ui/DashBoardWrapper";
 
 const ProfileSettings = () => {
   const router = useRouter();
@@ -76,20 +77,10 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
-      {/* Header */}
-      <div className=" mb-6">
-        <button
-          onClick={() => router.back()}
-          className="p-2 flex items-center gap-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
-            Profile Settings
-          </h1>
-        </button>
-      </div>
-
+    <DashBoardWrapper
+     href="/dashboard/merchant/settings"
+     label="Profile"
+    >
       <div className="bg-white rounded-2xl shadow-sm p-6 lg:p-8">
         {/* Profile Picture Upload */}
         <div className="mb-6">
@@ -313,7 +304,7 @@ const ProfileSettings = () => {
         back_cta_title="Continue"
         back_cta_url="/dashboard/buyer/settings"
       />
-    </div>
+    </DashBoardWrapper>
   );
 };
 

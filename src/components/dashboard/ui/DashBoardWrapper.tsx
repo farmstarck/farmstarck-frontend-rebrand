@@ -3,7 +3,7 @@ import BackNavBtn from "./BackNavBtn";
 
 interface DashBoardWrapperProps {
   children: React.ReactNode;
-  href: string;
+  href?: string;
   label: string;
   linkAvailable?: boolean;
 }
@@ -11,7 +11,7 @@ interface DashBoardWrapperProps {
 const DashBoardWrapper = ({ children,linkAvailable, href, label }: DashBoardWrapperProps) => {
   return (
     <div className="w-full flex items-start flex-col gap-5">
-      <BackNavBtn href={href} label={label} linkAvailable={linkAvailable} />
+      <BackNavBtn href={href || "#"} label={label} linkAvailable={linkAvailable} />
       <div className="w-full max-w-7xl bg-white rounded-md mb-5 p-5  overflow-hidden ">
         {children}
       </div>

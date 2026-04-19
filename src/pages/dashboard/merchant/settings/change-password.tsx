@@ -5,6 +5,7 @@ import { ErrorMessage } from "@/utils/PageUtils";
 import OtpVerification from "@/components/common/auth/OtpVerification";
 import SuccessModal from "@/components/common/status/SuccessModal";
 import ApiLoader from "@/components/common/ui/ApiLoader";
+import DashBoardWrapper from "@/components/dashboard/ui/DashBoardWrapper";
 
 const ChangePassword = () => {
   const router = useRouter();
@@ -54,20 +55,10 @@ const ChangePassword = () => {
     console.log("Email OTP resent");
   };
   return (
-    <div className="max-w-7xl mx-auto px-4">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
-          Change Password
-        </h1>
-      </div>
-
+    <DashBoardWrapper
+     label="Change Password"
+     href="/dashboard/merchant/settings"
+    >
       <div className="bg-white rounded-2xl w-full shadow-sm p-6 lg:p-8">
         <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-5">
           {/* Previous Password */}
@@ -188,7 +179,7 @@ const ChangePassword = () => {
       />
 
       <ApiLoader loading={loading} />
-    </div>
+    </DashBoardWrapper>
   );
 };
 

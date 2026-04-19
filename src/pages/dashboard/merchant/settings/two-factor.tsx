@@ -3,6 +3,7 @@ import { CheckCircle, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/router";
 import SuccessModal from "@/components/common/status/SuccessModal";
 import OtpVerification from "@/components/common/auth/OtpVerification";
+import DashBoardWrapper from "@/components/dashboard/ui/DashBoardWrapper";
 
 const TwoFactorSettings = () => {
   const router = useRouter();
@@ -23,20 +24,11 @@ const TwoFactorSettings = () => {
   };
 
   return (
-    <div className="px-4">
-      <div className=" mb-6">
-        <button
-          onClick={() => router.back()}
-          className="p-2 flex items-center gap-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft size={20} />
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
-            Two Factor Authentication
-          </h1>
-        </button>
-      </div>
-
-      <div className="bg-white p-4 grid grid-cols-1 md:grid-cols-2 gap-5 w-full rounded-xl shadow-sm space-y-6">
+    <DashBoardWrapper
+     href="/dashboard/merchant/settings"
+     label="Two Factor Authentication"
+    >
+       <div className="bg-white p-4 grid grid-cols-1 md:grid-cols-2 gap-5 w-full rounded-xl shadow-sm space-y-6">
         {/* Email Section */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -95,7 +87,7 @@ const TwoFactorSettings = () => {
         back_cta_title="Continue"
         back_cta_url="/dashboard/buyer/settings"
       />
-    </div>
+    </DashBoardWrapper>
   );
 };
 
