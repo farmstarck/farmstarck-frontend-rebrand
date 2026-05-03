@@ -12,6 +12,7 @@ import {
   LogOutIcon,
   LayoutDashboard,
   ShoppingCartIcon,
+  HistoryIcon,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -57,15 +58,21 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
     },
     {
       icon: <Wallet size={20} />,
-      label: "My Pocket",
-      href: "/dashboard/buyer/my-pocket",
-      more: "/wallet",
+      label: "My Wallet",
+      href: "/dashboard/buyer/my-wallet",
+      more: "/my-wallet",
     },
     {
       icon: <Bell size={20} />,
       label: "Notifications",
       href: "/dashboard/buyer/notifications",
       more: "/notifications",
+    },
+    {
+      icon: <HistoryIcon size={20} />,
+      label: "Transactions",
+      href: "/dashboard/buyer/transaction-history",
+      more: "/transaction-history",
     },
     {
       icon: <Settings size={20} />,
@@ -212,6 +219,9 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
             </button>
 
             <div className="flex items-center gap-2">
+              <button onClick={() => navigate("/market/marketplace/")}>
+                <ShoppingCartSolidIcon className="w-6 h-6 text-white" />
+              </button>
               <button
                 onClick={() => navigate("/dashboard/buyer/notifications")}
                 className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -265,7 +275,7 @@ const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
 
         {/* Main Content - Scrollable */}
         <main className="pt-16 bg-[#ecf6ee] lg:pt-20 min-h-screen">
-          <div className="p-4 lg:pl-10">{children}</div>
+          <div className="px-2 pt-4 lg:pl-10">{children}</div>
         </main>
       </div>
     </div>

@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Button from "@/ui/Button";
+import CompleteFarmersForm from "@/forms/CompleteFarmersForm";
 
 const testimonial = [
   {
@@ -10,22 +12,23 @@ const testimonial = [
     author: "Chinwe, yam merchant (Benue)",
     videoUrl: "https://www.youtube.com/embed/qBMDHcPz35Y?si=YHXjkw4sbxagICPe",
   },
-  // {
-  //   id: 2,
-  //   text: "I would highly recommend this to everyone. A true game-changer.",
-  //   author: "John Smith",
-  //   videoUrl: "https://www.youtube.com/embed/Q49EhjZAJNI?si=9XjXQkQmPXP0Teq_",
-  // },
-  // {
-  //   id: 3,
-  //   text: "Excellent service and fantastic results. Couldn't ask for more.",
-  //   author: "Alice Johnson",
-  //   videoUrl: "https://www.youtube.com/embed/Q49EhjZAJNI?si=9XjXQkQmPXP0Teq_",
-  // },
+  {
+    id: 2,
+    text: "I would highly recommend this to everyone. A true game-changer.",
+    author: "John Smith",
+    videoUrl: "https://www.youtube.com/embed/Q49EhjZAJNI?si=9XjXQkQmPXP0Teq_",
+  },
+  {
+    id: 3,
+    text: "Excellent service and fantastic results. Couldn't ask for more.",
+    author: "Alice Johnson",
+    videoUrl: "https://www.youtube.com/embed/Q49EhjZAJNI?si=9XjXQkQmPXP0Teq_",
+  },
 ];
 
 const Testimonial = () => {
   const [current, setCurrent] = useState<number>(0);
+  const [join,setJoin] = useState(false)
 
   const next = () => {
     setCurrent((prev) => (prev + 1) % testimonial.length);
@@ -102,8 +105,19 @@ const Testimonial = () => {
               </AnimatePresence>
             </div>
           </div>
+          <div className="mt-10 w-full flex items0center justify-center">
+            <Button 
+            onClick={()=> setJoin(true)}
+            label="Join Happy Farmers"
+             textClass="w-1/3 py-3 font-semibold !rounded-full"
+            />
+          </div>
         </div>
       </div>
+
+      {join && (
+        <CompleteFarmersForm onClose={()=> setJoin(false)}/>
+      )}
     </div>
   );
 };

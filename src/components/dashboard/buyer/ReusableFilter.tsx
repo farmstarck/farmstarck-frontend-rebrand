@@ -13,6 +13,7 @@ interface Props {
   /** Main toggle */
   isOpen: boolean;
   onClose: () => void;
+  statusText?:string;
 
   /** Status filter (required) */
   statusOptions?: FilterOption[];
@@ -45,6 +46,7 @@ const ReusableFilter = ({
   priorityOptions = [],
   selectedPriorities = [],
   setSelectedPriorities,
+  statusText ="Status",
   dateFrom,
   dateTo,
   setDateFrom,
@@ -114,7 +116,7 @@ const ReusableFilter = ({
             {statusOptions.length > 0 && setSelectedStatuses && (
               <div>
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Filter by Status
+                  Filter by {statusText}
                 </h3>
                 <div className="space-y-2">
                   {statusOptions.map((opt) => (
@@ -293,22 +295,23 @@ const ReusableFilter = ({
 
           {/* ACTION BUTTONS */}
           <div className="mt-8 space-y-3">
-            {hasActiveFilters && (
-              <button
-                onClick={() => {
-                  onClear();
-                }}
-                className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
-              >
-                Clear Filters
-              </button>
-            )}
             <button
               onClick={onClose}
               className="w-full px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
             >
               Apply Filters
             </button>
+
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  onClear();
+                }}
+                className="w-full px-4 py-2.5 border border-primary text-primary rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
       </div>

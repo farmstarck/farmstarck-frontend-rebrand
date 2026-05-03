@@ -10,7 +10,7 @@ import { SuccessMessage } from "@/utils/PageUtils";
 import { LucideTrash2, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import  { useState } from "react";
 
 const MyWishlist = () => {
   const { wishlist } = useWishlistStore();
@@ -92,7 +92,7 @@ const MyWishlist = () => {
                   <div className="flex gap-4 flex-col">
                     <div className="flex items-center gap-4">
                       {/* Product Image */}
-                      <div className="relative w-40 h-40 flex-shrink-0">
+                      <div className="relative w-40 h-40 shrink-0">
                         <img
                           src={item.imageUrl}
                           alt={item.name}
@@ -124,7 +124,7 @@ const MyWishlist = () => {
                           {/* Delete Button */}
                           <button
                             onClick={() => handleRemoveItem(item.id)}
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex-shrink-0"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0"
                           >
                             <Trash2Icon className="w-5 h-5" />
                           </button>

@@ -1,10 +1,9 @@
 export interface lgaTypes{
     lgas:string[]
 }
-export interface statesTypes {
+export interface statesTypes extends lgaTypes {
     state:string
     capital:string
-    lgas:string[]
 }
 
 export const nigerianStatesWithLGAs:statesTypes[] = [
@@ -350,12 +349,12 @@ export const allStates = nigerianStatesWithLGAs.map(state => state.state);
 
 // // Get all LGAs for a specific state
 export const fetchLGAs = (param: string) => {
-    nigerianStatesWithLGAs.find(state => state.state === param)?.lgas || [];
+    return nigerianStatesWithLGAs.find(state => state.state === param)?.lgas || [];
 }
 
 // Get capital of a state
 export const fetchCapital = (param:string)=>{
-nigerianStatesWithLGAs.find(state => state.state === param)?.capital;
+return nigerianStatesWithLGAs.find(state => state.state === param)?.capital;
 } 
 
 // // Count total LGAs

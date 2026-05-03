@@ -1,5 +1,4 @@
 import { Trash2, X } from 'lucide-react'
-import React from 'react'
 
 interface DeleteModalProps {
     closeModal: (val: boolean) => void;

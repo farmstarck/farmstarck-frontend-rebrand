@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import BuyerDashboardLayout from "@/layouts/BuyerDashboardLayout";
 import { useAuthStore } from "@/store/slices/auth.slice";
+import MerchantDashboardLayout from "@/layouts/MerchantDashboardLayout";
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -58,6 +59,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // Check if current route is a buyer route
   const isBuyerRoute = router.pathname.startsWith("/dashboard/buyer");
+  const isMerchantRoute = router.pathname.startsWith("/dashboard/merchant");
   const isNoLayout = noLayoutRoutes.includes(router.pathname);
 
   // Get the appropriate layout
@@ -79,6 +81,18 @@ export default function App({ Component, pageProps }: AppProps) {
         <BuyerDashboardLayout>
           <PageComponent {...pageProps} />
         </BuyerDashboardLayout>
+        // </div>
+      );
+    }
+
+
+    // If it's a merchant route, use MerchantDashboardLayout
+    if (isMerchantRoute) {
+      return (
+        // <div className="">
+        <MerchantDashboardLayout>
+          <PageComponent {...pageProps} />
+        </MerchantDashboardLayout>
         // </div>
       );
     }

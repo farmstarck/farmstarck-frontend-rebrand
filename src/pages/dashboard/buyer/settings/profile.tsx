@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { ChevronLeft, User, Mail, Phone, Camera } from "lucide-react";
+import React, { useState } from "react";
+import { ChevronLeft, User, Mail, Camera } from "lucide-react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { CustomDropDown } from "@/components/common/CustomDropDown";
-import { allStates, nigerianStatesWithLGAs } from "@/data/states";
-import { isObject } from "framer-motion";
+import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 import SuccessModal from "@/components/common/status/SuccessModal";
 
 const ProfileSettings = () => {
@@ -21,35 +20,10 @@ const ProfileSettings = () => {
   });
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [lgaOptions, setLgaOptions] = useState<
-    Array<{ value: string; label: string }>
-  >([]);
   const [verified, setVerified] = useState(false);
-
-  const statesArr = allStates.map((state) => ({
-    label: state,
-    value: state,
-  }));
-
-  // Update LGA options when state changes
-  useEffect(() => {
-    if (formData.state) {
-      const state = nigerianStatesWithLGAs.find(
-        (state) => state.state === formData.state,
-      );
-
-      // Check if state is an object before mapping the lgas
-      if (isObject(state)) {
-        const lgaDropdownOptions = state.lgas.map((lga) => ({
-          label: lga,
-          value: lga,
-        }));
-        setLgaOptions(lgaDropdownOptions);
-      } else {
-        setLgaOptions([]);
-      }
-    }
-  }, [formData.state]);
+  const { stateOptions, lgaOptions } = useStatesAndLgas({
+    selectedState: formData.state,
+  });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -126,9 +100,11 @@ const ProfileSettings = () => {
             <div className="relative">
               <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
                 {profileImage ? (
-                  <img
+                  <Image
                     src={profileImage}
                     alt="Profile"
+                    width={80}
+                    height={80}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -276,7 +252,7 @@ const ProfileSettings = () => {
                   searchable={true}
                   width="full"
                   value={formData.state}
-                  options={statesArr}
+                  options={stateOptions}
                   onChange={handleStateChange}
                   placeholder="Select State"
                   searchholder="search states"

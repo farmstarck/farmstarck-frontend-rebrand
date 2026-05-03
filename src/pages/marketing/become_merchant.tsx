@@ -4,6 +4,9 @@ import Image from "next/image";
 import Testimonial from "../../components/GenericTestimonial";
 import Link from "next/link";
 import Faq from "@/components/Home/Faq";
+import Button from "@/ui/Button";
+import { useState } from "react";
+import CompleteMerchantForm from "@/forms/CompleteMerchantForm";
 
 export const MerchantAccordionItems = [
   {
@@ -73,6 +76,8 @@ const featuresItem = [
 ];
 
 const BecomeMerchant = () => {
+
+  const [openModal, setOpenModal] = useState(false)
   return (
     <>
       <Head>
@@ -92,118 +97,120 @@ const BecomeMerchant = () => {
         <link rel="canonical" href="https://farmstarck.com/marketing/become_merchant" />
       </Head>
       <div className="flex flex-col">
-      <div className="bg-[var(--lite)]">
-        <div className="p-5 relative flex flex-col justify-center items-center ">
-          <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
-            <h2 className="uppercase text-sm md:text-base text-center text-[var(--dark-green)] font-subHeading leading-relaxed">
-              our journey
-            </h2>
-            <h1 className="font-subHeading text-2xl md:text-4xl text-[var(--dark-green)] font-extrabold">
-              Become a Merchant
-            </h1>
-          </div>
-          <div className="w-full max-w-5xl m-auto mt-5 md:mt-10 flex flex-col md:flex-row justify-between items-center bg-white rounded-2xl px-5 md:px-10 py-8  md:py-5">
-            <div className="flex flex-col gap-3 md:gap-10 w-full md:w-2/3 items-center md:items-start">
-              <div className="w-full flex flex-col items-center md:items-start gap-3 md:gap-10 m-auto pb-8">
-                <h2 className="font-subHeading leading-tight text-center font-extrabold text-[var(--dark-green)] text-2xl sm:text-4xl md:text-5xl lg:text-6xl md:text-start">
-                  <span className="text-[var(--primary)]">Earn More.</span> Work
-                  Smarter.Reach More Custormers.
-                </h2>
-                <p className="text-sm font-subHeading2 sm:text-base md:text-lg text-center md:text-start">
-                  Join thousands of farmers and agro-merchants already growing
-                  with Farmstarck.
-                </p>
-                <div className="flex md:hidden w-full md:w-2/3 item-center">
-                  <Image
-                    height={900}
-                    width={900}
-                    src={'/assets/images/marketplace-merchant.png'}
-                    alt="market-img"
-                    className="object-contain w-full h-auto min-w-[250px]"
-                  />
+        <div className="bg-[var(--lite)]">
+          <div className="p-5 relative flex flex-col justify-center items-center ">
+            <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
+              <h2 className="uppercase text-sm md:text-base text-center text-[var(--dark-green)] font-subHeading leading-relaxed">
+                our journey
+              </h2>
+              <h1 className="font-subHeading text-2xl md:text-4xl text-[var(--dark-green)] font-extrabold">
+                Become a Merchant
+              </h1>
+            </div>
+            <div className="w-full max-w-5xl m-auto mt-5 md:mt-10 flex flex-col md:flex-row justify-between items-center bg-white rounded-2xl px-5 md:px-10 py-8  md:py-5">
+              <div className="flex flex-col gap-3 md:gap-10 w-full md:w-2/3 items-center md:items-start">
+                <div className="w-full flex flex-col items-center md:items-start gap-3 md:gap-10 m-auto pb-8">
+                  <h2 className="font-subHeading leading-tight text-center font-extrabold text-[var(--dark-green)] text-2xl sm:text-4xl md:text-5xl lg:text-6xl md:text-start">
+                    <span className="text-[var(--primary)]">Earn More.</span> Work
+                    Smarter.Reach More Custormers.
+                  </h2>
+                  <p className="text-sm font-subHeading2 sm:text-base md:text-lg text-center md:text-start">
+                    Join thousands of farmers and agro-merchants already growing
+                    with Farmstarck.
+                  </p>
+                  <div className="flex md:hidden w-full md:w-2/3 item-center">
+                    <Image
+                      height={900}
+                      width={900}
+                      src={'/assets/images/marketplace-merchant.png'}
+                      alt="market-img"
+                      className="object-contain w-full h-auto min-w-[250px]"
+                    />
+                  </div>
+                  <div className="w-full">
+                    <Button
+                      onClick={() => setOpenModal(true)}
+                      label="Start Selling"
+                      textClass="w-1/3 py-3 font-semibold !rounded-full"
+                    />
+                  </div>
                 </div>
-                <Link
-                  href=""
-                  className="px-20 self-auto text-center mt-5 py-3 md:py-4 bg-[var(--primary)] text-white text-base rounded-full font-btnBody transition-all duration-300 hover:bg-white hover:text-[var(--primary)] hover:border hover:border-[var(--primary)]"
-                >
-                  Start Selling
-                </Link>
+              </div>
+              <div className="hidden md:block w-full md:w-2/3">
+                <Image
+                  src={'/assets/images/marketplace-merchant.png'}
+                  alt="market-img"
+                  height={900}
+                  width={900}
+                  className="object-contain w-full h-auto min-w-[350px]"
+                />
               </div>
             </div>
-            <div className="hidden md:block w-full md:w-2/3">
-              <Image
-                src={'/assets/images/marketplace-merchant.png'}
-                alt="market-img"
-                height={900}
-                width={900}
-                className="object-contain w-full h-auto min-w-[350px]"
-              />
+          </div>
+          <div className="px-5 py-10 md:py-20 relative flex flex-col justify-center items-center gap-5 md:gap-10">
+            <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
+              <h1 className="font-subHeading text-center text-2xl md:text-3xl text-[var(--dark-green)] font-extrabold">
+                Why Become Our Merchant
+              </h1>
             </div>
-          </div>
-        </div>
-        <div className="px-5 py-10 md:py-20 relative flex flex-col justify-center items-center gap-5 md:gap-10">
-          <div className="w-full flex flex-col gap-3 md:gap-5 items-center ">
-            <h1 className="font-subHeading text-center text-2xl md:text-3xl text-[var(--dark-green)] font-extrabold">
-              Why Become Our Merchant
-            </h1>
-          </div>
-          <div className="w-full max-w-5xl mx-auto space-y-8 flex flex-col items-center">
-            <div className="flex flex-wrap w-full justify-center md:justify-center items-center gap-y-5 md:gap-y-10 gap-x-3 md:gap-x-8">
-              {featuresItem.map((item, i) => (
-                <div
-                  key={i}
-                  className={`
+            <div className="w-full max-w-5xl mx-auto space-y-8 flex flex-col items-center">
+              <div className="flex flex-wrap w-full justify-center md:justify-center items-center gap-y-5 md:gap-y-10 gap-x-3 md:gap-x-8">
+                {featuresItem.map((item, i) => (
+                  <div
+                    key={i}
+                    className={`
                         ${item.bg} flex flex-col items-center 
                         ${i === featuresItem.length - 1
-                      ? " flex w-[150px] md:w-[30%] md:flex-none"
-                      : "w-[150px] md:w-[30%]"
-                    }
+                        ? " flex w-[150px] md:w-[30%] md:flex-none"
+                        : "w-[150px] md:w-[30%]"
+                      }
                     `}
-                >
-                  <div className={item.iconBg}>
-                    <img src={item.icon} alt={item.header} className="w-4" />
+                  >
+                    <div className={item.iconBg}>
+                      <img src={item.icon} alt={item.header} className="w-4" />
+                    </div>
+                    <h2 className="font-subHeading text-[var(--dark-green)] text-center pt-2 text-sm md:text-base h-10 md:h-8">
+                      {item.header}
+                    </h2>
+                    <p className=" pt-2 text-center text-sm font-subHeading2 h-28 md:h-14">
+                      {item.text}
+                    </p>
                   </div>
-                  <h2 className="font-subHeading text-[var(--dark-green)] text-center pt-2 text-sm md:text-base h-10 md:h-8">
-                    {item.header}
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white">
+          <div className="px-5 relative pt-12 md:pt-10 pb-10">
+            <div className="w-full max-w-6xl m-auto space-y-12 flex flex-col items-center">
+              <div className="w-full flex flex-col items-center gap-3 md:gap-5">
+                <div className="max-w-3xl flex flex-col items-center gap-3 md:gap-5">
+                  <h2 className="text-xl sm:text-3xl md:text-4xl  text-center font-subHeading leading-tight font-extrabold text-[var(--dark-green)] text-centers">
+                    List and Manage Yor Products -{" "}
+                    <span className="text-[var(--primary)]">
+                      All in One Dashboard
+                    </span>
                   </h2>
-                  <p className=" pt-2 text-center text-sm font-subHeading2 h-28 md:h-14">
-                    {item.text}
+                  <p className="text-sm font-subHeading2 sm:text-base md:text-lg text-center">
+                    Seamlessly list your products, use our streamlined dashboard
+                    to manage orders, and track inventory
                   </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="bg-white">
-        <div className="px-5 relative pt-12 md:pt-10 pb-10">
-          <div className="w-full max-w-6xl m-auto space-y-12 flex flex-col items-center">
-            <div className="w-full flex flex-col items-center gap-3 md:gap-5">
-              <div className="max-w-3xl flex flex-col items-center gap-3 md:gap-5">
-                <h2 className="text-xl sm:text-3xl md:text-4xl  text-center font-subHeading leading-tight font-extrabold text-[var(--dark-green)] text-centers">
-                  List and Manage Yor Products -{" "}
-                  <span className="text-[var(--primary)]">
-                    All in One Dashboard
-                  </span>
-                </h2>
-                <p className="text-sm font-subHeading2 sm:text-base md:text-lg text-center">
-                  Seamlessly list your products, use our streamlined dashboard
-                  to manage orders, and track inventory
-                </p>
-              </div>
 
-              <img
-                src={'/assets/images/dashboard.png'}
-                alt="dashboard-img"
-                className="object-contain w-full h-auto min-w-[300px]"
-              />
+                <img
+                  src={'/assets/images/dashboard.png'}
+                  alt="dashboard-img"
+                  className="object-contain w-full h-auto min-w-[300px]"
+                />
+              </div>
+              <Testimonial />
             </div>
-            <Testimonial />
           </div>
         </div>
+        {openModal && <CompleteMerchantForm onClose={() => setOpenModal(false)} />}
+        <Faq accordionItems={MerchantAccordionItems} />
       </div>
-      <Faq accordionItems={MerchantAccordionItems} />
-    </div>
     </>
   );
 };
