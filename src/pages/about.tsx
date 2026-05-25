@@ -1,7 +1,7 @@
 "use client";
 import Head from "next/head";
 import Image from "next/image";
-
+//
 const solutionItem = [
   {
     text: "The Marketplace connects sellers and buyers directly, from crops to chemicals to tools",
