@@ -14,13 +14,17 @@ interface Props {
   onClose: () => void;
   isEdit?: boolean;
 }
+
 interface FileUploadSlotProps {
   label: string;
   hint: string;
   file: File | null;
   onClear: () => void;
   onUpload: (f: File) => void;
-  inputRef: RefObject<HTMLInputElement | null>; // ← add | null
+  inputRef: RefObject<HTMLInputElement | null>;
+  isRequired?: boolean;
+  error?: boolean;
+  existingUrl?: string;
 }
 
 const FARM_TYPES = [
@@ -53,23 +57,19 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // ── File validation error states ─────────────────────────────────
+  const [ownershipError, setOwnershipError] = useState(false);
+  const [addressError, setAddressError] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+
   const { stateOptions, lgaOptions } = useStatesAndLgas({
     selectedState: formData.state,
   });
 
-  const { mutate: becomeFarmer, isPending } = useMutation({
-    ...userMutations.becomeFarmer(),
-    onSuccess: () => {
-      setSuccess(true);
-      queryClient.invalidateQueries({ queryKey: userQueries.all });
-    },
-    onError: (err) => ErrorMessage(renderAxiosOrAuthError(err)),
-  });
-
-  // Edit Farmer
+  // ── Edit Farmer ───────────────────────────────────────────────────
   const { data: farmerProfile } = useQuery(userQueries.farmerProfile());
 
-  const { mutate, isPending: isUpdatingFarmer } = useMutation({
+  const { mutate, isPending } = useMutation({
     ...(isEdit
       ? userMutations.updateFarmerProfile()
       : userMutations.becomeFarmer()),
@@ -80,7 +80,7 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
     onError: (err) => ErrorMessage(renderAxiosOrAuthError(err)),
   });
 
-  // Pre-fill on edit
+  // ── Pre-fill on edit ─────────────────────────────────────────────
   useEffect(() => {
     if (isEdit && farmerProfile) {
       setFormData({
@@ -98,11 +98,45 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { farmName, farmType, farmAddress } = formData;
+
     if (!farmName || !farmType || !farmAddress) {
       ErrorMessage("Please fill in all required fields");
       return;
     }
-    becomeFarmer({
+
+    // ── Validate required documents ──────────────────────────────
+    let allValid = true;
+
+    const hasExistingOwnership = isEdit && !!farmerProfile?.proofOfOwnershipUrl;
+    if (!proofOfOwnership && !hasExistingOwnership) {
+      setOwnershipError(true);
+      allValid = false;
+    } else {
+      setOwnershipError(false);
+    }
+
+    const hasExistingAddress = isEdit && !!farmerProfile?.proofOfAddressUrl;
+    if (!proofOfAddress && !hasExistingAddress) {
+      setAddressError(true);
+      allValid = false;
+    } else {
+      setAddressError(false);
+    }
+
+    const hasExistingPhoto = isEdit && !!farmerProfile?.farmPhotoUrl;
+    if (!farmPhoto && !hasExistingPhoto) {
+      setPhotoError(true);
+      allValid = false;
+    } else {
+      setPhotoError(false);
+    }
+
+    if (!allValid) {
+      ErrorMessage("Please upload all required documents");
+      return;
+    }
+
+    mutate({
       farmName,
       farmType,
       farmAddress,
@@ -123,39 +157,62 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
     onClear,
     onUpload,
     inputRef,
+    isRequired,
+    error,
+    existingUrl,
   }: FileUploadSlotProps) => {
     const isPdf = file?.type === "application/pdf";
 
     return (
       <div className="w-full">
-        <label className="block text-[13px] font-semibold">{label}</label>
+        <label className="block text-[13px] font-semibold">
+          {label}
+          {isRequired && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
         <p className="text-[11px] text-gray-500 mb-2">{hint}</p>
         <div className="flex gap-2 h-20 items-center">
+          {/* Upload trigger */}
           <div
             onClick={() => inputRef.current?.click()}
-            className="h-20 w-[140px] border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary shrink-0"
+            className={`h-20 w-[140px] border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
+              error
+                ? "border-red-400 bg-red-50 hover:border-red-500"
+                : "border-gray-400 hover:border-primary"
+            }`}
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-gray-500"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
+            {/* Show existing URL thumbnail in edit mode when no new file */}
+            {existingUrl && !file ? (
+              <img
+                src={existingUrl}
+                alt={label}
+                className="w-full h-full object-cover rounded-md opacity-50"
+                onError={(ev) => {
+                  (ev.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={error ? "#ef4444" : "currentColor"}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={error ? "text-red-400" : "text-gray-500"}
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            )}
           </div>
 
+          {/* New file preview */}
           {file && (
             <div className="relative h-20 w-24 rounded-lg overflow-hidden border border-gray-200 shrink-0 group">
               {isPdf ? (
-                // ── PDF preview ────────────────────────────────────
                 <div className="w-full h-full bg-red-50 flex flex-col items-center justify-center gap-1">
                   <svg
                     width="20"
@@ -180,7 +237,6 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
                   </span>
                 </div>
               ) : (
-                // ── Image preview ───────────────────────────────────
                 <>
                   <img
                     src={URL.createObjectURL(file)}
@@ -220,6 +276,12 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
             </div>
           )}
         </div>
+
+        {error && (
+          <p className="text-xs text-red-500 mt-1 font-medium">
+            {label} is required
+          </p>
+        )}
 
         <input
           type="file"
@@ -374,16 +436,28 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
                 hint="Land Document or Farm Certificate (Image or PDF)"
                 file={proofOfOwnership}
                 onClear={() => setProofOfOwnership(null)}
-                onUpload={setProofOfOwnership}
+                onUpload={(f) => {
+                  setProofOfOwnership(f);
+                  setOwnershipError(false);
+                }}
                 inputRef={proofOfOwnershipRef}
+                isRequired
+                error={ownershipError}
+                existingUrl={farmerProfile?.proofOfOwnershipUrl}
               />
               <FileUploadSlot
                 label="Proof Of Address"
                 hint="Utility Bill or Farm License (Image or PDF)"
                 file={proofOfAddress}
                 onClear={() => setProofOfAddress(null)}
-                onUpload={setProofOfAddress}
+                onUpload={(f) => {
+                  setProofOfAddress(f);
+                  setAddressError(false);
+                }}
                 inputRef={proofOfAddressRef}
+                isRequired
+                error={addressError}
+                existingUrl={farmerProfile?.proofOfAddressUrl}
               />
             </div>
 
@@ -393,8 +467,14 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
                 hint="At least 1 clear photo of your farm"
                 file={farmPhoto}
                 onClear={() => setFarmPhoto(null)}
-                onUpload={setFarmPhoto}
+                onUpload={(f) => {
+                  setFarmPhoto(f);
+                  setPhotoError(false);
+                }}
                 inputRef={farmPhotoRef}
+                isRequired
+                error={photoError}
+                existingUrl={farmerProfile?.farmPhotoUrl}
               />
             </div>
 

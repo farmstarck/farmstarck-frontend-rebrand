@@ -41,6 +41,9 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
   const [businessLogo, setBusinessLogo] = useState<File | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // ── File validation error state ──────────────────────────────────
+  const [proofError, setProofError] = useState(false);
+
   const { stateOptions, lgaOptions } = useStatesAndLgas({
     selectedState: formData.state,
   });
@@ -106,6 +109,15 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
       return;
     }
 
+    // ── Proof of address is required unless already saved in edit mode ──
+    const hasExistingProof = isEdit && !!merchantProfile?.proofOfAddressUrl;
+    if (!proofOfAddress && !hasExistingProof) {
+      setProofError(true);
+      ErrorMessage("Please upload a proof of address document");
+      return;
+    }
+    setProofError(false);
+
     const payload = {
       shopName,
       businessCategory,
@@ -115,7 +127,7 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
       businessState: formData.state || undefined,
       businessLga: formData.lga || undefined,
       businessLogo: businessLogo ?? undefined,
-      proofOfAddress: proofOfAddress ?? undefined, // ← add
+      proofOfAddress: proofOfAddress ?? undefined,
     };
 
     if (isEdit && merchantProfile) {
@@ -249,7 +261,7 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
 
           {/* Files */}
           <div className="grid grid-cols-2 gap-5 w-full mt-2">
-            {/* Business Logo */}
+            {/* Business Logo — optional */}
             <div className="w-full">
               <label className="block text-[13px] font-semibold">
                 Business Logo
@@ -327,36 +339,53 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
               />
             </div>
 
-            {/* Proof of Address */}
+            {/* Proof of Address — required */}
             <div className="w-full">
               <label className="block text-[13px] font-semibold">
-                Proof Of Address
+                Proof Of Address{" "}
+                <span className="text-red-500">*</span>
               </label>
               <p className="text-[11px] text-gray-500 mb-2">
-                {isEdit
+                {isEdit && merchantProfile?.proofOfAddressUrl
                   ? "Upload new document to replace existing"
-                  : "Utility Bill or Business License (Image or PDF)"}
+                  : "Utility Bill or Business License (Image or PDF) — Required"}
               </p>
               <div className="flex gap-2 h-20 items-center">
                 <div
                   onClick={() => proofOfAddressRef.current?.click()}
-                  className="h-20 w-[140px] border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary shrink-0"
+                  className={`h-20 w-[140px] border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
+                    proofError
+                      ? "border-red-400 bg-red-50 hover:border-red-500"
+                      : "border-gray-400 hover:border-primary"
+                  }`}
                 >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-gray-500"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
+                  {/* Show existing thumbnail in edit mode when no new file */}
+                  {isEdit && merchantProfile?.proofOfAddressUrl && !proofOfAddress ? (
+                    <img
+                      src={merchantProfile.proofOfAddressUrl}
+                      alt="Current proof"
+                      className="w-full h-full object-cover rounded-md opacity-50"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={proofError ? "#ef4444" : "currentColor"}
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={proofError ? "text-red-400" : "text-gray-500"}
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                  )}
                 </div>
 
                 {proofOfAddress && (
@@ -413,13 +442,23 @@ const CompleteMerchantForm = ({ onClose, isEdit = false }: Props) => {
                   </div>
                 )}
               </div>
+
+              {proofError && (
+                <p className="text-xs text-red-500 mt-1 font-medium">
+                  Proof of address is required
+                </p>
+              )}
+
               <input
                 type="file"
                 className="hidden"
                 ref={proofOfAddressRef}
                 accept="image/*,application/pdf"
                 onChange={(e) => {
-                  if (e.target.files?.[0]) setProofOfAddress(e.target.files[0]);
+                  if (e.target.files?.[0]) {
+                    setProofOfAddress(e.target.files[0]);
+                    setProofError(false);
+                  }
                 }}
               />
             </div>

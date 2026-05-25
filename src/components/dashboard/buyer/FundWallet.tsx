@@ -48,8 +48,6 @@ const PAYMENT_METHODS: {
   },
 ];
 
-const CALLBACK_URL = `${process.env.NEXT_PUBLIC_CLIENT_URL}/dashboard/my-wallet/callback`;
-
 export default function FundWallet({ onClose }: FundWalletProps) {
   const { user } = useAuthStore();
   const router = useRouter();
@@ -68,6 +66,8 @@ export default function FundWallet({ onClose }: FundWalletProps) {
     if (!raw) return setAmount("");
     setAmount(Number(raw).toLocaleString("en-NG"));
   };
+
+  const CALLBACK_URL = `${process.env.NEXT_PUBLIC_CLIENT_URL}/dashboard/my-wallet/callback`;
 
   const handleInitiatePayment = async () => {
     if (!user?.email) {
