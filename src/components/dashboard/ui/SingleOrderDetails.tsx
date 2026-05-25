@@ -14,7 +14,7 @@ import OrderItemCard from "@/components/dashboard/buyer/OrderItemCard";
 import PaymentSummary from "@/components/dashboard/buyer/PaymentSummary";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orderMutations, orderQueries } from "@/queries/order.queries";
-import { OrderItem } from "@/types/prisma-schema-types";
+import { Order, OrderItem, OrderItemStatus } from "@/types/prisma-schema-types";
 import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { RateExperiencePayload } from "@/types";
@@ -65,7 +65,7 @@ const SingleOrderDetails: React.FC<SingleOrderDetailsProps> = ({
 
   const { data: order, isLoading } = useQuery({
     ...orderQueries.getBuyerOrderById(orderId as string),
-    select: (res: any) => res.data,
+    select: (res: { data: Order }) => res.data,
     enabled: !!orderId && router.isReady,
   });
 
@@ -273,7 +273,7 @@ const SingleOrderDetails: React.FC<SingleOrderDetailsProps> = ({
                 <OrderItemCard
                   key={item.id}
                   item={item}
-                  OrderItemStatus={order.status}
+                  OrderItemStatus={order.status as unknown as OrderItemStatus}
                   onRateProduct={(item) => {
                     setSelectedProduct(item);
                     setShowRateProduct(true);

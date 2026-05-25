@@ -43,7 +43,7 @@ const Blog = () => {
   const pagination = data?.pagination;
 
   const allTags = useMemo(
-    () => [...new Set(posts.flatMap((p: any) => p.tags ?? []))] as string[],
+    () => [...new Set(posts.flatMap((p: { tags?: string[] }) => p.tags ?? []))] as string[],
     [posts],
   );
 
@@ -72,7 +72,7 @@ const Blog = () => {
               <span className="text-primary">Agricultural Trends</span>
             </h1>
             <p className="text-gray-500 text-sm md:text-base max-w-lg leading-relaxed">
-              Insights, tips and news from Nigeria's leading agricultural
+              Insights, tips and news from Nigeria&apos;s leading agricultural
               marketplace — straight from our team of farming experts.
             </p>
 
@@ -154,7 +154,7 @@ const Blog = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {posts.map((post: any) => (
+                {posts.map((post: { id: string; slug: string; title: string; tags?: string[]; headerImage?: string; createdAt: string; content: unknown }) => (
                   <BlogCard
                     key={post.id}
                     post={post}
@@ -212,11 +212,12 @@ const Blog = () => {
 };
 
 // ── Excerpt helper ─────────────────────────────────────────────────
-export const extractExcerpt = (content: any, maxLength = 120): string => {
-  if (!content?.blocks) return "";
-  const text = content.blocks
-    .filter((b: any) => b.type === "paragraph")
-    .map((b: any) => b.data.text.replace(/<[^>]+>/g, ""))
+export const extractExcerpt = (content: { blocks?: { type: string; data: Record<string, unknown> }[] } | unknown, maxLength = 120): string => {
+  const c = content as { blocks?: { type: string; data: Record<string, unknown> }[] };
+  if (!c?.blocks) return "";
+  const text = c.blocks
+    .filter((b) => b.type === "paragraph")
+    .map((b) => ((b.data.text as string) ?? "").replace(/<[^>]+>/g, ""))
     .join(" ");
   return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 };

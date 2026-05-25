@@ -175,11 +175,12 @@ const ProductCard = ({ product }: { product: Product }) => {
             ))}
           </div>
           {hasRatings ? (
-            <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">
-              ({product.ratingCount})
+            <span className="text-[9px] sm:text-[10px] text-gray-500 font-bold">
+              {product.ratingCount}{" "}
+              {product.ratingCount > 1 ? "reviews" : "review"}
             </span>
           ) : (
-            <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">
+            <span className="text-[9px] sm:text-[10px] text-gray-500 font-bold">
               No reviews
             </span>
           )}

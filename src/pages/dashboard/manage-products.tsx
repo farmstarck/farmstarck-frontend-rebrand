@@ -6,7 +6,7 @@ import Image from "next/image";
 import Button from "@/ui/Button";
 import ModalLayout from "@/layouts/ModalLayout";
 import UploadProduct from "@/components/dashboard/merchant/UploadProduct";
-import { MerchantProductCard } from "@/components/dashboard/merchant/MerchantProductCard";
+import { MerchantProductCard, MerchantProductCardProduct } from "@/components/dashboard/merchant/MerchantProductCard";
 import SearchAndFilter from "@/components/common/ui/SearchAndFilter";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useSellerGuard } from "@/hooks/useSellerGuard";
@@ -85,7 +85,7 @@ const ManageProduct = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["seller-products", params],
     queryFn: () => ProductService.getSellerProducts(params),
-    select: (res: any) => ({
+    select: (res: { data?: MerchantProductCardProduct[]; pagination?: { totalPages: number; totalRecords: number } }) => ({
       products: res.data ?? [],
       totalPages: res.pagination?.totalPages ?? 1,
       totalRecords: res.pagination?.totalRecords ?? 0,
@@ -179,7 +179,7 @@ const ManageProduct = () => {
         ) : (
           /* Product list */
           <div className="flex flex-col gap-2.5">
-            {products.map((product: any) => (
+            {products.map((product: MerchantProductCardProduct) => (
               <MerchantProductCard
                 key={product.id}
                 product={product}

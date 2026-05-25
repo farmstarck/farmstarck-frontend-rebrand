@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import Calendar from "react-calendar";
-// @ts-ignore
 import "react-calendar/dist/Calendar.css";
 
 export interface FilterOption {
@@ -298,7 +297,7 @@ const ReusableFilter = ({
                           }
                         `}</style>
                         <Calendar
-                          onChange={(value: any) => {
+                          onChange={(value) => {
                             if (value instanceof Date) {
                               setDateFrom(value.toISOString().slice(0, 10));
                               setShowFromCalendar(false);
@@ -336,7 +335,7 @@ const ReusableFilter = ({
                     {showToCalendar && (
                       <div className="absolute top-full left-0 mt-1 z-10 bg-white shadow-lg rounded-lg border border-gray-200">
                         <Calendar
-                          onChange={(value: any) => {
+                          onChange={(value) => {
                             if (value instanceof Date) {
                               setDateTo(value.toISOString().slice(0, 10));
                               setShowToCalendar(false);

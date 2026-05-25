@@ -43,7 +43,7 @@ export const productQueries = {
   }),
 
   // SELLER QUERIES
-  sellerProducts: (params?: any) => ({
+  sellerProducts: (params?: Record<string, unknown>) => ({
     queryKey: [...productQueries.all, "seller-list", params] as const,
     queryFn: () => ProductService.getSellerProducts(params),
   }),

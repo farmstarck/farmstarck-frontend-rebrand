@@ -12,6 +12,7 @@ import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import ModalLayout from "@/layouts/ModalLayout";
 import UpdateProduct from "@/components/dashboard/merchant/UpdateProduct";
 import ProductForm from "@/components/dashboard/merchant/ProductForm";
+import { MerchantProductCardProduct } from "@/components/dashboard/merchant/MerchantProductCard";
 
 const SingleProduct = () => {
   useSellerGuard();
@@ -34,10 +35,10 @@ const SingleProduct = () => {
     queryKey: ["seller-product", id as string],
     queryFn: () => ProductService.getSellerProductById(id as string),
     enabled: !!id,
-    select: (res: any) => res.data,
+    select: (res: { data: MerchantProductCardProduct }) => res.data,
   });
 
-  const productData = data?.data ?? null;
+  const productData = data ?? null;
 
   // ── Populate images from real data ───────────────────────────────
   useEffect(() => {
@@ -286,7 +287,19 @@ const SingleProduct = () => {
             <ProductForm
               isEdit
               productId={id as string}
-              initialData={productData}
+              initialData={productData ? {
+                ...productData,
+                countType: productData.countType ?? undefined,
+                weightRange: productData.weightRange ?? undefined,
+                volumeRange: productData.volumeRange ?? undefined,
+                brand: productData.brand ?? undefined,
+                produceType: productData.produceType ?? undefined,
+                expiryDate:
+                  productData.expiryDate instanceof Date
+                    ? productData.expiryDate.toISOString().slice(0, 10)
+                    : (productData.expiryDate ?? undefined),
+                specifications: productData.specifications ?? undefined,
+              } : undefined}
               onClose={() => setShowUpdateForm(false)}
             />
           </div>

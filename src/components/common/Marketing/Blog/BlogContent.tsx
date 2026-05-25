@@ -1,6 +1,18 @@
+type BlockData = {
+  text?: string;
+  level?: number;
+  style?: string;
+  items?: string[];
+  file?: { url?: string };
+  caption?: string;
+  code?: string;
+  content?: string[][];
+  [key: string]: unknown;
+};
+
 interface Block {
   type: string;
-  data: any;
+  data: BlockData;
 }
 
 interface EditorContent {
@@ -19,12 +31,13 @@ const BlogContent = ({ content }: { content: EditorContent }) => {
               <p
                 key={i}
                 className="leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: block.data.text }}
+                dangerouslySetInnerHTML={{ __html: block.data.text ?? "" }}
               />
             );
 
           case "header":
-            const Tag = `h${block.data.level}` as keyof JSX.IntrinsicElements;
+            const level = block.data.level ?? 2;
+            const Tag = `h${level}` as keyof JSX.IntrinsicElements;
             const headerClass: Record<number, string> = {
               1: "text-3xl font-extrabold text-gray-900 mt-8 mb-4",
               2: "text-2xl font-bold text-gray-900 mt-6 mb-3",
@@ -36,8 +49,8 @@ const BlogContent = ({ content }: { content: EditorContent }) => {
             return (
               <Tag
                 key={i}
-                className={headerClass[block.data.level] ?? "font-bold"}
-                dangerouslySetInnerHTML={{ __html: block.data.text }}
+                className={headerClass[level] ?? "font-bold"}
+                dangerouslySetInnerHTML={{ __html: block.data.text ?? "" }}
               />
             );
 
@@ -50,7 +63,7 @@ const BlogContent = ({ content }: { content: EditorContent }) => {
                   block.data.style === "ordered" ? "list-decimal" : "list-disc"
                 }`}
               >
-                {block.data.items.map((item: string, j: number) => (
+                {(block.data.items ?? []).map((item: string, j: number) => (
                   <li key={j} dangerouslySetInnerHTML={{ __html: item }} />
                 ))}
               </ListTag>
@@ -80,7 +93,7 @@ const BlogContent = ({ content }: { content: EditorContent }) => {
               >
                 <p
                   className="italic text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: block.data.text }}
+                  dangerouslySetInnerHTML={{ __html: block.data.text ?? "" }}
                 />
                 {block.data.caption && (
                   <cite className="text-xs text-gray-400 mt-1 block not-italic">

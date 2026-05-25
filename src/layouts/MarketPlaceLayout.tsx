@@ -24,9 +24,10 @@ const MarketPlaceLayout = ({ children }: { children: React.ReactNode }) => {
     document.head.appendChild(script);
 
     // Initialize gtag
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    function gtag(...args: any[]) {
-      (window as any).dataLayer.push(args);
+    (window as unknown as Record<string, unknown>).dataLayer =
+      (window as unknown as Record<string, unknown[]>).dataLayer || [];
+    function gtag(...args: unknown[]) {
+      ((window as unknown as Record<string, unknown[]>).dataLayer as unknown[]).push(args);
     }
     gtag("js", new Date());
     gtag("config", GA_ID);

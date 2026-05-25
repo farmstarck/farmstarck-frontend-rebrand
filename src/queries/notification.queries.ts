@@ -20,8 +20,8 @@ export const notificationQueries = {
   notifications: (params: QueryNotificationParams) => ({
     queryKey: [...notificationQueries.all, "list", params] as const,
     queryFn: () => NotificationService.getNotifications(params),
-    select: (res: any): PaginatedResponse<AppNotification> => ({
-      items: res.data as AppNotification[],
+    select: (res: { data: AppNotification[]; unreadCount?: number; pagination: { totalPages: number; totalRecords: number; currentPage: number } }): PaginatedResponse<AppNotification> => ({
+      items: res.data,
       unreadCount: res.unreadCount,
       totalPages: res.pagination.totalPages,
       totalRecords: res.pagination.totalRecords,
@@ -32,8 +32,8 @@ export const notificationQueries = {
   activities: (params: QueryActivityParams) => ({
     queryKey: [...notificationQueries.all, "activities", params] as const,
     queryFn: () => NotificationService.getActivities(params),
-    select: (res: any): PaginatedResponse<AppActivity> => ({
-      items: res.data as AppActivity[],
+    select: (res: { data: AppActivity[]; pagination: { totalPages: number; totalRecords: number; currentPage: number } }): PaginatedResponse<AppActivity> => ({
+      items: res.data,
       totalPages: res.pagination.totalPages,
       totalRecords: res.pagination.totalRecords,
       currentPage: res.pagination.currentPage,
@@ -43,7 +43,7 @@ export const notificationQueries = {
   unreadCount: () => ({
     queryKey: [...notificationQueries.all, "unread-count"] as const,
     queryFn: NotificationService.getUnreadCount,
-    select: (res: any) => res.count as number,
+    select: (res: { count: number }) => res.count,
   }),
 };
 

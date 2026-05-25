@@ -1,13 +1,20 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useProductFilters } from "@/hooks/useProductFilter";
+import { useProductFilters, ProductFilter } from "@/hooks/useProductFilter";
 import { categoryQueries } from "@/queries/category.queries";
 import { Product, SubCategory } from "@/types/prisma-schema-types";
 import { productQueries } from "@/queries/product.queries";
 
-type ProductQueryFactory = (filters: any) => {
+type ProductApiResponse = {
+  data: {
+    data: Product[];
+    pagination: { totalPages: number; currentPage: number };
+  };
+};
+
+type ProductQueryFactory = (filters: ProductFilter) => {
   queryKey: readonly unknown[];
-  queryFn: () => Promise<any>;
+  queryFn: () => Promise<ProductApiResponse>;
 };
 
 export const useProductPage = (queryFactory: ProductQueryFactory) => {
@@ -15,16 +22,16 @@ export const useProductPage = (queryFactory: ProductQueryFactory) => {
 
   const { data: productsData } = useQuery({
     ...queryFactory(filters),
-    select: (res: any) => ({
-      products: res.data.data as Product[],
-      totalPages: res.data.pagination.totalPages as number,
-      currentPage: res.data.pagination.currentPage as number,
+    select: (res: ProductApiResponse) => ({
+      products: res.data.data,
+      totalPages: res.data.pagination.totalPages,
+      currentPage: res.data.pagination.currentPage,
     }),
   });
 
   const { data: subCategories = [] } = useQuery({
     ...categoryQueries.subCategories(),
-    select: (res: any) => res.data.data as SubCategory[],
+    select: (res: { data: { data: SubCategory[] } }) => res.data.data,
   });
 
   const locations = useMemo(() => {

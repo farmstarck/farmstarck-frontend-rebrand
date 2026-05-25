@@ -65,7 +65,7 @@ const AddBankModal = ({ onClose }: AddBankModalProps) => {
   const handleBankChange = (bankId: string) => {
     setSelectedBankId(bankId);
     // code is stored on the option object
-    const bank = banks.find((b: any) => b.value === bankId);
+    const bank = banks.find((b: { value: string; code?: string }) => b.value === bankId);
     setSelectedBankCode(bank?.code ?? "");
     setAccountHolderName("");
     setVerifyError("");

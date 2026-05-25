@@ -1,4 +1,4 @@
-const formatSpecifications = (specs: any): string[] => {
+const formatSpecifications = (specs: unknown): string[] => {
   if (!specs) return [];
   if (Array.isArray(specs)) return specs.filter(Boolean);
   if (typeof specs === "object") {

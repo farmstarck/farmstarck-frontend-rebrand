@@ -22,7 +22,7 @@ export function redirectToSignIn() {
 
 const isAuthError = (error: unknown) => {
   if (!error || typeof error !== "object") return false;
-  const status = (error as any)?.response?.status;
+  const status = (error as { response?: { status?: number } })?.response?.status;
 
   return status === 401 || status === 403;
 };

@@ -22,7 +22,14 @@ export const getBankAccent = (bankName: string = "") => {
 };
 
 interface BankCardProps {
-  detail: any;
+  detail: {
+    id: string;
+    bank?: { name?: string };
+    isDefault?: boolean;
+    paystackRecipientCode?: string;
+    accountNumber: string;
+    accountHolderName: string;
+  };
   onDelete: (id: string) => void;
   onSetDefault: (id: string) => void;
 }

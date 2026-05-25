@@ -214,6 +214,28 @@ const SellerItemRow = ({
   );
 };
 
+// ── Seller order response shape ───────────────────────────────────
+interface SellerOrderResponse {
+  data: {
+    items: OrderItem[];
+    status: string;
+    subTotal?: number;
+    commission?: number;
+    sellerEarning?: number;
+    paidOut?: boolean;
+    eligibleForPayout?: boolean;
+    eligibleAt?: string;
+    createdAt?: string;
+    order?: {
+      orderId?: string;
+      buyer?: { fullName?: string; email?: string };
+      address?: { street?: string; city?: string; state?: string; phoneNumber?: string };
+      createdAt?: string;
+      shippingMethod?: string;
+    };
+  };
+}
+
 // ── Main component ────────────────────────────────────────────────
 interface Props {
   backHref: string;
@@ -227,7 +249,7 @@ const SellerOrderDetails: React.FC<Props> = ({ backHref }) => {
 
   const { data: orderData, isLoading } = useQuery({
     ...orderQueries.getSellerOrderById(orderId as string),
-    select: (res: any) => res,
+    select: (res: unknown) => res as SellerOrderResponse,
     enabled: !!orderId && router.isReady,
   });
 
@@ -305,7 +327,7 @@ const SellerOrderDetails: React.FC<Props> = ({ backHref }) => {
               <p className="text-gray-500">Date</p>
               <p className="font-semibold text-gray-900">
                 {new Date(
-                  order.order?.createdAt ?? order.createdAt,
+                  order.order?.createdAt ?? order.createdAt ?? "",
                 ).toLocaleDateString()}
               </p>
             </div>

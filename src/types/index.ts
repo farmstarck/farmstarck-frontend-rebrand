@@ -166,7 +166,7 @@ export type AppNotification = {
   title: string;
   message: string;
   isRead: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 };
 
@@ -176,7 +176,7 @@ export type AppActivity = {
   type: ActivityType;
   title: string;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 };
 

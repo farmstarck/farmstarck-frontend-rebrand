@@ -275,7 +275,7 @@ const Support = () => {
           {/* Nudge to contact tab */}
           <div className="mt-8 p-4 bg-litegreen rounded-xl flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              Can't find what you're looking for?
+              Can&apos;t find what you&apos;re looking for?
             </p>
             <button
               onClick={() => setActiveTab("contact")}
