@@ -224,7 +224,7 @@ const CompleteFarmersForm = ({ onClose, isEdit }: Props) => {
         <input
           type="file"
           className="hidden"
-          ref={inputRef}
+          ref={inputRef as React.RefObject<HTMLInputElement>}
           accept="image/*,application/pdf"
           onChange={(e) => {
             if (e.target.files?.[0]) onUpload(e.target.files[0]);
