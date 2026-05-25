@@ -41,8 +41,7 @@ export const useStatesAndLgas = ({
 
   const hasSelectedLga = useMemo(
     () =>
-      !selectedLga ||
-      lgaOptions.some((option) => option.value === selectedLga),
+      !selectedLga || lgaOptions.some((option) => option.value === selectedLga),
     [lgaOptions, selectedLga],
   );
 

@@ -1,5 +1,4 @@
 import OrdersListPanel from "@/components/dashboard/ui/OrdersListPanel";
-import React from "react";
 
 const MyOrders = () => {
   return (

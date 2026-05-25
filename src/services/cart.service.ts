@@ -1,48 +1,26 @@
 import api from "@/lib/axios-client";
 
-type AddToCartProps = {
-  productId: string;
-  quantity: number;
+export type AddToCartProps = { productId: string; quantity: number };
+export type RemoveFromCartProps = { productId: string };
+export type UpdateCartQuantityProps = { productId: string; quantity: number };
+export type BulkSyncProps = { productId: string; quantity: number };
+
+const CartService = {
+  addToCart: (data: AddToCartProps) =>
+    api.post("/api/cart/add", data).then((r) => r.data),
+
+  getCart: () => api.get("/api/cart").then((r) => r.data),
+
+  removeFromCart: (data: RemoveFromCartProps) =>
+    api.delete(`/api/cart/remove/${data.productId}`).then((r) => r.data),
+
+  updateCartQuantity: (data: UpdateCartQuantityProps) =>
+    api.patch("/api/cart/update", data).then((r) => r.data),
+
+  clearCart: () => api.delete("/api/cart/clear").then((r) => r.data),
+
+  bulkSync: (data: BulkSyncProps[]) =>
+    api.post("/api/cart/bulk-sync", data).then((r) => r.data),
 };
 
-type RemoveFromCartProps = {
-  productId: string;
-};
-
-type UpdateCartQuantityProps = {
-  productId: string;
-  quantity: number;
-};
-type BulkSyncProps = {
-  productId: string;
-  quantity: number;
-};
-
-const Services = {
-  addToCart: async (data: AddToCartProps) => {
-    const response = await api.post("/api/cart/add", data);
-    return response.data;
-  },
-  getCart: async () => {
-    const response = await api.get("/api/cart");
-    return response.data;
-  },
-  removeFromCart: async (data: RemoveFromCartProps) => {
-    const response = await api.delete(`/api/cart/remove/${data.productId}`);
-    return response.data;
-  },
-  updateCartQuantity: async (data: UpdateCartQuantityProps) => {
-    const response = await api.patch(`/api/cart/update`, data);
-    return response.data;
-  },
-  clearCart: async () => {
-    const response = await api.delete(`/api/cart/clear`);
-    return response.data;
-  },
-  bulkSync: async (data: BulkSyncProps[]) => {
-    const response = await api.post(`/api/cart/bulk-sync`, data);
-    return response.data;
-  },
-};
-
-export default Services;
+export default CartService;

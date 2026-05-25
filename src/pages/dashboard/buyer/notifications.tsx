@@ -1,256 +1,241 @@
 "use client";
-import React, { useState } from 'react';
-import { Package, Bell, Activity, CheckCircle, Trash2 } from 'lucide-react';
-import DeleteConfirmationModal from '@/components/common/DeleteConfirmationModal';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { Package, Bell, Activity, CheckCircle, Trash2 } from "lucide-react";
+import DeleteConfirmationModal from "@/components/common/DeleteConfirmationModal";
+import Image from "next/image";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  notificationMutations,
+  notificationQueries,
+} from "@/queries/notification.queries";
 
-interface Notification {
-    id: string;
-    type: 'notification' | 'service' | 'activity' |'none';
-    category: 'order' | 'service' | 'activity' | 'promotion';
-    title: string;
-    message: string;
-    date: string;
-    time: string;
-    isRead: boolean;
-}
+import { AppActivity, AppNotification } from "@/types";
+
+import { NotificationType } from "@/types/prisma-schema-types";
+
+type Tab = "notification" | "services" | "activities";
+
+const NOTIFICATION_TYPE_MAP: Record<Tab, NotificationType | undefined> = {
+  notification: undefined, // all notifications
+  services: NotificationType.service,
+  activities: undefined, // activities use separate endpoint
+};
+
+const getCategoryIcon = (type: string) => {
+  switch (type) {
+    case "order":
+      return <Package size={20} className="text-white" />;
+    case "service":
+      return <Bell size={20} className="text-white" />;
+    case "payment":
+    case "refund":
+    case "wallet_funded":
+    case "wallet_debited":
+      return <CheckCircle size={20} className="text-white" />;
+    default:
+      return <Activity size={20} className="text-white" />;
+  }
+};
 
 const Notifications = () => {
-    const [activeTab, setActiveTab] = useState<'notification' | 'services' | 'activities'|'none'>('notification');
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [notificationToDelete, setNotificationToDelete] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<Tab>("notification");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [notificationToDelete, setNotificationToDelete] = useState<
+    string | null
+  >(null);
 
-    // Mock notifications data
-    const [notifications, setNotifications] = useState<Notification[]>([
-        {
-            id: '1',
-            type: 'notification',
-            category: 'order',
-            title: 'Order Completed',
-            message: 'Your order 14O98765 has been delivered successfully. Thank you',
-            date: '06-12-2025',
-            time: '14:09',
-            isRead: false
-        },
-        {
-            id: '2',
-            type: 'notification',
-            category: 'order',
-            title: 'Order Completed',
-            message: 'Your order 14O98765 has been delivered successfully. Thank you',
-            date: '06-12-2025',
-            time: '14:09',
-            isRead: false
-        },
-        {
-            id: '3',
-            type: 'notification',
-            category: 'order',
-            title: 'Order Completed',
-            message: 'Your order 14O98765 has been delivered successfully. Thank you',
-            date: '06-12-2025',
-            time: '14:09',
-            isRead: false
-        },
-        {
-            id: '4',
-            type: 'notification',
-            category: 'order',
-            title: 'Order Completed',
-            message: 'Your order 14O98765 has been delivered successfully. Thank you',
-            date: '04-12-2025',
-            time: '14:09',
-            isRead: false
-        },
-        {
-            id: '5',
-            type: 'service',
-            category: 'service',
-            title: 'Service Request Approved',
-            message: 'Your service request for farm consultation has been approved',
-            date: '05-12-2025',
-            time: '10:30',
-            isRead: false
-        },
-        {
-            id: '6',
-            type: 'service',
-            category: 'service',
-            title: 'Payment Received',
-            message: 'Payment of ₦50,000 has been received for your service',
-            date: '05-12-2025',
-            time: '09:15',
-            isRead: false
-        },
-        {
-            id: '7',
-            type: 'activity',
-            category: 'activity',
-            title: 'New Product Added',
-            message: 'You have successfully added a new product to your store',
-            date: '03-12-2025',
-            time: '16:45',
-            isRead: false
-        },
-        {
-            id: '8',
-            type: 'activity',
-            category: 'activity',
-            title: 'Profile Updated',
-            message: 'Your profile information has been updated successfully',
-            date: '02-12-2025',
-            time: '11:20',
-            isRead: false
-        }
-    ]);
+  const isActivitiesTab = activeTab === "activities";
 
-    const getCategoryIcon = (category: string) => {
-        switch (category) {
-            case 'order':
-                return <Package size={20} className="text-white" />;
-            case 'service':
-                return <Bell size={20} className="text-white" />;
-            case 'activity':
-                return <Activity size={20} className="text-white" />;
-            default:
-                return <CheckCircle size={20} className="text-white" />;
-        }
-    };
+  // ── Queries ──────────────────────────────────────────────────────
+  const { data: notifData, isLoading: loadingNotifs } = useQuery({
+    ...notificationQueries.notifications({
+      size: 20,
+      type: activeTab === "services" ? NotificationType.service : undefined,
+    }),
+    enabled: !isActivitiesTab,
+  });
 
-    const handleDeleteClick = (id: string) => {
-        setNotificationToDelete(id);
-        setShowDeleteModal(true);
-    };
+  const { data: activityData, isLoading: loadingActivities } = useQuery({
+    ...notificationQueries.activities({ size: 20 }),
+    enabled: isActivitiesTab,
+  });
 
-    const handleConfirmDelete = () => {
-        if (notificationToDelete) {
-            setNotifications(prev => prev.filter(notif => notif.id !== notificationToDelete));
-            setNotificationToDelete(null);
-        }
-    };
+  const isLoading = isActivitiesTab ? loadingActivities : loadingNotifs;
 
-    const filteredNotifications = notifications.filter(notif => {
-        if (activeTab === 'notification') return notif.type === 'notification';
-        if (activeTab === 'services') return notif.type === 'service';
-        if (activeTab === 'activities') return notif.type === 'activity';
-        if (activeTab === 'none') return notif.type === 'none';
-        return true;
-    });
+  // ── Mutations ────────────────────────────────────────────────────
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: notificationQueries.all });
 
-    return (
-        <div className="max-w-7xl mx-auto p-4">
-            <h1 className="text-xl lg:text-2xl font-bold text-gray-800 mb-6">Notifications</h1>
+  const { mutate: markRead } = useMutation({
+    ...notificationMutations.markRead(),
+    onSuccess: invalidate,
+  });
 
-            {/* Tab Navigation */}
-            <div className="bg-white rounded-xl w-full p-6">
-                <div className="flex flex-wrap gap-2 mb-6">
-                    <button
-                        onClick={() => setActiveTab('notification')}
-                        className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
-                            activeTab === 'notification'
-                                ? 'bg-primary text-white'
-                                : 'bg-white text-gray-700 border border-primary hover:bg-primary/10'
-                        }`}
-                    >
-                        Notification
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('services')}
-                        className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
-                            activeTab === 'services'
-                                ? 'bg-primary text-white'
-                                : 'bg-white text-gray-700 border border-primary hover:bg-primary/10'
-                        }`}
-                    >
-                        Services
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('activities')}
-                        className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
-                            activeTab === 'activities'
-                                ? 'bg-primary text-white'
-                                : 'bg-white text-gray-700 border border-primary hover:bg-primary/10'
-                        }`}
-                    >
-                        Activities
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('none')}
-                        className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
-                            activeTab === 'none'
-                                ? 'bg-primary text-white'
-                                : 'bg-white text-gray-700 border border-primary hover:bg-primary/10'
-                        }`}
-                    >
-                        None
-                    </button>
-                </div>
+  const { mutate: markAllRead } = useMutation({
+    ...notificationMutations.markAllRead(),
+    onSuccess: invalidate,
+  });
 
-                {/* Notifications List */}
-                <div className="space-y-4">
-                    {filteredNotifications.length === 0 ? (
-                        <div className="bg-white flex items-center flex-col gap-5 rounded-2xl p-8 text-center">
-                            <Image 
-                            src='/assets/images/dashboard/buyer/notify.png'
-                            alt='notice img' 
-                            lazyBoundary='100'
-                             width={200} 
-                             height={200} 
-                             />
-                            <p className="text-gray-500">You do not have any notification yet. Check back later</p>
-                        </div>
-                    ) : (
-                        filteredNotifications.map((notif) => (
-                            <div
-                                key={notif.id}
-                                className="bg-white rounded-2xl p-4 lg:p-6 border border-gray-200 hover:shadow-md transition-shadow group"
-                            >
-                                <div className="flex gap-3 lg:gap-4">
-                                    {/* Icon */}
-                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                                        {getCategoryIcon(notif.category)}
-                                    </div>
+  const { mutate: deleteNotification } = useMutation({
+    ...notificationMutations.deleteNotification(),
+    onSuccess: () => {
+      invalidate();
+      setShowDeleteModal(false);
+      setNotificationToDelete(null);
+    },
+  });
 
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-gray-900 mb-1 text-sm lg:text-base">
-                                            {notif.title}
-                                        </h3>
-                                        <p className="text-gray-600 text-sm lg:text-base mb-2">
-                                            {notif.message}
-                                        </p>
-                                        <p className="text-gray-400 text-xs lg:text-sm">
-                                            {notif.date} {notif.time}
-                                        </p>
-                                    </div>
+  const handleDeleteClick = (id: string) => {
+    setNotificationToDelete(id);
+    setShowDeleteModal(true);
+  };
 
-                                    {/* Delete Button */}
-                                    <button
-                                        onClick={() => handleDeleteClick(notif.id)}
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-red-50 rounded-lg h-fit"
-                                        aria-label="Delete notification"
-                                    >
-                                        <Trash2 size={20} className="text-red-500" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
+  // ── Render items ─────────────────────────────────────────────────
+  const renderItems = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center py-10">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
+    }
+
+    const items = isActivitiesTab
+      ? (activityData?.items ?? [])
+      : (notifData?.items ?? []);
+
+    if (items.length === 0) {
+      return (
+        <div className="bg-white flex items-center flex-col gap-5 rounded-2xl p-8 text-center">
+          <Image
+            src="/assets/images/dashboard/buyer/notify.png"
+            alt="no notifications"
+            width={200}
+            height={200}
+          />
+          <p className="text-gray-500">
+            You do not have any {isActivitiesTab ? "activity" : "notification"}{" "}
+            yet.
+          </p>
+        </div>
+      );
+    }
+
+    return items.map((item) => {
+      const isNotif = !isActivitiesTab;
+      const notif = item as AppNotification;
+      const activity = item as AppActivity;
+
+      return (
+        <div
+          key={item.id}
+          onClick={() => isNotif && !notif.isRead && markRead(item.id)}
+          className={`rounded-2xl p-4 lg:p-6 border transition-shadow group cursor-pointer ${
+            isNotif && !notif.isRead
+              ? "border-primary/30 bg-primary/5"
+              : "border-gray-200 bg-white hover:shadow-md"
+          }`}
+        >
+          <div className="flex gap-3 lg:gap-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              {getCategoryIcon(item.type)}
             </div>
 
-            {/* Delete Confirmation Modal */}
-            <DeleteConfirmationModal
-                isOpen={showDeleteModal}
-                closeModal={setShowDeleteModal}
-                onConfirm={handleConfirmDelete}
-                title="Delete Notification"
-                message="Are you sure you want to delete this notification? This action cannot be undone."
-                confirmText="Delete"
-                cancelText="Cancel"
-            />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-semibold text-gray-900 text-sm lg:text-base">
+                  {item.title}
+                  {isNotif && !notif.isRead && (
+                    <span className="ml-2 inline-block w-2 h-2 bg-primary rounded-full align-middle" />
+                  )}
+                </h3>
+                {isNotif && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(item.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-red-50 rounded-lg shrink-0"
+                  >
+                    <Trash2 size={16} className="text-red-500" />
+                  </button>
+                )}
+              </div>
+              <p className="text-gray-600 text-sm mt-0.5">{item.message}</p>
+              <p className="text-gray-400 text-xs mt-1">
+                {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}{" "}
+                {new Date(item.createdAt).toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </div>
         </div>
-    );
+      );
+    });
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-4">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
+          Notifications
+        </h1>
+        {!isActivitiesTab && (notifData?.unreadCount ?? 0) > 0 && (
+          <button
+            onClick={() => markAllRead()}
+            className="text-sm text-primary font-medium hover:underline"
+          >
+            Mark all as read ({notifData?.unreadCount})
+          </button>
+        )}
+      </div>
+
+      <div className="bg-white rounded-xl w-full p-6">
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {(["notification", "services", "activities"] as Tab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-full font-medium text-sm transition-colors capitalize ${
+                activeTab === tab
+                  ? "bg-primary text-white"
+                  : "bg-white text-gray-700 border border-primary hover:bg-primary/10"
+              }`}
+            >
+              {tab}
+              {tab === "notification" && (notifData?.unreadCount ?? 0) > 0 && (
+                <span className="ml-1.5 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifData?.unreadCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-4">{renderItems()}</div>
+      </div>
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        closeModal={setShowDeleteModal}
+        onConfirm={() =>
+          notificationToDelete && deleteNotification(notificationToDelete)
+        }
+        title="Delete Notification"
+        message="Are you sure you want to delete this notification? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+    </div>
+  );
 };
 
 export default Notifications;

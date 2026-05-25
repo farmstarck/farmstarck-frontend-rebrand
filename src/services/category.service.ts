@@ -2,49 +2,32 @@ import { ProductFilter } from "@/hooks/useProductFilter";
 import api from "@/lib/axios-client";
 import { buildProductFilterQuery } from "@/utils/buildProductFilterQuery";
 
-const Services = {
-  getAllCategories: async () => {
-    const response = await api.get("/api/category");
-    return response.data;
-  },
+const CategoryService = {
+  getAllCategories: () => api.get("/api/category").then((r) => r.data),
 
-  getCategoryById: async (id: string) => {
-    const response = await api.get(`/api/category/single/${id}`);
-    return response.data;
-  },
+  getCategoryById: (id: string) =>
+    api.get(`/api/category/single/${id}`).then((r) => r.data),
 
-  getCategoryBySlug: async (slug: string) => {
-    const response = await api.get(`/api/category/slug/${slug}`);
-    return response.data;
-  },
+  getCategoryBySlug: (slug: string) =>
+    api.get(`/api/category/slug/${slug}`).then((r) => r.data),
 
-  getAllSubCategories: async () => {
-    const response = await api.get(`/api/category/subcategories`);
-    return response.data;
-  },
+  getAllSubCategories: () =>
+    api.get("/api/category/subcategories").then((r) => r.data),
 
-  getSubCategoriesByCategoryId: async (categoryId: string) => {
-    const response = await api.get(`/api/category/subcategories/${categoryId}`);
-    return response.data;
-  },
+  getSubCategoriesByCategoryId: (categoryId: string) =>
+    api.get(`/api/category/subcategories/${categoryId}`).then((r) => r.data),
 
-  getProductsBySubCategoryId: async (subCategoryId: string) => {
-    const response = await api.get(
-      `/api/category/subcategory/products/${subCategoryId}`,
-    );
-    return response.data;
-  },
+  getProductsBySubCategoryId: (subCategoryId: string) =>
+    api
+      .get(`/api/category/subcategory/products/${subCategoryId}`)
+      .then((r) => r.data),
 
-  getProductsByCategoryId: async (
-    categoryId: string,
-    filters: ProductFilter,
-  ) => {
-    const params = buildProductFilterQuery(filters);
-    const response = await api.get(`/api/category/products/${categoryId}`, {
-      params,
-    });
-    return response.data;
-  },
+  getProductsByCategoryId: (categoryId: string, filters: ProductFilter) =>
+    api
+      .get(`/api/category/products/${categoryId}`, {
+        params: buildProductFilterQuery(filters),
+      })
+      .then((r) => r.data),
 };
 
-export default Services;
+export default CategoryService;

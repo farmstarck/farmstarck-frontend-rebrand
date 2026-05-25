@@ -6,11 +6,11 @@ interface productProps {
   onClose: () => void;
   title?: string;
   btn_text_green?: string;
-  update?:boolean;
+  update?: boolean;
   btn_text_white?: string;
-  screen: "confirm" | "success" | "loading" ;
+  screen: "confirm" | "success" | "loading";
   onSubmit: () => void;
-  setOpenModal: (val:boolean) => void
+  setOpenModal: (val: boolean) => void;
 }
 
 const ProductModal = ({
@@ -18,13 +18,12 @@ const ProductModal = ({
   title,
   btn_text_green,
   btn_text_white,
-  update=false,
-  screen="confirm",
+  update = false,
+  screen = "confirm",
   onSubmit,
-  setOpenModal
+  setOpenModal,
 }: productProps) => {
-    // const [open,setOpen] = useState(false);
-  
+  // const [open,setOpen] = useState(false);
 
   return (
     <>
@@ -44,55 +43,51 @@ const ProductModal = ({
               />
             </button>
 
-            {/* Success Icon */}
-            {/* <div className="flex justify-center mb-4">
-              <div className="">
-                <Image
-                  width={100}
-                  height={100}
-                  src="/assets/images/status/success.png"
-                  alt="success img"
-                />
-              </div>
-            </div> */}
-
             {/* Title */}
             <h2 className="text-lg font-bold">{title}</h2>
 
             <div className="flex items-center flex-col gap-4 pt-10">
-                <div className="w-full">
-                  <button
-                    onClick={onSubmit}
-                    className="bg-primary w-full text-white py-3 rounded-full font-semibold"
-                  >
-                    {btn_text_green || "Yes, confirm"}
-                  </button>
-                </div>
+              <div className="w-full">
                 <button
-                  onClick={onClose}
-                  className="border w-full  rounded-full border-primary text-primary py-3  font-semibold"
+                  onClick={onSubmit}
+                  className="bg-primary w-full text-white py-3 rounded-full font-semibold"
                 >
-                  {btn_text_white || "No, go back"}
+                  {btn_text_green || "Yes, confirm"}
                 </button>
+              </div>
+              <button
+                onClick={onClose}
+                className="border w-full  rounded-full border-primary text-primary py-3  font-semibold"
+              >
+                {btn_text_white || "No, go back"}
+              </button>
             </div>
           </div>
         </div>
-      ):
-      screen === "loading" ? (
-        <ApiLoader loading/>
-      ):
-      (
+      ) : screen === "loading" ? (
+        <ApiLoader loading />
+      ) : (
         <SuccessModal
           isOpen={true}
-          onClose={()=> { onClose(); setOpenModal(false)}}
-          title= {update ? "You have successfully updated this product. " : "You have successfully upload a product. "}
-          description= {!update ? "All product you upload will appear on your dashboard once it is approved." : ""}
+          onClose={() => {
+            onClose();
+            setOpenModal(false);
+          }}
+          title={
+            update
+              ? "You have successfully updated this product. "
+              : "You have successfully upload a product. "
+          }
+          description={
+            !update
+              ? "All product you upload will appear on your dashboard once it is approved."
+              : ""
+          }
           cta_title="Continue"
           cta={true}
-          cta_url={"/dashboard/merchant/manage-products"}
+          cta_url={"/dashboard/manage-products"}
         />
-      )
-      }
+      )}
     </>
   );
 };

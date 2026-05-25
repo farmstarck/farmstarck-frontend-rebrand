@@ -1,5 +1,5 @@
 // components/common/MarketPlace/LocationFilter.tsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Minus, Plus, MapPin } from "lucide-react";
 
 export interface LocationFilterProps {
@@ -37,7 +37,18 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
       setSelected([location]);
     }
   };
-
+  const uniqueLocations = useMemo(() => {
+    const seen = new Map<string, string>();
+    locations.forEach((l) => {
+      if (!l) return;
+      const trimmed = l.trim();
+      const key = trimmed.toLowerCase();
+      if (!seen.has(key)) {
+        seen.set(key, trimmed);
+      }
+    });
+    return [...seen.values()].sort();
+  }, [locations]);
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header */}
@@ -86,7 +97,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
           </label>
 
           {/* Individual Locations - Checkboxes for multi-select */}
-          {locations.map((location) => (
+          {uniqueLocations.map((location) => (
             <label
               key={location}
               className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"

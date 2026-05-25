@@ -45,7 +45,7 @@ export const ProductsTopBar: React.FC<ProductsTopBarProps> = ({
         </div>
 
         {/* Toggle icons */}
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           {Icons.map((Icon, index) => {
             const active = index === iconStyle;
 
@@ -62,7 +62,7 @@ export const ProductsTopBar: React.FC<ProductsTopBarProps> = ({
               </button>
             );
           })}
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { MerchantOrders, merchantOrderStatusMeta } from "@/data/MerchantOrdersData";
+import {
+  MerchantOrders,
+  merchantOrderStatusMeta,
+} from "@/data/MerchantOrdersData";
 import { MerchantOrderStatus } from "@/types/products";
 import MerchantOrderCard from "@/components/dashboard/merchant/MerchantOrderCard";
 import SearchAndFilter from "@/components/common/ui/SearchAndFilter";
@@ -12,12 +15,12 @@ import Image from "next/image";
 const ITEMS_PER_PAGE = 5;
 
 const statusFilterOptions: FilterOption[] = [
-  { value: "pending",    label: "Pending" },
-  { value: "confirmed",  label: "Confirmed" },
+  { value: "pending", label: "Pending" },
+  { value: "confirmed", label: "Confirmed" },
   { value: "processing", label: "Processing" },
-  { value: "shipped",    label: "Shipped" },
-  { value: "delivered",  label: "Delivered" },
-  { value: "cancelled",  label: "Cancelled" },
+  { value: "shipped", label: "Shipped" },
+  { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 // /** Summary counts for the tab strip at the top */
@@ -32,11 +35,13 @@ const statusFilterOptions: FilterOption[] = [
 // ];
 
 const ManageOrders: React.FC = () => {
-  const [search, setSearch]                     = useState("");
+  const [search, setSearch] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [activeTab, setActiveTab]   = useState<MerchantOrderStatus | "all">("all");
+  const [activeTab, setActiveTab] = useState<MerchantOrderStatus | "all">(
+    "all",
+  );
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -49,26 +54,41 @@ const ManageOrders: React.FC = () => {
         order.items.some((i) => i.productName.toLowerCase().includes(q));
 
       const matchStatus =
-        selectedStatuses.length === 0 || selectedStatuses.includes(order.status);
+        selectedStatuses.length === 0 ||
+        selectedStatuses.includes(order.status);
 
       const matchTab = activeTab === "all" || order.status === activeTab;
 
-      const matchDateFrom = !dateFrom || new Date(order.date) >= new Date(dateFrom);
-      const matchDateTo   = !dateTo   || new Date(order.date) <= new Date(dateTo);
+      const matchDateFrom =
+        !dateFrom || new Date(order.date) >= new Date(dateFrom);
+      const matchDateTo = !dateTo || new Date(order.date) <= new Date(dateTo);
 
-      return matchSearch && matchStatus && matchTab && matchDateFrom && matchDateTo;
+      return (
+        matchSearch && matchStatus && matchTab && matchDateFrom && matchDateTo
+      );
     });
   }, [search, selectedStatuses, activeTab, dateFrom, dateTo]);
 
-  const totalPages   = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated    = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE,
+  );
 
-  const handleSearchChange = (val: string) => { setSearch(val); setPage(1); };
-  const handleTabChange    = (tab: MerchantOrderStatus | "all") => {
-    setActiveTab(tab); setPage(1); setSelectedStatuses([]);
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setPage(1);
+  };
+  const handleTabChange = (tab: MerchantOrderStatus | "all") => {
+    setActiveTab(tab);
+    setPage(1);
+    setSelectedStatuses([]);
   };
   const handleClear = () => {
-    setSelectedStatuses([]); setDateFrom(""); setDateTo(""); setPage(1);
+    setSelectedStatuses([]);
+    setDateFrom("");
+    setDateTo("");
+    setPage(1);
   };
 
   return (
@@ -129,11 +149,20 @@ const ManageOrders: React.FC = () => {
             statusText="Status"
             statusOptions={statusFilterOptions}
             selectedStatuses={selectedStatuses}
-            setSelectedStatuses={(v) => { setSelectedStatuses(v); setPage(1); }}
+            setSelectedStatuses={(v) => {
+              setSelectedStatuses(v);
+              setPage(1);
+            }}
             dateFrom={dateFrom}
             dateTo={dateTo}
-            setDateFrom={(v) => { setDateFrom(v); setPage(1); }}
-            setDateTo={(v) => { setDateTo(v); setPage(1); }}
+            setDateFrom={(v) => {
+              setDateFrom(v);
+              setPage(1);
+            }}
+            setDateTo={(v) => {
+              setDateTo(v);
+              setPage(1);
+            }}
             onClearFilters={handleClear}
           />
         </div>

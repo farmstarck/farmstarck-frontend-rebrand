@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Headphones,
@@ -12,11 +11,12 @@ import {
 import Button from "@/ui/Button";
 import { useRouter } from "next/router";
 import { Product } from "@/types/prisma-schema-types";
-import ProductService from "@/services/product.service";
 import { ProductFilter } from "@/hooks/useProductFilter";
 import ProductCard from "./ProductCard";
+import { useQueries } from "@tanstack/react-query";
+import { productQueries } from "@/queries/product.queries";
 
-const Features = [
+const FEATURES = [
   {
     title: "Great Value",
     icon: BadgeDollarSign,
@@ -24,107 +24,97 @@ const Features = [
   },
   {
     title: "Nationwide Shipping",
-    desc: "We ship to over 10 states and regions in Nigeria",
     icon: Truck,
+    desc: "We ship to over 10 states and regions in Nigeria",
   },
   {
     title: "Secure Payment",
-    desc: "Pay with the most popular and secure payment methods.",
     icon: ShieldCheck,
+    desc: "Pay with the most popular and secure payment methods.",
   },
   {
     title: "Buyer Protection Policy",
-    desc: "Protection policy covers all your purchase journey.",
     icon: BadgeCheck,
+    desc: "Protection policy covers all your purchase journey.",
   },
   {
     title: "Help Center",
-    desc: "24/7 assistance for a smooth shopping experience.",
     icon: Headphones,
+    desc: "24/7 assistance for a smooth shopping experience.",
   },
   {
     title: "Shop Better",
-    desc: "Our Mobile App is coming soon for the best experience.",
     icon: Smartphone,
+    desc: "Our Mobile App is coming soon for the best experience.",
   },
 ];
 
-const OtherProducts = () => {
+const SMALL_FILTER = { size: 10 } as ProductFilter;
+const BEST_SELLING_FILTER = { size: 5 } as ProductFilter;
+
+type ProductSectionProps = {
+  title: string;
+  route: string;
+  products: Product[];
+};
+
+const ProductSection = ({ title, route, products }: ProductSectionProps) => {
   const router = useRouter();
-  const switchPage = (route: string) => {
-    router.push(route);
-  };
-  const [products, setProducts] = useState<Product[] | null>(null);
-  const [mostViewedProducts, setMostViewedProducts] = useState<
-    Product[] | null
-  >(null);
-  const [bestSellingProducts, setBestSellingProducts] = useState<
-    Product[] | null
-  >(null);
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        <button
+          onClick={() => router.push(route)}
+          className="text-[#00C700] font-medium hover:underline text-sm"
+        >
+          View All
+        </button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-  // Fetch products
-  useEffect(() => {
-    ProductService.getAllProducts({ size: 10 } as ProductFilter)
-      .then((res) => setProducts(res.data.data))
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    ProductService.getMostViewedProducts({ size: 10 } as ProductFilter)
-      .then((res) => setMostViewedProducts(res.data.data))
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    ProductService.getBestSellingProducts({ size: 5 } as ProductFilter)
-      .then((res) => setBestSellingProducts(res.data.data))
-      .catch(console.error);
-  }, []);
+const OtherProducts = () => {
+  const [allProducts, mostViewed, bestSelling] = useQueries({
+    queries: [
+      {
+        ...productQueries.allProducts(SMALL_FILTER),
+        select: (res: any) => res.data.data as Product[],
+      },
+      {
+        ...productQueries.mostViewed(SMALL_FILTER),
+        select: (res: any) => res.data.data as Product[],
+      },
+      {
+        ...productQueries.bestSelling(BEST_SELLING_FILTER),
+        select: (res: any) => res.data.data as Product[],
+      },
+    ],
+  });
 
   return (
     <div className="w-full py-8">
       <div className="w-11/12 lg:max-w-6xl mx-auto flex items-start flex-col gap-10">
-        {/* All Products Section */}
-        <div className=" w-full">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">All Products</h2>
-            <button
-              onClick={() => switchPage("marketplace/allproducts")}
-              className="text-[#00C700] font-medium hover:underline text-sm"
-            >
-              View All
-            </button>
-          </div>
+        <ProductSection
+          title="All Products"
+          route="marketplace/allproducts"
+          products={allProducts.data ?? []}
+        />
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {products?.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
+        <ProductSection
+          title="Most Viewed Products"
+          route="marketplace/most_viewed"
+          products={mostViewed.data ?? []}
+        />
 
-        {/* Most Viewed Products Section */}
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Most Viewed Products
-            </h2>
-            <button
-              onClick={() => switchPage("marketplace/most_viewed")}
-              className="text-[#00C700] font-medium hover:underline text-sm"
-            >
-              View All
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {mostViewedProducts?.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-
-        <div className="w-full mt-10 bg-primary p-4  rounded-lg flex items-start lg:items-center gap-5 flex-col lg:flex-row">
+        {/* WhatsApp CTA Banner */}
+        <div className="w-full mt-10 bg-primary p-4 rounded-lg flex items-start lg:items-center gap-5 flex-col lg:flex-row">
           <div className="w-full h-72 lg:h-96 lg:w-1/2 relative">
             <img
               src="/assets/images/marketplaces/foodVeges.png"
@@ -135,7 +125,7 @@ const OtherProducts = () => {
           <div className="w-full lg:w-1/2 max-w-md flex items-start flex-col gap-5">
             <h2 className="leading-normal font-bold text-white text-2xl">
               Buy and Pay directly from whatsapp, and get your produce delivered
-              at your doorstep{" "}
+              at your doorstep
             </h2>
             <Button
               label="Order Now"
@@ -143,29 +133,16 @@ const OtherProducts = () => {
             />
           </div>
         </div>
-        {/* Best selling Products Section */}
-        <div className="w-full ">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Best Selling Products
-            </h2>
-            <button
-              onClick={() => switchPage("marketplace/best_selling")}
-              className="text-[#00C700] font-medium hover:underline text-sm"
-            >
-              View All
-            </button>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {bestSellingProducts?.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
+        <ProductSection
+          title="Best Selling Products"
+          route="marketplace/best_selling"
+          products={bestSelling.data ?? []}
+        />
       </div>
 
-      <div className="w-full bg-white p-5 lg:p-10 my-10 lg:py-20 ">
+      {/* Request Product CTA */}
+      <div className="w-full bg-white p-5 lg:p-10 my-10 lg:py-20">
         <div className="w-full mx-auto flex lg:items-center gap-10 flex-col lg:flex-row">
           <div className="w-full lg:w-1/2 flex items-start flex-col gap-4">
             <div className="text-4xl font-bold max-w-md">
@@ -186,13 +163,14 @@ const OtherProducts = () => {
         </div>
       </div>
 
+      {/* Features Grid */}
       <div className="w-11/12 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {Features.map((feature, index) => {
+        {FEATURES.map((feature) => {
           const Icon = feature.icon;
           return (
             <div
-              key={index}
-              className="flex items-center flex-col gap-3 p-4 rounded-lg  "
+              key={feature.title}
+              className="flex items-center flex-col gap-3 p-4 rounded-lg"
             >
               <div className="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                 <Icon className="w-6 h-6 text-white" />

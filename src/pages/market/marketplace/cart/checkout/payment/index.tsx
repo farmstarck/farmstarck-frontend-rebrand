@@ -11,8 +11,19 @@ import { PaymentMethod, ShippingMethod } from "@/types/prisma-schema-types";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { ErrorMessage } from "@/utils/PageUtils";
 import Image from "next/image";
+import WalletPaymentModal from "@/components/common/MarketPlace/Checkout/WalletPaymentModal";
+import OrderService from "@/services/order.service";
+import { walletQueries } from "@/queries/wallet.queries";
+import { useQuery } from "@tanstack/react-query";
+import { clearCartAction } from "@/store/actions/cart.action";
 
 const paymentMethods = [
+  {
+    title: "wallet",
+    img: "/assets/images/payment/wallet.png",
+    desc: "Pay instantly from your balance",
+    wallet: true,
+  },
   {
     title: "paystack",
     img: "/assets/images/payment/paystack.png",
@@ -48,13 +59,19 @@ const PaymentPage = () => {
 
   const { user } = useAuthStore();
 
-  const [selected, setSelected] = useState<PaymentMethod>(
-    PaymentMethod.paystack,
-  );
+  const [selected, setSelected] = useState<PaymentMethod>(PaymentMethod.wallet);
   const [successPayment, setSuccessPayment] = useState(false);
   const [failedPayment, setFailedPayment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+
   const router = useRouter();
+
+  // Fetch wallet balance to show on wallet option
+  const { data: walletInfo } = useQuery({
+    ...walletQueries.info(),
+    select: (res: any) => res.wallet,
+  });
 
   useEffect(() => {
     if (!items.length || !selectedAddress || !shippingMethod) {
@@ -62,12 +79,33 @@ const PaymentPage = () => {
     }
   }, []);
 
+  const { data: orderFeeInfo } = useQuery({
+    queryKey: ["order-fee", items, shippingMethod],
+    queryFn: () =>
+      PaymentService.getOrderFeeInfo({
+        items,
+        shippingMethod: shippingMethod ?? ("store_pickup" as ShippingMethod),
+      }),
+    enabled: !!items.length && !!shippingMethod,
+    select: (res: any) => res.data,
+  });
+
+  // Use this as the amount:
+  const orderAmount = orderFeeInfo?.totalAmount ?? 0;
+
   const handlePaymentSelection = async () => {
     if (!user?.email) {
       router.push("/auth/login");
       return;
     }
 
+    // Wallet — show confirmation modal
+    if (selected === PaymentMethod.wallet) {
+      setShowWalletModal(true);
+      return;
+    }
+
+    // Paystack / Flutterwave — redirect flow
     try {
       setLoading(true);
       const response = await PaymentService.initiateOrderPayment({
@@ -79,21 +117,48 @@ const PaymentPage = () => {
 
       const { authorizationUrl, reference } = response.data;
 
-      // Save reference temporarily
       setPaymentDetails({
         paymentMethod: selected,
         paymentReference: reference,
       });
 
-      // Redirect user
       window.location.href = authorizationUrl;
     } catch (error) {
-      console.error(error);
       const msg = renderAxiosOrAuthError(error);
       ErrorMessage(msg);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Called after user confirms wallet payment in modal
+  const handleWalletPayment = async () => {
+    if (!selectedAddress?.id) {
+      ErrorMessage("Please select a delivery address");
+      return;
+    }
+
+    const reference = `WALLET_${Date.now()}`;
+
+    setPaymentDetails({
+      paymentMethod: PaymentMethod.wallet,
+      paymentReference: reference,
+    });
+
+    await OrderService.createOrder({
+      items,
+      paymentDetails: {
+        paymentMethod: PaymentMethod.wallet,
+        paymentReference: reference,
+      },
+      shippingMethod: shippingMethod ?? ("store_pickup" as ShippingMethod),
+      addressId: selectedAddress.id,
+    });
+
+    setShowWalletModal(false);
+    resetCheckout();
+    await clearCartAction();
+    setSuccessPayment(true);
   };
 
   return (
@@ -108,10 +173,8 @@ const PaymentPage = () => {
           forward={true}
         />
 
-        {/* Page Title */}
         <div className="my-6 text-2xl font-extrabold">Payment</div>
 
-        {/* Centered card */}
         <div className="my-10 w-full lg:max-w-xl mx-auto">
           <div className="w-full flex flex-col gap-4 bg-white rounded-xl p-6 shadow-lg">
             {paymentMethods.map((method, index) => {
@@ -131,21 +194,54 @@ const PaymentPage = () => {
                 >
                   {/* Left */}
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={method.img}
-                      alt={method.title}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    {/* Wallet uses a styled icon instead of image */}
+                    {method.wallet ? (
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect x="2" y="5" width="20" height="14" rx="2" />
+                          <path d="M16 12h2" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <Image
+                        src={method.img}
+                        alt={method.title}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    )}
 
                     <div className="flex flex-col">
-                      <span className="font-semibold text-black">
+                      <span className="font-semibold text-black capitalize">
                         Pay with {method.title}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        {method.desc}
-                      </span>
+                      {/* Show balance on wallet option */}
+                      {method.wallet && walletInfo ? (
+                        <span className="text-sm text-gray-500">
+                          Balance —{" "}
+                          <span className="font-semibold text-gray-700">
+                            ₦
+                            {walletInfo?.balance?.toLocaleString("en-NG", {
+                              minimumFractionDigits: 2,
+                            })}
+                            {walletInfo?.balance === 0 && " (Add funds to use)"}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-500">
+                          {method.desc}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -156,11 +252,11 @@ const PaymentPage = () => {
                     </span>
                   )}
 
-                  {/* Right selector */}
+                  {/* Selector */}
                   {!method.soon && (
                     <div
                       className={`
-                        w-5 h-5 flex items-center justify-center rounded-full border
+                        w-5 h-5 flex items-center justify-center rounded-full border shrink-0
                         ${isSelected ? "bg-primary border-primary" : "border-gray-400"}
                       `}
                     >
@@ -175,7 +271,7 @@ const PaymentPage = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="20 6 9 17 4 12"></polyline>
+                          <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
                     </div>
@@ -184,11 +280,9 @@ const PaymentPage = () => {
               );
             })}
 
-            {/* Pay Button */}
             <button
               onClick={handlePaymentSelection}
               disabled={loading}
-              //   onClick={() => setFailedPayment(true)}
               className="mt-4 w-full bg-primary text-white py-3 rounded-lg font-semibold text-center disabled:opacity-50"
             >
               {loading ? "Processing..." : "Pay Now"}
@@ -196,22 +290,31 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Wallet Payment Modal */}
+      <WalletPaymentModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        amount={orderAmount}
+        onConfirm={handleWalletPayment}
+      />
+
       <SuccessModal
         title="Payment Successful"
-        description=" You have successfully placed an order"
+        description="You have successfully placed an order"
         back_cta={true}
         back_cta_title="Track Order"
-        back_cta_url="/market/marketplace/order"
+        back_cta_url="/dashboard/orders"
         isOpen={successPayment}
         cta={true}
         cta_title="Continue Shopping"
-        cta_url="/market/marketplace/allproducts"
-        onClose={() => setSuccessPayment(false)}
+        cta_url="/market/marketplace"
+        onClose={() => router.push("/market/marketplace")}
       />
       <FailureModal
         title="Payment Failed"
         payment={true}
-        description=" Something went wrong while processing your payment"
+        description="Something went wrong while processing your payment"
         isOpen={failedPayment}
         onClose={() => setFailedPayment(false)}
       />

@@ -32,8 +32,8 @@ export const SuccessMessage = (message: string) => {
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
+export const getStatusColor = (status: string | undefined) => {
+  switch (status?.toLowerCase()) {
     case "delivered":
       return "bg-primary text-white";
     case "ready to ship":
@@ -245,7 +245,7 @@ export const orders: Order[] = [
     date: "2024-01-10",
     location: "Lagos",
   },
-]
+];
 
 export const getInitials = (name?: string) => {
   if (!name) return "";

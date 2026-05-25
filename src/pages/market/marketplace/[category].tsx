@@ -1,80 +1,51 @@
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
 import { ProductsTopBar } from "@/components/common/MarketPlace/ProductsTopBar";
 import { SlidersHorizontal, X } from "lucide-react";
-
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
-import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import CategoriesImageFilters from "@/components/common/MarketPlace/Categories/CategoriesImageFilters";
 import { CategoryHeader } from "@/components/common/MarketPlace/Categories/CategoryHeader";
 import { useProductFilters } from "@/hooks/useProductFilter";
-import CategoryService from "@/services/category.service";
-import { Category, Product, SubCategory } from "@/types/prisma-schema-types";
+import { Product } from "@/types/prisma-schema-types";
 import { FiltersPanel } from "@/components/common/MarketPlace/FiltersPanel";
+import { useQuery } from "@tanstack/react-query";
+import { categoryQueries } from "@/queries/category.queries";
 
 const DynamicCategories = () => {
   const router = useRouter();
   const { category } = router.query;
-  const [categoryData, setCategoryData] = useState<Category | null>(null);
-  const [subCategories, setSubCategories] = useState<SubCategory[] | null>(
-    null,
-  );
-  const [products, setProducts] = useState<Product[] | null>(null);
-  const [locations, setLocations] = useState<string[]>([]);
-
   const { filters, actions } = useProductFilters();
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const toggleFilter = () => setIsFilterOpen((v) => !v);
-  const closeFilter = () => setIsFilterOpen(false);
+  // ── Queries ──────────────────────────────────────────────────────
+  const { data: categoryData } = useQuery({
+    ...categoryQueries.categoryBySlug(category as string),
+    select: (res) => res.data.data,
+  });
 
-  //  Fetch category
-  useEffect(() => {
-    if (!category) return;
+  const { data: subCategories = [] } = useQuery({
+    ...categoryQueries.subCategoriesByCategory(categoryData?.id ?? ""),
+    select: (res) => res.data.data,
+  });
 
-    CategoryService.getCategoryBySlug(category as string)
-      .then((res) => setCategoryData(res.data.data))
-      .catch(console.error);
-  }, [category]);
+  const { data: products = [] } = useQuery({
+    ...categoryQueries.productsByCategory(categoryData?.id ?? "", filters),
+    select: (res) => res.data.data as Product[],
+  });
 
-  // Fetch subcategories
-  useEffect(() => {
-    if (!categoryData) return;
-
-    CategoryService.getSubCategoriesByCategoryId(categoryData?.id as string)
-      .then((res) => setSubCategories(res.data.data))
-      .catch(console.error);
-  }, [categoryData]);
-
-  // Fetch products
-  useEffect(() => {
-    if (!categoryData?.id) return;
-
-    CategoryService.getProductsByCategoryId(categoryData.id, filters)
-      .then((res) => setProducts(res.data.data))
-      .catch(console.error);
-  }, [categoryData, filters]);
-
-  // Compute locations from products
-  useEffect(() => {
-    if (!products) return;
-    const unique = [
-      ...new Set(products.map((p) => p.location).filter(Boolean)),
-    ];
-    setLocations(unique);
-  }, [products]);
-
-  const hasActiveFilters =
-    filters.locations.length > 0 ||
-    filters.attributes.length > 0 ||
-    !!filters.priceRange;
+  // ── Derived state ────────────────────────────────────────────────
+  const locations = useMemo(
+    () => [...new Set(products.map((p) => p.location).filter(Boolean))],
+    [products],
+  );
 
   const totalActiveFilters =
     filters.locations.length +
     filters.attributes.length +
     (filters.priceRange ? 1 : 0);
+
+  const hasActiveFilters = totalActiveFilters > 0;
 
   return (
     <div className="w-full py-5 relative bg-lite min-h-screen">
@@ -85,34 +56,24 @@ const DynamicCategories = () => {
         />
 
         <CategoriesImageFilters
-          subCategories={subCategories ?? []}
+          subCategories={subCategories}
           selectedSlug={filters.subcategoryId}
           onSelect={actions.setSubCategoryId}
         />
 
         <ProductsTopBar
-          total={products?.length ?? 0}
+          total={products.length}
           sort={filters.sortBy ?? ""}
           setSort={actions.setSortBy}
         />
 
         {/* Mobile Filter Button */}
         <button
-          onClick={toggleFilter}
-          className="
-                md:hidden fixed bottom-6 left-6 z-999
-                bg-primary text-white 
-                w-14 h-14 rounded-full
-                flex items-center justify-center
-                shadow-lg hover:shadow-xl
-                active:scale-95
-                transition-all duration-300
-                group
-            "
+          onClick={() => setIsFilterOpen((v) => !v)}
+          className="md:hidden fixed bottom-6 left-6 z-999 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 group"
           aria-label="Toggle Filters"
         >
           <SlidersHorizontal className="w-6 h-6 transition-transform group-hover:rotate-90" />
-
           {hasActiveFilters && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center font-bold">
               {totalActiveFilters}
@@ -124,18 +85,15 @@ const DynamicCategories = () => {
         {isFilterOpen && (
           <div
             className="md:hidden fixed inset-0 bg-black/50 z-50"
-            onClick={closeFilter}
+            onClick={() => setIsFilterOpen(false)}
           />
         )}
 
         {/* Mobile Filter Sidebar */}
         <div
-          className={`
-                md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50
-                transform transition-transform duration-300 ease-in-out
-                overflow-y-auto
-                ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}
-            `}
+          className={`md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+            isFilterOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
           <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
             <div>
@@ -147,9 +105,8 @@ const DynamicCategories = () => {
                 </p>
               )}
             </div>
-
             <button
-              onClick={closeFilter}
+              onClick={() => setIsFilterOpen(false)}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <X className="w-5 h-5" />
@@ -158,7 +115,7 @@ const DynamicCategories = () => {
 
           <div className="p-4 space-y-4">
             <FiltersPanel
-              products={products ?? []}
+              products={products}
               locations={locations}
               additionalFilters={categoryData?.filters ?? []}
               selectedLocations={filters.locations}
@@ -173,7 +130,7 @@ const DynamicCategories = () => {
 
           <div className="sticky bottom-0 bg-white border-t p-4">
             <button
-              onClick={closeFilter}
+              onClick={() => setIsFilterOpen(false)}
               className="w-full bg-primary text-white py-3 rounded-lg font-semibold"
             >
               Apply Filters
@@ -183,10 +140,9 @@ const DynamicCategories = () => {
 
         {/* Desktop Layout */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Filters */}
           <div className="hidden md:block col-span-1 space-y-4">
             <FiltersPanel
-              products={products ?? []}
+              products={products}
               locations={locations}
               additionalFilters={categoryData?.filters ?? []}
               selectedLocations={filters.locations}
@@ -199,9 +155,8 @@ const DynamicCategories = () => {
             />
           </div>
 
-          {/* Products */}
           <div className="col-span-1 md:col-span-3">
-            {products?.length === 0 ? (
+            {products.length === 0 ? (
               <div className="w-full text-center flex flex-col items-center">
                 <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
                   <img
@@ -216,7 +171,7 @@ const DynamicCategories = () => {
                 </p>
               </div>
             ) : (
-              <ProductsGrid products={products ?? []} />
+              <ProductsGrid products={products} />
             )}
           </div>
         </div>

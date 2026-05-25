@@ -11,25 +11,23 @@ import {
 import { useCartStore, useWishlistStore } from "@/store/slices/cart.slice";
 import { Product } from "@/types/prisma-schema-types";
 import { SuccessMessage } from "@/utils/PageUtils";
-import { MapPin, ShoppingCart, Heart } from "lucide-react";
+import { MapPin, ShoppingCart, Heart, Star } from "lucide-react";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { cart } = useCartStore();
   const { wishlist } = useWishlistStore();
   const { navigate } = useNavigate();
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-NG", {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
       minimumFractionDigits: 0,
     }).format(price);
-  };
 
-  // Add/Remove from Cart
   const addToCartFunction = (item: Product) => {
-    const foundItem = cart.find((it) => it.id === item.id);
-    if (foundItem) {
+    const found = cart.find((it) => it.id === item.id);
+    if (found) {
       removeFromCartAction(item.id);
       SuccessMessage("Item removed from cart");
     } else {
@@ -38,98 +36,170 @@ const ProductCard = ({ product }: { product: Product }) => {
     }
   };
 
-  // Add/Remove from Wishlist (FIXED FUNCTION)
   const toggleWishlist = (item: Product) => {
-    const foundWish = wishlist.find((it) => it.id === item.id);
-    if (foundWish) {
-      removeFromWishlistAction(item.id); // Fixed: was removeFromCart
+    const found = wishlist.find((it) => it.id === item.id);
+    if (found) {
+      removeFromWishlistAction(item.id);
       SuccessMessage("Item removed from wishlist");
     } else {
-      addToWishlistAction(item); // Fixed: was addToCart
+      addToWishlistAction(item);
       SuccessMessage("Item added to wishlist");
     }
   };
 
-  const idFound = cart.some((item) => item.id === product.id);
+  const inCart = cart.some((item) => item.id === product.id);
   const isWishlisted = wishlist.some((item) => item.id === product.id);
 
+  // ── Discount calculation ────────────────────────────────────────
+  const hasDiscount =
+    product.discountPerUnit > 0 &&
+    product.discountPerUnit > product.pricePerUnit; // only show if original > selling
+
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((product.discountPerUnit - product.pricePerUnit) /
+          product.discountPerUnit) *
+          100,
+      )
+    : 0;
+  const sellingPrice = product.pricePerUnit; // ₦60,000 — what they pay
+  const originalPrice = product.discountPerUnit;
+
+  // ── Rating calculation ──────────────────────────────────────────
+  const avgRating =
+    product.ratingCount && product.ratingCount > 0
+      ? product.ratingSum / product.ratingCount
+      : 0;
+  const hasRatings = product.ratingCount && product.ratingCount > 0;
+
   return (
-    <div className="bg-white satoshi pb-4 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full ">
+    <div className="bg-white satoshi rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+      {/* ── Image ──────────────────────────────────────────────── */}
       <div
         onClick={() =>
           navigate(
             `/market/marketplace/product/${product.category?.name}/${product.id}`,
           )
         }
-        className="flex items-start cursor-pointer  flex-col "
+        className="relative w-full cursor-pointer"
       >
-        {/* Image Container */}
-        <div className="relative w-full h-44 sm:h-52 lg:h-40">
+        <div className="relative h-36 sm:h-44 lg:h-48 w-full bg-gray-50">
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-contain"
+            className="object-cover"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
-        </div>
-        {/* Content */}
-        <div className="px-2 pt-2 flex flex-col grow relative">
-          <div className="w-fit capitalize flex items-center gap-1 bg-litegreen text-primary py-1 text-[10px] font-medium px-3 rounded-full">
-            <Image
-              width={8}
-              height={8}
-              src="/assets/images/marketplaces/productIcon.png"
-              alt="size image"
-            />
-            {product.countType}
-          </div>
-          <h3 className="font-semibold capitalize text-sm sm:text-base line-clamp-2 mt-1">
-            {product.name}
-          </h3>
 
-          {/* Price */}
-          <div className="text-[#00C700] font-bold text-sm sm:text-base mb-2">
-            {formatPrice(product.pricePerUnit)}
-          </div>
+          {/* Discount tag — top left */}
+          {hasDiscount && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+              -{discountPercent}%
+            </div>
+          )}
 
-          {/* Location */}
-          <div className="flex capitalize items-center gap-1 text-gray-500 text-xs sm:text-sm mb-4">
-            <MapPin size={14} />
-            <span>{product.location}</span>
-          </div>
+          {/* Wishlist — top right */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleWishlist(product);
+            }}
+            className={`absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 hover:scale-110 ${
+              isWishlisted ? "bg-primary" : "bg-red-500"
+            }`}
+          >
+            <Heart size={13} className="fill-white text-white" />
+          </button>
         </div>
       </div>
-      <div className="w-11/12 mx-auto ">
-        <hr className="mb-3 border-0.5  border-gray-300" />
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 mt-auto">
-          {/* ADD TO CART BUTTON */}
-          <button
-            onClick={() => addToCartFunction(product)}
-            className={`flex-1 text-xs sm:text-sm border rounded-lg py-1.5 sm:py-2 px-2 sm:px-4 flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 font-medium ${
-              idFound
-                ? "border-primary bg-primary text-white"
-                : "border-primary text-primary hover:bg-primary hover:text-white"
-            }`}
-          >
-            <ShoppingCart size={14} />
-            {idFound ? "Remove" : "Add"}
-          </button>
-
-          {/* WISHLIST BUTTON - FIXED STYLING */}
-          <button
-            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 ${
-              isWishlisted ? "bg-[#00C700] border-[#00C700]" : " bg-red-500"
-            }`}
-            onClick={() => toggleWishlist(product)}
-          >
-            <Heart
-              size={14}
-              className={`fill-white text-white transition-all`}
-            />
-          </button>
+      {/* ── Content ────────────────────────────────────────────── */}
+      <div
+        onClick={() =>
+          navigate(
+            `/market/marketplace/product/${product.category?.name}/${product.id}`,
+          )
+        }
+        className="px-2.5 pt-2 pb-1 flex flex-col gap-0.5 cursor-pointer flex-1"
+      >
+        {/* Count type pill */}
+        <div className="w-fit capitalize flex items-center gap-1 bg-litegreen text-primary py-0.5 text-[9px] sm:text-[10px] font-semibold px-2 rounded-full mb-0.5">
+          <Image
+            width={7}
+            height={7}
+            src="/assets/images/marketplaces/productIcon.png"
+            alt="unit"
+          />
+          {product.countType}
         </div>
+
+        {/* Name */}
+        <h3 className="font-bold text-gray-900 text-xs sm:text-sm leading-tight line-clamp-2 capitalize">
+          {product.name}
+        </h3>
+
+        {/* Price — show discounted price + strikethrough original */}
+        <div className="flex items-baseline gap-1.5 flex-wrap">
+          {/* Selling price — prominent */}
+          <p className="text-primary font-extrabold text-sm sm:text-base leading-tight">
+            {formatPrice(sellingPrice)}
+          </p>
+          {/* Original price — slashed */}
+          {hasDiscount && (
+            <p className="text-gray-400 font-medium text-[10px] sm:text-xs line-through leading-tight">
+              {formatPrice(originalPrice)}
+            </p>
+          )}
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-0.5 text-primary font-semibold text-[10px] sm:text-xs mt-0.5">
+          <MapPin size={10} />
+          <span className="capitalize truncate">{product.location}</span>
+        </div>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 mt-0.5">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={10}
+                className={
+                  star <= Math.round(avgRating)
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "fill-none text-gray-400" // ← outlined when empty
+                }
+              />
+            ))}
+          </div>
+          {hasRatings ? (
+            <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">
+              ({product.ratingCount})
+            </span>
+          ) : (
+            <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium">
+              No reviews
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Cart button ─────────────────────────────────────────── */}
+      <div className="px-2.5 pb-3 pt-2">
+        <hr className="border-gray-100 mb-2" />
+        <button
+          onClick={() => addToCartFunction(product)}
+          className={`w-full text-xs sm:text-sm border rounded-xl py-2 sm:py-2.5 flex items-center justify-center gap-1.5 transition-all duration-200 font-semibold ${
+            inCart
+              ? "border-primary bg-primary text-white"
+              : "border-primary text-primary hover:bg-primary hover:text-white"
+          }`}
+        >
+          <ShoppingCart size={13} />
+          {inCart ? "Remove" : "Add to Cart"}
+        </button>
       </div>
     </div>
   );

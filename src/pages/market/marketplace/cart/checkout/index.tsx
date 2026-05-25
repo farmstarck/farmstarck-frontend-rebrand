@@ -4,64 +4,87 @@ import React, { useEffect, useState } from "react";
 import { useCartStore } from "@/store/slices/cart.slice";
 import Image from "next/image";
 import { useNavigate } from "@/hooks/useNavigate";
-import { useAuthStore } from "@/store/slices/auth.slice";
-import { useRouter } from "next/router";
-import { Plus } from "lucide-react";
+import { AlertTriangle, Package, Plus, XCircle } from "lucide-react";
 import { BackDrop } from "@/components/common/BackDrop";
 import AddOrEditAddressForm from "@/components/common/MarketPlace/Checkout/AddOrEditAddressForm";
-import AddressService from "@/services/address.service";
-import { Address, ShippingMethod } from "@/types/prisma-schema-types";
-import { defaultInputRanges } from "react-date-range";
+import { ShippingMethod } from "@/types/prisma-schema-types";
 import { useCheckoutStore } from "@/store/slices/checkout.slice";
+import { useQuery } from "@tanstack/react-query";
+import { addressQueries } from "@/queries/address.queries";
+import { orderQueries } from "@/queries/order.queries";
+import { removeFromCartAction } from "@/store/actions/cart.action";
+import PaymentService from "@/services/payment.service";
 
 const Checkout = () => {
   const { cart } = useCartStore();
   const { selectedAddress, setUserSelectedAddress, setShipping, setItems } =
     useCheckoutStore();
-
-  const { isAuthenticated, isLoading } = useAuthStore();
   const { navigate } = useNavigate();
-  const router = useRouter();
+
   const [deliveryMethod, setDeliveryMethod] = useState<"doorstep" | "pickup">(
     "doorstep",
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [defaultAddress, setDefaultAddress] = useState<Address | null>(null);
-  const [reload, setReload] = useState<number>(0);
 
-  // Handle closing modal
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+  // Validate cart items on load
+  const checkoutItems = cart.map((item) => ({
+    productId: item.id,
+    quantity: item.cartQuantity || 1,
+  }));
 
-  // Fetch User Addresses
+  const { data: validationResultData, isLoading: isValidating } = useQuery({
+    ...orderQueries.validateCart(checkoutItems),
+    enabled: cart.length > 0,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: orderFeeInfo } = useQuery({
+    queryKey: ["order-fee", checkoutItems, deliveryMethod],
+    queryFn: () =>
+      PaymentService.getOrderFeeInfo({
+        items: checkoutItems,
+        shippingMethod:
+          deliveryMethod === "doorstep"
+            ? ShippingMethod.door_delivery
+            : ShippingMethod.store_pickup,
+      }),
+    enabled: cart.length > 0,
+    select: (res: any) => res.data,
+  });
+
+  const validationResult = validationResultData?.data;
+
+  const hasCartIssues = validationResult && !validationResult.valid;
+
+  const getItemValidation = (productId: string) =>
+    validationResult?.items.find((i: any) => i.productId === productId);
+
+  // ── Fetch default address (only if none selected yet) ────────────
+  const { data: defaultAddress } = useQuery({
+    ...addressQueries.defaultAddress(),
+    select: (res) => res.data,
+    enabled: !selectedAddress,
+  });
+
+  const addressToUse = selectedAddress ?? defaultAddress ?? null;
+
+  // Sync default address into checkout store
   useEffect(() => {
-    if (selectedAddress) return;
+    if (defaultAddress && !selectedAddress) {
+      setUserSelectedAddress(defaultAddress);
+    }
+  }, [defaultAddress]);
 
-    AddressService.getDefaultAddress()
-      .then((res) => {
-        setDefaultAddress(res.data);
-        setUserSelectedAddress(res.data);
-      })
-      .catch(console.error);
-  }, [reload, selectedAddress]);
-
-  // useEffect(() => {
-  //   if (!isLoading && !isAuthenticated) {
-  //     localStorage.setItem("redirectAfterAuth", router.asPath);
-  //     router.replace("/signin");
-  //   }
-  // }, [isAuthenticated, isLoading]);
-
+  // Sync cart items into checkout store
   useEffect(() => {
     const checkoutItems = cart.map((item) => ({
       productId: item.id,
       quantity: item.cartQuantity || 1,
     }));
-
     setItems(checkoutItems);
   }, [cart]);
 
+  // Sync shipping method into checkout store
   useEffect(() => {
     if (deliveryMethod === "doorstep") {
       setShipping(ShippingMethod.door_delivery, 7500);
@@ -70,23 +93,18 @@ const Checkout = () => {
     }
   }, [deliveryMethod]);
 
-  // Calculate totals
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.pricePerUnit * (item.cartQuantity || 1),
-    0,
-  );
-  const shippingFee = deliveryMethod === "doorstep" ? 7500 : 0;
-  const vat = 0;
-  const estimatedTotal = subtotal + shippingFee + vat;
-
-  const addressToUse = selectedAddress || defaultAddress;
-
-  useEffect(() => {
-    if (addressToUse) {
-      setUserSelectedAddress(addressToUse);
-    }
-  }, [addressToUse]);
-
+  // ── Totals ───────────────────────────────────────────────────────
+  const subtotal =
+    orderFeeInfo?.subtotal ??
+    cart.reduce(
+      (sum, item) => sum + item.pricePerUnit * (item.cartQuantity || 1),
+      0,
+    );
+  const shippingFee =
+    orderFeeInfo?.shippingFee ?? (deliveryMethod === "doorstep" ? 7500 : 0);
+  const serviceCharge = orderFeeInfo?.serviceCharge ?? 0;
+  const estimatedTotal =
+    orderFeeInfo?.totalAmount ?? subtotal + shippingFee + serviceCharge;
   return (
     <div className="w-full py-5 satoshi bg-lite min-h-screen">
       <div className="w-11/12 lg:max-w-7xl mx-auto">
@@ -98,44 +116,52 @@ const Checkout = () => {
           forward={true}
         />
 
-        {/* Page Title */}
-        <div className="my-6 text-2xl font-extrabold ">Checkout</div>
+        <div className="my-6 text-2xl font-extrabold">Checkout</div>
+
+        {/* ── Cart issues banner ──────────────────────────── */}
+        {hasCartIssues && (
+          <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+            <AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-red-700 text-sm">
+                Some items in your cart have issues
+              </p>
+              <p className="text-xs text-red-500 mt-0.5">
+                Please review and remove unavailable items before proceeding to
+                payment.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Section - Delivery & Form */}
+          {/* Left Section */}
           <div className="lg:col-span-2 space-y-5 order-2 lg:order-1">
-            {/* Delivery Method Selection */}
+            {/* Delivery Method */}
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="text-lg font-bold text-dark-green mb-4">
                 Choose a preferred way you would love to get your order
               </h3>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Doorstep Delivery */}
+                {/* Doorstep */}
                 <button
                   onClick={() => setDeliveryMethod("doorstep")}
-                  className={`
-                              relative p-4 rounded-xl border-2 transition-all duration-300
-                                ${
-                                  deliveryMethod === "doorstep"
-                                    ? "border-primary bg-primary/5"
-                                    : "border-gray-200 hover:border-primary/50"
-                                }
-                              `}
+                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                    deliveryMethod === "doorstep"
+                      ? "border-primary bg-primary/5"
+                      : "border-gray-200 hover:border-primary/50"
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`
-                            w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5
-                            ${
-                              deliveryMethod === "doorstep"
-                                ? "border-primary"
-                                : "border-gray-300"
-                            }
-                       `}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                        deliveryMethod === "doorstep"
+                          ? "border-primary"
+                          : "border-gray-300"
+                      }`}
                     >
                       {deliveryMethod === "doorstep" && (
-                        <div className="w-3 h-3 rounded-full bg-primary"></div>
+                        <div className="w-3 h-3 rounded-full bg-primary" />
                       )}
                     </div>
                     <div className="text-left">
@@ -150,31 +176,25 @@ const Checkout = () => {
                   </div>
                 </button>
 
-                {/* Store Pickup */}
+                {/* Pickup */}
                 <button
                   onClick={() => setDeliveryMethod("pickup")}
-                  className={`
-                              relative p-4 rounded-xl border-2 transition-all duration-300
-                                ${
-                                  deliveryMethod === "pickup"
-                                    ? "border-primary bg-primary/5"
-                                    : "border-gray-200 hover:border-primary/50"
-                                }
-                                    `}
+                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                    deliveryMethod === "pickup"
+                      ? "border-primary bg-primary/5"
+                      : "border-gray-200 hover:border-primary/50"
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`
-                            w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5
-                            ${
-                              deliveryMethod === "pickup"
-                                ? "border-primary"
-                                : "border-gray-300"
-                            }
-                      `}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                        deliveryMethod === "pickup"
+                          ? "border-primary"
+                          : "border-gray-300"
+                      }`}
                     >
                       {deliveryMethod === "pickup" && (
-                        <div className="w-3 h-3 rounded-full bg-primary"></div>
+                        <div className="w-3 h-3 rounded-full bg-primary" />
                       )}
                     </div>
                     <div className="text-left">
@@ -194,8 +214,8 @@ const Checkout = () => {
                 </button>
               </div>
             </div>
-            {/* Delivery Address Details */}
 
+            {/* Address Details */}
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold text-dark-green">
@@ -237,27 +257,88 @@ const Checkout = () => {
               )}
             </div>
 
-            {/* Submit Button */}
+            {hasCartIssues && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <XCircle size={18} className="text-red-500" />
+                  Items needing attention
+                </h3>
+                {validationResult.items
+                  .filter((v: any) => v.status !== "available")
+                  .map((v: any) => {
+                    const cartItem = cart.find((c) => c.id === v.productId);
+                    return (
+                      <div
+                        key={v.productId}
+                        className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl"
+                      >
+                        {cartItem?.imageUrl && (
+                          <img
+                            src={cartItem.imageUrl}
+                            alt={cartItem.name}
+                            className="w-12 h-12 rounded-lg object-cover shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {cartItem?.name ?? "Unknown product"}
+                          </p>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            {v.status === "unavailable" ? (
+                              <XCircle size={12} className="text-red-500" />
+                            ) : (
+                              <Package size={12} className="text-orange-500" />
+                            )}
+                            <p
+                              className={`text-xs font-medium ${
+                                v.status === "unavailable"
+                                  ? "text-red-500"
+                                  : "text-orange-500"
+                              }`}
+                            >
+                              {v.message}
+                            </p>
+                          </div>
+                          {v.status === "insufficient_stock" && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              You have {cartItem?.cartQuantity} in cart — only{" "}
+                              {v.availableQuantity} available
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => removeFromCartAction(v.productId)}
+                          className="shrink-0 px-3 py-1.5 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Proceed Button */}
             <button
-              disabled={addressToUse === null}
+              disabled={!addressToUse || hasCartIssues || isValidating}
               onClick={() =>
                 navigate("/market/marketplace/cart/checkout/payment")
               }
               className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98] disabled:bg-primary/50 disabled:cursor-not-allowed"
             >
-              Proceed to Payment
+              {isValidating
+                ? "Checking items..."
+                : hasCartIssues
+                  ? "Remove unavailable items to continue"
+                  : "Proceed to Payment"}
             </button>
 
-            {/* Delivery Form */}
             <BackDrop
               isOpen={isModalOpen}
-              handleClose={handleModalClose}
+              handleClose={() => setIsModalOpen(false)}
               title="Add New Address"
             >
-              <AddOrEditAddressForm
-                setIsModalOpen={setIsModalOpen}
-                setReload={setReload}
-              />
+              <AddOrEditAddressForm setIsModalOpen={setIsModalOpen} />
             </BackDrop>
           </div>
 
@@ -268,49 +349,64 @@ const Checkout = () => {
                 Order Summary ({cart.length} Item(s))
               </h3>
 
-              {/* Cart Items */}
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                {cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-3 border-b border-b-litegreen py-3"
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-sm text-dark truncate">
-                        {item.name}
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        Crate of {item.countType}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Qty: {item.cartQuantity || 1}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-dark">
-                        ₦{item.pricePerUnit.toLocaleString()}
+                {cart.map((item) => {
+                  const validation = getItemValidation(item.id);
+                  const hasIssue =
+                    validation && validation.status !== "available";
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`flex gap-3 border-b py-3 ${
+                        hasIssue
+                          ? "border-b-red-100 opacity-60"
+                          : "border-b-litegreen"
+                      }`}
+                    >
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                        {hasIssue && (
+                          <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
+                            <XCircle size={20} className="text-red-600" />
+                          </div>
+                        )}
                       </div>
-                      {item.discountPerUnit && item.discountPerUnit > 0 && (
-                        <div className="text-xs text-gray-400 line-through">
-                          ₦{item.discountPerUnit.toLocaleString()}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-dark truncate">
+                          {item.name}
+                        </h4>
+                        {hasIssue ? (
+                          <p className="text-xs text-red-500 font-medium mt-0.5">
+                            {validation.message}
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-xs text-gray-500">
+                              Qty: {item.cartQuantity || 1}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div
+                          className={`font-bold ${hasIssue ? "text-gray-400 line-through" : "text-dark"}`}
+                        >
+                          ₦{item.pricePerUnit.toLocaleString()}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* Price Breakdown */}
-              <div className="space-y-3  pt-4">
+              <div className="space-y-3 pt-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-semibold">
@@ -323,14 +419,18 @@ const Checkout = () => {
                     ₦{shippingFee.toLocaleString()}
                   </span>
                 </div>
+                {/* ← Add service charge row */}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">VAT</span>
-                  <span className="font-semibold">{vat.toFixed(2)}</span>
+                  <span className="text-gray-600">Service Charge</span>
+                  <span className="font-semibold">
+                    {serviceCharge > 0
+                      ? `₦${serviceCharge.toLocaleString()}`
+                      : "₦0.00"}
+                  </span>
                 </div>
               </div>
 
-              {/* Total */}
-              <div className="mt-4 pt-4 border-t border-t-litegreen  p-4">
+              <div className="mt-4 pt-4 border-t border-t-litegreen p-4">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-dark">Estimated Total</span>
                   <span className="text-xl font-bold text-primary">

@@ -111,5 +111,9 @@ export function buildProductFilterQuery(filters: ProductFilter) {
           : filters.sortBy;
   }
 
+  if (filters.minRating) {
+    query.minRating = filters.minRating;
+  }
+
   return query;
 }

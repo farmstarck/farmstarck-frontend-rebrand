@@ -20,25 +20,20 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       cart: [],
 
-      // Add item — if it exists, increase quantity
       addToCart: (item) => {
-        const cart = get().cart;
+        const { cart } = get();
         const exists = cart.find((p) => p.id === item.id);
-
-        if (exists) {
-          return set({
-            cart: cart.map((p) =>
-              p.id === item.id ? { ...p, cartQuantity: p.cartQuantity + 1 } : p,
-            ),
-          });
-        }
-
         set({
-          cart: [...cart, { ...item, cartQuantity: 1 }],
+          cart: exists
+            ? cart.map((p) =>
+                p.id === item.id
+                  ? { ...p, cartQuantity: p.cartQuantity + 1 }
+                  : p,
+              )
+            : [...cart, { ...item, cartQuantity: 1 }],
         });
       },
 
-      // Update quantity manually from UI
       updateQuantity: (id, cartQuantity) =>
         set((state) => ({
           cart: state.cart.map((item) =>
@@ -51,20 +46,16 @@ export const useCartStore = create<CartState>()(
           cart: state.cart.filter((item) => item.id !== id),
         })),
 
-      clearCart: () =>
-        set(() => ({
-          cart: [],
-        })),
-      hydrateCart: (items) =>
-        set(() => ({
-          cart: items,
-        })),
+      clearCart: () => set({ cart: [] }),
+
+      hydrateCart: (items) => set({ cart: items }),
     }),
     { name: "cart-storage" },
   ),
 );
 
-// ======= Wishlist Store =======
+// ── Wishlist Store ───────────────────────────────────────────────────
+
 interface WishlistState {
   wishlist: Product[];
   addToWishlist: (item: Product) => void;
@@ -79,7 +70,7 @@ export const useWishlistStore = create<WishlistState>()(
 
       addToWishlist: (item) =>
         set((state) => {
-          if (state.wishlist.find((i) => i.id === item.id)) return state; // prevent duplicates
+          if (state.wishlist.some((i) => i.id === item.id)) return state;
           return { wishlist: [...state.wishlist, item] };
         }),
 
@@ -88,10 +79,7 @@ export const useWishlistStore = create<WishlistState>()(
           wishlist: state.wishlist.filter((item) => item.id !== id),
         })),
 
-      clearWishlist: () =>
-        set(() => ({
-          wishlist: [],
-        })),
+      clearWishlist: () => set({ wishlist: [] }),
     }),
     { name: "wishlist-storage" },
   ),

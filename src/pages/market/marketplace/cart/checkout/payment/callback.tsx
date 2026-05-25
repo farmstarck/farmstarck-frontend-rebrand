@@ -28,6 +28,7 @@ const PaymentCallbackPage = () => {
 
   const [stage, setStage] = useState<PaymentStage>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const PaymentCallbackPage = () => {
         }
 
         setStage("creating_order");
-        await OrderService.createOrder({
+        const { data } = await OrderService.createOrder({
           items,
           paymentDetails: {
             paymentMethod,
@@ -64,6 +65,7 @@ const PaymentCallbackPage = () => {
           shippingMethod,
           addressId: selectedAddress?.id ?? null,
         });
+        setOrderId(data.id);
 
         resetCheckout();
         setStage("success");
@@ -93,7 +95,7 @@ const PaymentCallbackPage = () => {
         description="You have successfully placed an order"
         back_cta
         back_cta_title="Track Order"
-        back_cta_url="/market/marketplace/order"
+        back_cta_url={`/dashboard/orders/${orderId}`}
         isOpen={stage === "success"}
         cta
         cta_title="Continue Shopping"

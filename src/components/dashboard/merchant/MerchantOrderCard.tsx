@@ -5,18 +5,23 @@ import { Calendar, MapPin, Package, ChevronRight, User } from "lucide-react";
 import { MerchantOrder } from "@/types/products";
 import { merchantOrderStatusMeta } from "@/data/MerchantOrdersData";
 import { useNavigate } from "@/hooks/useNavigate";
+import { SellerOrder } from "@/types/prisma-schema-types";
 
 interface Props {
-  order: MerchantOrder;
+  order: SellerOrder;
+  basePath?: string;
 }
 
-const MerchantOrderCard: React.FC<Props> = ({ order }) => {
+const MerchantOrderCard: React.FC<Props> = ({
+  order,
+  basePath = "/dashboard/merchant/orders",
+}) => {
   const { navigate } = useNavigate();
   const meta = merchantOrderStatusMeta[order.status];
   const firstItem = order.items[0];
   const extraCount = order.items.length - 1;
 
-  const formattedDate = new Date(order.date).toLocaleDateString("en-GB", {
+  const formattedDate = new Date(order.createdAt).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -24,14 +29,14 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
 
   return (
     <div
-      onClick={() => navigate(`/dashboard/merchant/orders/${order.id}`)}
+      onClick={() => navigate(`${basePath}/${order.id}`)} // ← use basePath here
       className="w-full flex flex-col sm:flex-row items-start gap-4 bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:shadow-md hover:border-gray-300 transition-all duration-200 group"
     >
-      {/* Product thumbnail */}
+      {/* Product thumbnail — remove onClick, parent handles it */}
       <div className="relative w-full sm:w-24 h-[40dvh] sm:h-24 shrink-0 rounded-lg overflow-hidden bg-[#d0dad1]">
         <Image
           src="/assets/images/dashboard/buyer/empty_order.png"
-          alt={firstItem.productName}
+          alt={firstItem?.productTitle ?? "Order"}
           fill
           className="object-contain"
           onError={(e) => {
@@ -40,14 +45,13 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
           }}
         />
       </div>
-
       {/* Content */}
       <div className="flex-1 min-w-0 w-full">
         {/* Top row */}
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
-              {order.orderNumber}
+              {order.order.orderId}
             </p>
             {/* <p className="font-semibold text-gray-800 text-sm leading-tight mt-0.5">
               {firstItem.productName}
@@ -70,7 +74,9 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
         {/* Buyer */}
         <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1.5">
           <User size={12} className="shrink-0" />
-          <span className="font-medium text-gray-700">{order.buyerName}</span>
+          <span className="font-medium text-gray-700">
+            {order.order?.buyer?.fullName}
+          </span>
         </div>
 
         {/* Meta row */}
@@ -81,7 +87,7 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
           </span>
           <span className="flex items-center gap-1">
             <MapPin size={11} />
-            {order.location}
+            {order.order?.address?.city}, {order.order?.address?.state}
           </span>
           <span className="flex items-center gap-1">
             <Calendar size={11} />
@@ -92,7 +98,7 @@ const MerchantOrderCard: React.FC<Props> = ({ order }) => {
         {/* Bottom row: amount + arrow */}
         <div className="flex items-center justify-between">
           <p className="text-base font-bold text-gray-900">
-            ₦{order.totalAmount.toLocaleString("en-NG")}
+            ₦{order?.subTotal.toLocaleString("en-NG")}
           </p>
           <ChevronRight
             size={16}
