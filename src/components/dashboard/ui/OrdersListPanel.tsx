@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Filter, Search } from "lucide-react";
 import Image from "next/image";
 import OrderCard from "@/components/dashboard/ui/OrderCard";
 import Pagination from "@/components/common/ui/Pagination";
 import { useNavigate } from "@/hooks/useNavigate";
-import { orders } from "@/utils/PageUtils";
+import { Order, OrderStatus } from "@/types/prisma-schema-types";
+import { useQuery } from "@tanstack/react-query";
+import { orderQueries } from "@/queries/order.queries";
+import { TimeFilterOption } from "@/types";
+import { useDebounce } from "@/hooks/useDebounce";
+import SearchInput from "@/components/common/SearchInput";
 
 interface OrdersListPanelProps {
   emptyActionPath?: string;
@@ -12,13 +17,11 @@ interface OrdersListPanelProps {
   orderDetailsBasePath: string;
 }
 
-const statusOptions = [
-  { value: "delivered", label: "Delivered" },
-  { value: "ready to ship", label: "Ready to Ship" },
-  { value: "pending", label: "Pending" },
-  { value: "shipped", label: "Shipped" },
-  { value: "cancelled", label: "Cancelled" },
-];
+const STATUS_OPTIONS = Object.entries(OrderStatus).map(([key, value]) => ({
+  value,
+  label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+}));
+const ORDERS_PER_PAGE = 5;
 
 const OrdersListPanel = ({
   emptyActionPath = "/market/marketplace",
@@ -26,76 +29,95 @@ const OrdersListPanel = ({
   orderDetailsBasePath,
 }: OrdersListPanelProps) => {
   const { navigate } = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus | undefined>(
+    undefined,
+  );
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 5;
+
+  // Debounce the search so we don't fire a request on every keystroke
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  // ── Date validation ──────────────────────────────────────────────
+  const isDateRangeComplete = !!dateFrom && !!dateTo;
+  const isMissingEndDate = !!dateFrom && !dateTo;
+  const isMissingStartDate = !dateFrom && !!dateTo;
+
+  // ── Query params ─────────────────────────────────────────────────
+  const params = useMemo(
+    () => ({
+      page: currentPage,
+      size: ORDERS_PER_PAGE,
+      status: selectedStatus,
+      date: dateFrom && dateTo ? ("custom" as TimeFilterOption) : undefined,
+      startDate: isDateRangeComplete ? new Date(dateFrom) : undefined,
+      endDate: isDateRangeComplete ? new Date(dateTo) : undefined,
+      search: debouncedSearch || undefined,
+    }),
+    [
+      currentPage,
+      selectedStatus,
+      isDateRangeComplete,
+      dateFrom,
+      dateTo,
+      debouncedSearch,
+    ],
+  );
+  // ── Query ────────────────────────────────────────────────────────
+  const { data, isLoading } = useQuery({
+    ...orderQueries.getBuyerOrders(params),
+    select: (res) => ({
+      orders: res.data as Order[],
+      totalPages: res.pagination?.totalPages ?? 1,
+    }),
+  });
+
+  const orders = data?.orders ?? [];
+  const totalPages = data?.totalPages ?? 1;
+
+  // ── Handlers ─────────────────────────────────────────────────────
+  const toggleStatus = (status: OrderStatus) => {
+    setCurrentPage(1);
+    // Clicking the active status deselects it, otherwise select the new one
+    setSelectedStatus((prev) => (prev === status ? undefined : status));
+  };
 
   const handleClearFilters = () => {
-    setSelectedStatuses([]);
+    setSelectedStatus(undefined);
     setDateFrom("");
     setDateTo("");
     setSearchQuery("");
+    setCurrentPage(1);
   };
 
-  const toggleStatus = (status: string) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((item) => item !== status)
-        : [...prev, status],
-    );
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
   };
 
+  // Reset page only when debounced value settles
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedStatuses, dateFrom, dateTo]);
+  }, [debouncedSearch]);
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.totalAmount.toString().includes(searchQuery) ||
-      order.items.some((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-
-    const matchesStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(order.status);
-
-    const matchesDate =
-      (!dateFrom || new Date(order.date) >= new Date(dateFrom)) &&
-      (!dateTo || new Date(order.date) <= new Date(dateTo));
-
-    return matchesSearch && matchesStatus && matchesDate;
-  });
-
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filteredOrders.slice(
-    indexOfFirstOrder,
-    indexOfLastOrder,
-  );
+  const handleDateChange = (field: "from" | "to", value: string) => {
+    field === "from" ? setDateFrom(value) : setDateTo(value);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden relative">
+      {/* Search & Filter Toggle */}
       <div className="p-4 lg:p-6 border-gray-200">
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Search by order number or product"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search by order number or product"
+          />
           <button
             type="button"
             onClick={() => setShowFilters((prev) => !prev)}
@@ -107,28 +129,25 @@ const OrdersListPanel = ({
         </div>
       </div>
 
+      {/* Filter Panel */}
       {showFilters && (
         <div className="px-4 lg:px-6 pb-5 border-b border-gray-100">
           <div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
-              {statusOptions.map((status) => {
-                const isActive = selectedStatuses.includes(status.value);
-
-                return (
-                  <button
-                    key={status.value}
-                    type="button"
-                    onClick={() => toggleStatus(status.value)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                      isActive
-                        ? "bg-primary text-white"
-                        : "bg-white border border-gray-200 text-gray-700 hover:border-primary/40"
-                    }`}
-                  >
-                    {status.label}
-                  </button>
-                );
-              })}
+              {STATUS_OPTIONS.map((status) => (
+                <button
+                  key={status.value}
+                  type="button"
+                  onClick={() => toggleStatus(status.value)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    selectedStatus === status.value
+                      ? "bg-primary text-white"
+                      : "bg-white border border-gray-200 text-gray-700 hover:border-primary/40"
+                  }`}
+                >
+                  {status.label}
+                </button>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -139,9 +158,18 @@ const OrdersListPanel = ({
                 <input
                   type="date"
                   value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-primary"
+                  onChange={(e) => handleDateChange("from", e.target.value)}
+                  className={`w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-primary transition-colors ${
+                    isMissingStartDate
+                      ? "border-red-400 focus:border-red-400"
+                      : "border-gray-200"
+                  }`}
                 />
+                {isMissingStartDate && (
+                  <p className="mt-1 text-xs text-red-500">
+                    Please select a start date
+                  </p>
+                )}
               </div>
 
               <div>
@@ -151,9 +179,19 @@ const OrdersListPanel = ({
                 <input
                   type="date"
                   value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-primary"
+                  min={dateFrom || undefined}
+                  onChange={(e) => handleDateChange("to", e.target.value)}
+                  className={`w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-primary transition-colors ${
+                    isMissingEndDate
+                      ? "border-red-400 focus:border-red-400"
+                      : "border-gray-200"
+                  }`}
                 />
+                {isMissingEndDate && (
+                  <p className="mt-1 text-xs text-red-500">
+                    Please select an end date
+                  </p>
+                )}
               </div>
             </div>
 
@@ -170,7 +208,12 @@ const OrdersListPanel = ({
         </div>
       )}
 
-      {currentOrders.length === 0 ? (
+      {/* Orders List */}
+      {isLoading ? (
+        <div className="p-8 flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : orders.length === 0 ? (
         <div className="p-8 lg:p-16 flex flex-col items-center justify-center text-center">
           <div className="w-32 h-32 mb-6 relative">
             <Image
@@ -195,7 +238,7 @@ const OrdersListPanel = ({
       ) : (
         <>
           <div className="p-4 space-y-3">
-            {currentOrders.map((order) => (
+            {orders.map((order: Order) => (
               <OrderCard
                 key={order.id}
                 order={order}
@@ -210,8 +253,8 @@ const OrdersListPanel = ({
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
-                totalItems={filteredOrders.length}
-                itemsPerPage={ordersPerPage}
+                totalItems={orders.length}
+                itemsPerPage={ORDERS_PER_PAGE}
               />
             </div>
           )}

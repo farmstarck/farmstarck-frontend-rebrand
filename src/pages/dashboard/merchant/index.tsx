@@ -50,7 +50,7 @@ const MerchantOverview: React.FC = () => {
       bg: "bg-gray-100",
       iconColor: "text-gray-500",
     },
-  ]
+  ];
 
   useEffect(() => {
     ProductService.getBestSellingProducts({
@@ -60,7 +60,6 @@ const MerchantOverview: React.FC = () => {
       .then((res) => setProducts(res.data.data))
       .catch(console.error);
   }, []);
-
 
   const OverviewMetrics = [
     {
@@ -87,21 +86,23 @@ const MerchantOverview: React.FC = () => {
       bg: "bg-primary",
       textColor: "text-white",
     },
-
-  ]
+  ];
 
   return (
     <div className="max-w-7xl mx-auto">
       {/* Order Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {OverviewMetrics.map((metric, index) => (
-              <div key={index} className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow ${metric.bg} ${metric.textColor}`}>
-                <h3 className="text-sm font-medium opacity-90 mb-2">
-                  {metric.title}
-                </h3>
-                <p className="text-4xl font-bold">{metric.value}</p>
-              </div>
-            ))}
+        {OverviewMetrics.map((metric, index) => (
+          <div
+            key={index}
+            className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow ${metric.bg} ${metric.textColor}`}
+          >
+            <h3 className="text-sm font-medium opacity-90 mb-2">
+              {metric.title}
+            </h3>
+            <p className="text-4xl font-bold">{metric.value}</p>
+          </div>
+        ))}
         {/* <div className="bg-red-500 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
           <h3 className="text-sm font-medium opacity-90 mb-2">
             Cancelled Orders
@@ -112,7 +113,9 @@ const MerchantOverview: React.FC = () => {
 
       {/* Recent Activity Section */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
-        <h2 className="text-lg font-bold text-gray-800 mb-6">Recent Activity</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-6">
+          Recent Activity
+        </h2>
         <div className="space-y-1">
           {recentActivities.map((activity, index) => (
             <div
@@ -120,14 +123,20 @@ const MerchantOverview: React.FC = () => {
               className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0"
             >
               {/* Icon circle */}
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${activity.bg}`}>
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${activity.bg}`}
+              >
                 <span className={activity.iconColor}>{activity.icon}</span>
               </div>
 
               {/* Text */}
               <div className="flex flex-col gap-0.5">
-                <p className="text-sm md:text-base font-semibold text-gray-800">{activity.title}</p>
-                <p className="text-xs md:text-sm text-gray-500">{activity.desc}</p>
+                <p className="text-sm md:text-base font-semibold text-gray-800">
+                  {activity.title}
+                </p>
+                <p className="text-xs md:text-sm text-gray-500">
+                  {activity.desc}
+                </p>
                 <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
               </div>
             </div>

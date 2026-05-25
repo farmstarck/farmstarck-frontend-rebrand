@@ -1,75 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import { ProductFilterLayout } from "@/components/common/MarketPlace/ProductFilterLayout";
 import Button from "@/ui/Button";
-import ProductService from "@/services/product.service";
-import CategoryService from "@/services/category.service";
-import { Product, SubCategory } from "@/types/prisma-schema-types";
-import { useProductFilters } from "@/hooks/useProductFilter";
+import { useProductPage } from "@/hooks/useProductPage";
+import { productQueries } from "@/queries/product.queries";
 
 const AllProductsPage = () => {
-  const [products, setProducts] = useState<Product[] | null>(null);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [subCategories, setSubCategories] = useState<SubCategory[] | null>(
-    null,
-  );
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { filters, actions } = useProductFilters();
-
-  // Fetch products
-  useEffect(() => {
-    ProductService.getAllProducts(filters)
-      .then((res) => {
-        setProducts(res.data.data);
-        setTotalPages(res.data.pagination.totalPages);
-        setCurrentPage(res.data.pagination.currentPage);
-      })
-      .catch(console.error);
-  }, [filters]);
-
-  // Fetch subcategories
-  useEffect(() => {
-    CategoryService.getAllSubCategories()
-      .then((res) => setSubCategories(res.data.data))
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (!products) return;
-    const unique = [
-      ...new Set(products.map((p) => p.location).filter(Boolean)),
-    ];
-    setLocations(unique);
-  }, [products]);
-
-  const hasActiveFilters =
-    filters.locations.length > 0 ||
-    filters.attributes.length > 0 ||
-    !!filters.priceRange;
-
-  const totalActiveFilters =
-    filters.locations.length +
-    filters.attributes.length +
-    (filters.priceRange ? 1 : 0);
+  const pageProps = useProductPage(productQueries.allProducts);
 
   return (
     <ProductFilterLayout
       title="All Products"
       routeName="all-products"
-      products={products ?? []}
-      subCategories={subCategories ?? []}
-      locations={locations}
-      filters={filters}
-      actions={actions}
-      hasActiveFilters={hasActiveFilters}
-      totalActiveFilters={totalActiveFilters}
-      totalPages={totalPages}
-      currentPage={currentPage}
-      showPagination={true}
+      showPagination
+      {...pageProps}
     >
-      {/* CTA Banner */}
       <div className="my-10 w-full">
         <div className="w-full bg-primary rounded-lg py-5">
           <div className="w-11/12 mx-auto flex lg:items-center gap-10 flex-col lg:flex-row">

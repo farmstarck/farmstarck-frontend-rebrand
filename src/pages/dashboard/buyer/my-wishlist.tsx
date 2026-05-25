@@ -1,182 +1,272 @@
-import ConfirmationModal from "@/components/common/MarketPlace/ConfirmationModal";
-import { addToCartAction } from "@/store/actions/cart.action";
-import {
-  clearWishlistAction,
-  removeFromWishlistAction,
-} from "@/store/actions/wishlist.action";
-import { useWishlistStore } from "@/store/slices/cart.slice";
-import { Product } from "@/types/prisma-schema-types";
-import { SuccessMessage } from "@/utils/PageUtils";
-import { LucideTrash2, Trash2Icon } from "lucide-react";
+import React, { useState } from "react";
+import { Trash2, ShoppingCart, Ban } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import  { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { wishlistQueries, wishlistMutations } from "@/queries/wishlist.queries";
+import { WishlistItemResponse } from "@/types";
+import { addToCartAction } from "@/store/actions/cart.action";
+import { SuccessMessage } from "@/utils/PageUtils";
+import DeleteConfirmationModal from "@/components/common/DeleteConfirmationModal";
+import TitleHeader from "@/components/dashboard/buyer/TitleHeader";
+import { Product } from "@/types/prisma-schema-types";
 
-const MyWishlist = () => {
-  const { wishlist } = useWishlistStore();
+const fmt = (n: number) =>
+  "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: 2 });
+
+const DashboardWishlist = () => {
+  const queryClient = useQueryClient();
   const [showClearModal, setShowClearModal] = useState(false);
 
-  const handleAddToCart = (item: Product) => {
-    addToCartAction(item);
-    removeFromWishlistAction(item.id);
-    SuccessMessage("Item added to cart");
+  const { data: items = [], isLoading } = useQuery(
+    wishlistQueries.getWishlist(),
+  );
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: wishlistQueries.all });
+
+  const { mutate: removeItem } = useMutation({
+    ...wishlistMutations.removeFromWishlist(),
+    onSuccess: () => {
+      SuccessMessage("Item removed from wishlist");
+      invalidate();
+    },
+  });
+
+  const { mutate: clearWishlist } = useMutation({
+    ...wishlistMutations.clearWishlist(),
+    onSuccess: () => {
+      SuccessMessage("Wishlist cleared");
+      invalidate();
+      setShowClearModal(false);
+    },
+  });
+
+  const handleAddToCart = (item: WishlistItemResponse) => {
+    if (!item.isAvailable || !item.productId) return;
+    // Build a minimal Product shape for the cart action
+    addToCartAction({
+      id: item.productId,
+      imageUrl: item.productImage,
+      name: item.productTitle,
+      pricePerUnit: item.livePrice,
+    } as Product);
+    SuccessMessage(`${item.productTitle} added to cart`);
+    if (item.productId) removeItem(item.productId);
   };
 
-  const handleClearAll = () => {
-    clearWishlistAction();
-    setShowClearModal(false);
-  };
-
-  const handleRemoveItem = (id: string) => {
-    removeFromWishlistAction(id);
-    SuccessMessage("Item removed from wishlist");
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full min-h-screen lg:p-6">
-      <div className="w-full max-w-7xl mx-auto ">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-            My Wishlist
-          </h1>
-          {wishlist.length > 0 && (
-            <button
-              onClick={() => setShowClearModal(true)}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
-            >
-              <LucideTrash2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Clear All</span>
-            </button>
-          )}
-        </div>
+    <div className="max-w-7xl mx-auto">
+      <TitleHeader title="My Wishlist" />
 
-        {/* Wishlist Items */}
-        <div className="space-y-4 bg-white p-6 rounded-2xl">
-          {wishlist.length === 0 ? (
-            <div className="w-full py-5">
-              <div className="w-11/12 lg:max-w-7xl mx-auto">
-                <div className="flex w-full flex-col items-center  bg-white max-w-4xl rounded-md mx-auto justify-center mb-20 py-20">
-                  <div className="bg-white rounded-full ">
-                    <Image
-                      src={"/assets/images/wishimg.png"}
-                      alt="cart image"
-                      height={200}
-                      width={200}
-                    />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    Your wishlist is empty
-                  </h2>
-                  <p className="text-gray-600 mb-3">
-                    Your have not added any item to your wishlist
-                  </p>
-                  <div className="w-full flex items-center justify-center">
-                    <Link
-                      className="w-1/2 lg:w-1/3 text-center mx-auto text-white rounded-full bg-primary py-2.5 px-10 gap-1"
-                      href="/market/marketplace/allproducts"
+      {items.length === 0 ? (
+        <div className="bg-white rounded-2xl p-16 flex flex-col items-center gap-4 text-center shadow-sm">
+          <Image
+            src="/assets/images/wishimg.png"
+            alt="empty wishlist"
+            width={160}
+            height={160}
+          />
+          <h2 className="text-xl font-bold text-gray-900">
+            Your wishlist is empty
+          </h2>
+          <p className="text-gray-500 text-sm">
+            Save items you love and come back to them later
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          {/* Desktop Header */}
+          <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 text-sm font-semibold text-gray-700 bg-litegreen">
+            <div className="col-span-1">Image</div>
+            <div className="col-span-4">Product</div>
+            <div className="col-span-2">Price</div>
+            <div className="col-span-2">Availability</div>
+            <div className="col-span-3 text-right">Actions</div>
+          </div>
+
+          <div className="divide-y divide-gray-100">
+            {items.map((item) => (
+              <div key={item.id} className="px-4 md:px-6 py-4">
+                {/* Mobile */}
+                <div className="md:hidden space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative">
+                      {item.productImage ? (
+                        <Image
+                          src={item.productImage}
+                          alt={item.productTitle}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Ban size={20} className="text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p
+                        className={`font-semibold text-sm ${!item.isAvailable ? "text-gray-400" : "text-gray-900"}`}
+                      >
+                        {item.productTitle}
+                      </p>
+                      {item.productSku && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          SKU: {item.productSku}
+                        </p>
+                      )}
+                      <p className="font-bold text-primary mt-1">
+                        {fmt(item.livePrice)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        item.productId && removeItem(item.productId)
+                      }
+                      className="text-red-400 hover:text-red-600 p-1"
                     >
-                      Contine Shopping
-                    </Link>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    {!item.isAvailable ? (
+                      <span className="text-xs font-medium text-red-500 flex items-center gap-1 border border-red-200 px-2 py-1 rounded-full">
+                        <Ban size={12} /> Not Available
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        In Stock
+                      </span>
+                    )}
+                    <button
+                      disabled={!item.isAvailable}
+                      onClick={() => handleAddToCart(item)}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
+                        item.isAvailable
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      <ShoppingCart size={14} />
+                      {item.isAvailable ? "Add to Cart" : "Unavailable"}
+                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {wishlist.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200"
-                >
-                  <div className="flex gap-4 flex-col">
-                    <div className="flex items-center gap-4">
-                      {/* Product Image */}
-                      <div className="relative w-40 h-40 shrink-0">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-xl"
+
+                {/* Desktop */}
+                <div className="hidden md:grid grid-cols-12 gap-4 items-center">
+                  <div className="col-span-1">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 relative">
+                      {item.productImage ? (
+                        <Image
+                          src={item.productImage}
+                          alt={item.productTitle}
+                          fill
+                          className="object-cover"
                         />
-                      </div>
-
-                      {/* Product Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start  justify-between gap- ">
-                          <div className="flex-1">
-                            {/* Size Badge */}
-                            <div className="inline-flex items-center gap-1 bg-green-100 text-primary px-2 py-1 rounded-md text-xs font-medium">
-                              <Image
-                                width={10}
-                                height={10}
-                                src="/assets/images/marketplaces/productIcon.png"
-                                alt="size"
-                              />
-                              <span>Crate</span>
-                            </div>
-
-                            {/* Product Title */}
-                            <h3 className="font-semibold capitalize text-gray-900 text-sm sm:text-base line-clamp-2">
-                              {item.name}
-                            </h3>
-                          </div>
-
-                          {/* Delete Button */}
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0"
-                          >
-                            <Trash2Icon className="w-5 h-5" />
-                          </button>
-                        </div>
-
-                        {/* Price */}
-                        <p className="text-lg sm:text-xl font-bold text-gray-900">
-                          ₦{item?.pricePerUnit?.toLocaleString()}
-                        </p>
-
-                        {/* Date and Status */}
-                        <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-600">
-                          {/* <span>Date Added{item.wi}</span> */}
-                          <span className="font-medium">
-                            Status:{" "}
-                            <span className="font-semibold">In Stock</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="">
-                      {item.stockQuantity === 0 ? (
-                        <button
-                          onClick={() => handleAddToCart(item)}
-                          className={`w-full bg-gray-600 text-white  py-2.5 sm:py-3 rounded-full font-medium text-sm sm:text-base transition-colors`}
-                        >
-                          Contact Us
-                        </button>
                       ) : (
-                        <button
-                          onClick={() => handleAddToCart(item)}
-                          className={`w-full bg-primary text-white  py-2.5 sm:py-3 rounded-full font-medium text-sm sm:text-base transition-colors`}
-                        >
-                          Add to Cart
-                        </button>
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Ban size={18} className="text-gray-300" />
+                        </div>
                       )}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
-      <ConfirmationModal
-        closeModal={() => setShowClearModal(false)}
+                  <div className="col-span-4">
+                    <p
+                      className={`font-semibold text-sm ${!item.isAvailable ? "text-gray-400" : "text-gray-900"}`}
+                    >
+                      {item.productTitle}
+                    </p>
+                    {item.productSku && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        SKU: {item.productSku}
+                      </p>
+                    )}
+                    {!item.productId && (
+                      <p className="text-xs text-red-400 mt-1">
+                        Product no longer exists
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="col-span-2">
+                    <p className="font-bold text-gray-900">
+                      {fmt(item.livePrice)}
+                    </p>
+                  </div>
+
+                  <div className="col-span-2">
+                    {item.isAvailable ? (
+                      <span className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                        In Stock
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-red-500 border border-red-200 flex items-center gap-1 w-fit px-3 py-1 rounded-full">
+                        <Ban size={11} /> Not Available
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="col-span-3 flex items-center justify-end gap-3">
+                    <button
+                      disabled={!item.isAvailable}
+                      onClick={() => handleAddToCart(item)}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                        item.isAvailable
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                    >
+                      <ShoppingCart size={15} />
+                      {item.isAvailable ? "Add to Cart" : "Out of Stock"}
+                    </button>
+                    <button
+                      onClick={() =>
+                        item.productId && removeItem(item.productId)
+                      }
+                      className="p-2 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
+            <button
+              onClick={() => setShowClearModal(true)}
+              className="flex items-center gap-2 px-5 py-2 bg-red-500 text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-colors"
+            >
+              <Trash2 size={16} />
+              Clear All
+            </button>
+          </div>
+        </div>
+      )}
+
+      <DeleteConfirmationModal
         isOpen={showClearModal}
-        onConfirm={handleClearAll}
+        closeModal={setShowClearModal}
+        onConfirm={clearWishlist}
+        title="Clear Wishlist"
+        message="Are you sure you want to remove all items from your wishlist?"
+        confirmText="Clear All"
+        cancelText="Cancel"
       />
     </div>
   );
 };
 
-export default MyWishlist;
+export default DashboardWishlist;

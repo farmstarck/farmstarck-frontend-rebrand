@@ -1,34 +1,18 @@
 import api from "@/lib/axios-client";
 
-type AddToWishlistProps = {
-  productId: string;
+const WishlistService = {
+  getWishlist: () => api.get("/api/wishlist").then((r) => r.data.data),
+
+  addToWishlist: (productId: string) =>
+    api.post(`/api/wishlist/add/${productId}`).then((r) => r.data),
+
+  removeFromWishlist: (productId: string) =>
+    api.delete(`/api/wishlist/remove/${productId}`).then((r) => r.data),
+
+  clearWishlist: () => api.delete("/api/wishlist/clear").then((r) => r.data),
+
+  bulkSync: (data: { productId: string }[]) =>
+    api.post("/api/wishlist/bulk-sync", data).then((r) => r.data),
 };
 
-type RemoveFromWishlistProps = {
-  productId: string;
-};
-
-const Services = {
-  addToWishlist: async (data: AddToWishlistProps) => {
-    const response = await api.post(`/api/wishlist/add/${data.productId}`);
-    return response.data;
-  },
-  getWishlist: async () => {
-    const response = await api.get("/api/wishlist");
-    return response.data;
-  },
-  removeFromWishlist: async (data: RemoveFromWishlistProps) => {
-    const response = await api.delete(`/api/wishlist/remove/${data.productId}`);
-    return response.data;
-  },
-  clearWishlist: async () => {
-    const response = await api.delete(`/api/wishlist/clear`);
-    return response.data;
-  },
-  bulkSync: async (data: { productId: string }[]) => {
-    const response = await api.post(`/api/wishlist/bulk-sync`, data);
-    return response.data;
-  },
-};
-
-export default Services;
+export default WishlistService;

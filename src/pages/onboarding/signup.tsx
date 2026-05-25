@@ -11,8 +11,10 @@ import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import ButtonSpinner from "@/components/common/ButtonSpinner";
 import { useAuthStore } from "@/store/slices/auth.slice";
 import ApiLoader from "@/components/common/ui/ApiLoader";
+import { useRouter } from "next/router";
 
 const SignUp = () => {
+  const router = useRouter();
   const { navigate } = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -83,13 +85,26 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Form */}
+      {/* Left Side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="my-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Sign Up</h1>
-            <p className="text-gray-600">Start your journey in few clicks</p>
+          {/* Logo — navigates home */}
+          <button
+            onClick={() => router.push("/")}
+            className="mb-8 inline-block"
+          >
+            <Image
+              src="/assets/svg/logo-dark.svg"
+              alt="Farmstarck"
+              width={160}
+              height={40}
+              className="h-10 w-auto"
+            />
+          </button>
+
+          <div className="my38">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h1>
+            <p className="text-gray-600">Continue your journey in few clicks</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

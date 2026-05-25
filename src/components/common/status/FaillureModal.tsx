@@ -2,85 +2,73 @@ import React from "react";
 import Image from "next/image";
 import { useNavigate } from "@/hooks/useNavigate";
 
-type failedProps = {
-  onClose: () => void;
+interface FailureModalProps {
   isOpen: boolean;
-  description: string;
+  onClose: () => void;
   title: string;
+  description: string;
   payment?: boolean;
-};
+}
+
 const FailureModal = ({
-  onClose,
   isOpen,
-  payment = false,
+  onClose,
   title,
   description,
-}: failedProps) => {
+  payment = false,
+}: FailureModalProps) => {
   const { navigate } = useNavigate();
+
+  if (!isOpen) return null;
+
   return (
-    <>
-      {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999]">
-          <div className="bg-white w-[330px] md:w-[380px] rounded-2xl p-6 text-center relative shadow-xl">
-            {/* Close button */}
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999]">
+      <div className="bg-white w-[330px] md:w-[380px] rounded-2xl p-6 text-center relative shadow-xl">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+        >
+          <Image
+            src="/assets/images/status/cancel.png"
+            alt="close"
+            width={24}
+            height={24}
+          />
+        </button>
+
+        <div className="flex justify-center mb-4">
+          <Image
+            width={100}
+            height={100}
+            src="/assets/images/status/error.png"
+            alt="error"
+          />
+        </div>
+
+        <h2 className="text-lg font-extrabold text-red-600">{title}</h2>
+        <p className="text-gray-600 text-sm mt-1">{description}</p>
+
+        {payment && (
+          <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+              className="bg-red-500 text-white py-3 rounded-lg font-semibold w-full"
             >
-              <Image
-                src={"/assets/images/status/cancel.png"}
-                alt="cancel img"
-                width={24}
-                height={24}
-              />
+              Try Again
             </button>
-
-            {/* Error Icon */}
-            <div className="flex justify-center mb-4">
-              <div className="">
-                <Image
-                  width={100}
-                  height={100}
-                  src="/assets/images/status/error.png"
-                  alt="error img"
-                />
-              </div>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-lg font-extrabold text-red-600">{title}</h2>
-            <p className="text-gray-600 text-sm mt-1">{description}</p>
-
-            {/* Buttons */}
-            {payment && (
-              <>
-                <div className="mt-6 flex flex-col gap-3">
-                  <button
-                    onClick={() => {
-                      onClose();
-                      navigate("/market/marketplace/cart-items");
-                    }}
-                    className="bg-red-500 text-white py-3 rounded-lg font-semibold"
-                  >
-                    Try Again
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      onClose();
-                      navigate("/market/marketplace/cart/checkout");
-                    }}
-                    className="border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold"
-                  >
-                    Go Back
-                  </button>
-                </div>
-              </>
-            )}
+            <button
+              onClick={() => {
+                onClose();
+                navigate("/dashboard/my-wallet");
+              }}
+              className="border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold w-full"
+            >
+              Go Back
+            </button>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 };
 

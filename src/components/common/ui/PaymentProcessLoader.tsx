@@ -1,4 +1,4 @@
-"use client"
+"use client";
 const PaymentProcessing = ({ text }: { text: string }) => (
   <div className="flex flex-col items-center justify-center min-h-screen gap-6">
     <div className="w-32 h-32 rounded-full border-4 border-dashed border-primary animate-spin" />

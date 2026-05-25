@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import Calendar from "react-calendar";
+// @ts-ignore
 import "react-calendar/dist/Calendar.css";
 
 export interface FilterOption {
@@ -10,29 +11,25 @@ export interface FilterOption {
 }
 
 interface Props {
-  /** Main toggle */
   isOpen: boolean;
   onClose: () => void;
-  statusText?:string;
-
-  /** Status filter (required) */
+  statusText?: string;
   statusOptions?: FilterOption[];
   selectedStatuses?: string[];
   setSelectedStatuses?: (v: string[]) => void;
 
-  /** Priority filter (optional) */
+  approvalStatusOptions?: FilterOption[];
+  selectedApprovalStatuses?: string[];
+  setSelectedApprovalStatuses?: (v: string[]) => void;
+
   showPriorityFilter?: boolean;
   priorityOptions?: FilterOption[];
   selectedPriorities?: string[];
   setSelectedPriorities?: (v: string[]) => void;
-
-  /** Date filter (optional) */
   dateFrom?: string;
   dateTo?: string;
   setDateFrom?: (v: string) => void;
   setDateTo?: (v: string) => void;
-
-  /** Action handlers */
   onClear: () => void;
 }
 
@@ -42,11 +39,14 @@ const ReusableFilter = ({
   statusOptions = [],
   selectedStatuses = [],
   setSelectedStatuses,
+  approvalStatusOptions = [],
+  selectedApprovalStatuses = [],
+  setSelectedApprovalStatuses,
   showPriorityFilter = false,
   priorityOptions = [],
   selectedPriorities = [],
   setSelectedPriorities,
-  statusText ="Status",
+  statusText = "Status",
   dateFrom,
   dateTo,
   setDateFrom,
@@ -63,7 +63,7 @@ const ReusableFilter = ({
     setSelectedStatuses(
       selectedStatuses.includes(value)
         ? selectedStatuses.filter((s) => s !== value)
-        : [value]
+        : [value],
     );
   };
 
@@ -72,14 +72,15 @@ const ReusableFilter = ({
     setSelectedPriorities(
       selectedPriorities.includes(value)
         ? selectedPriorities.filter((p) => p !== value)
-        : [value]
+        : [value],
     );
   };
 
-  const hasActiveFilters = 
-    selectedStatuses.length > 0 || 
-    selectedPriorities.length > 0 || 
-    dateFrom || 
+  const hasActiveFilters =
+    selectedStatuses.length > 0 ||
+    (selectedApprovalStatuses?.length ?? 0) > 0 ||
+    selectedPriorities.length > 0 ||
+    dateFrom ||
     dateTo;
 
   const formatDate = (dateString: string) => {
@@ -141,14 +142,71 @@ const ReusableFilter = ({
                         checked={selectedStatuses.includes(opt.value)}
                         onChange={() => toggleStatus(opt.value)}
                       />
-                      <span className="text-sm text-gray-700">
-                        {opt.label}
-                      </span>
+                      <span className="text-sm text-gray-700">{opt.label}</span>
                     </label>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* APPROVAL STATUS FILTER — pending, approved, rejected */}
+            {approvalStatusOptions &&
+              approvalStatusOptions.length > 0 &&
+              setSelectedApprovalStatuses && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">
+                    Filter by Approval Status
+                  </h3>
+                  <div className="space-y-2">
+                    {approvalStatusOptions.map((opt) => (
+                      <label
+                        key={opt.value}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                            selectedApprovalStatuses?.includes(opt.value)
+                              ? "border-primary"
+                              : "border-gray-300 group-hover:border-gray-400"
+                          }`}
+                        >
+                          {selectedApprovalStatuses?.includes(opt.value) && (
+                            <div className="w-2 h-2 bg-primary rounded-full" />
+                          )}
+                        </div>
+                        <input
+                          type="checkbox"
+                          className="hidden"
+                          checked={
+                            selectedApprovalStatuses?.includes(opt.value) ??
+                            false
+                          }
+                          onChange={() => {
+                            const current = selectedApprovalStatuses ?? [];
+                            setSelectedApprovalStatuses(
+                              current.includes(opt.value)
+                                ? current.filter((s) => s !== opt.value)
+                                : [opt.value],
+                            );
+                          }}
+                        />
+                        <span className="text-sm text-gray-700 flex items-center gap-2">
+                          {opt.label}
+                          {opt.value === "rejected" && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
+                          )}
+                          {opt.value === "pending" && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block" />
+                          )}
+                          {opt.value === "approved" && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                          )}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             {/* PRIORITY FILTER (Optional) */}
             {showPriorityFilter && priorityOptions.length > 0 && (
@@ -179,9 +237,7 @@ const ReusableFilter = ({
                         checked={selectedPriorities.includes(opt.value)}
                         onChange={() => togglePriority(opt.value)}
                       />
-                      <span className="text-sm text-gray-700">
-                        {opt.label}
-                      </span>
+                      <span className="text-sm text-gray-700">{opt.label}</span>
                     </label>
                   ))}
                 </div>
@@ -194,7 +250,7 @@ const ReusableFilter = ({
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
                   Filter by Date
                 </h3>
-                
+
                 {/* From Date */}
                 <div className="mb-3">
                   <label className="block text-xs text-gray-600 mb-1.5">
@@ -208,12 +264,14 @@ const ReusableFilter = ({
                       }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent flex items-center justify-between"
                     >
-                      <span className={dateFrom ? "text-gray-900" : "text-gray-400"}>
+                      <span
+                        className={dateFrom ? "text-gray-900" : "text-gray-400"}
+                      >
                         {dateFrom ? formatDate(dateFrom) : "Select date"}
                       </span>
                       <CalendarIcon size={16} className="text-gray-400" />
                     </button>
-                    
+
                     {showFromCalendar && (
                       <div className="absolute top-full left-0 mt-1 z-10 bg-white shadow-lg rounded-lg border border-gray-200">
                         <style jsx global>{`
@@ -223,7 +281,7 @@ const ReusableFilter = ({
                             width: 280px;
                           }
                           .react-calendar__tile--active {
-                            background: #1C7B48 !important;
+                            background: #1c7b48 !important;
                             color: white !important;
                           }
                           .react-calendar__tile--now {
@@ -240,7 +298,7 @@ const ReusableFilter = ({
                           }
                         `}</style>
                         <Calendar
-                          onChange={(value:any) => {
+                          onChange={(value: any) => {
                             if (value instanceof Date) {
                               setDateFrom(value.toISOString().slice(0, 10));
                               setShowFromCalendar(false);
@@ -267,16 +325,18 @@ const ReusableFilter = ({
                       }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent flex items-center justify-between"
                     >
-                      <span className={dateTo ? "text-gray-900" : "text-gray-400"}>
+                      <span
+                        className={dateTo ? "text-gray-900" : "text-gray-400"}
+                      >
                         {dateTo ? formatDate(dateTo) : "Select date"}
                       </span>
                       <CalendarIcon size={16} className="text-gray-400" />
                     </button>
-                    
+
                     {showToCalendar && (
                       <div className="absolute top-full left-0 mt-1 z-10 bg-white shadow-lg rounded-lg border border-gray-200">
                         <Calendar
-                          onChange={(value:any) => {
+                          onChange={(value: any) => {
                             if (value instanceof Date) {
                               setDateTo(value.toISOString().slice(0, 10));
                               setShowToCalendar(false);

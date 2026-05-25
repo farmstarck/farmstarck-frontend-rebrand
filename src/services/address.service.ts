@@ -1,18 +1,8 @@
 import api from "@/lib/axios-client";
-
-interface AddressProps {
-  street: string;
-  landmark?: string;
-  phoneNumber: string;
-  recipientName: string;
-  email?: string;
-  city: string;
-  state: string;
-  isDefault?: boolean;
-}
+import { AddAddressProps } from "@/types";
 
 const Services = {
-  addAddress: async (data: AddressProps) => {
+  addAddress: async (data: AddAddressProps) => {
     const response = await api.post("/api/address", data);
     return response.data;
   },
@@ -32,7 +22,7 @@ const Services = {
     return response.data;
   },
 
-  updateAddress: async (id: string, data: AddressProps) => {
+  updateAddress: async (id: string, data: AddAddressProps) => {
     const response = await api.put(`/api/address/${id}`, data);
     return response.data;
   },

@@ -264,6 +264,8 @@ const About = () => {
                           <Image
                             src={item.img}
                             alt={item.name}
+                            width={300}
+                            height={300}
                             className="rounded-md w-full"
                           />
                         </div>

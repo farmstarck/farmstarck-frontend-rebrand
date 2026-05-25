@@ -10,104 +10,139 @@ import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { useAuthStore } from "@/store/slices/auth.slice";
 import ApiLoader from "@/components/common/ui/ApiLoader";
 import { consumeRedirectAfterAuth } from "@/utils/PageUtils";
+import OtpVerification from "@/components/common/auth/OtpVerification";
+import { useRouter } from "next/router";
 
 const SignIn = () => {
+  const router = useRouter();
   const { navigate } = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lastMethod, setLastMethod] = useState<"google" | "password" | null>(
     null,
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const { email, password } = formData;
-    if (!email || !password) {
-      ErrorMessage("All fields are required");
-      return;
-    }
-
-    const body = {
-      email,
-      password,
-    };
-    try {
-      setLoading(true);
-      const { data } = await AuthService.signIn(body);
-
-      const storage = keepLoggedIn ? localStorage : sessionStorage;
-
-      storage.setItem("accessToken", data.token);
-
-      localStorage.setItem("auth:lastMethod", "password");
-
-      await useAuthStore.getState().login();
-
-      // Check if there is a redirect URL stored
-      const redirect = consumeRedirectAfterAuth();
-      navigate(redirect ?? "/market/marketplace");
-    } catch (error) {
-      console.error(error);
-      const msg = renderAxiosOrAuthError(error);
-      ErrorMessage(msg);
-    } finally {
-      setLoading(false);
-      setFormData({
-        email: "",
-        password: "",
-      });
-      setKeepLoggedIn(false);
-    }
-  };
+  // ── 2FA state ────────────────────────────────────────────────────
+  const [show2FA, setShow2FA] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [twoFASentTo, setTwoFASentTo] = useState("");
 
   useEffect(() => {
     const method = localStorage.getItem("auth:lastMethod") as
       | "google"
       | "password"
       | null;
-
     setLastMethod(method);
   }, []);
+
+  const completeLogin = (token: string) => {
+    const storage = keepLoggedIn ? localStorage : sessionStorage;
+    storage.setItem("accessToken", token);
+    localStorage.setItem("auth:lastMethod", "password");
+    useAuthStore.getState().login();
+    const redirect = consumeRedirectAfterAuth();
+    navigate(redirect ?? "/market/marketplace");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { email, password } = formData;
+    if (!email || !password) {
+      ErrorMessage("All fields are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data } = await AuthService.signIn({ email, password });
+
+      if (data.requires2FA) {
+        // Show OTP step instead of completing login
+        setPendingUserId(data.userId);
+        setTwoFASentTo(email);
+        setShow2FA(true);
+        return;
+      }
+
+      completeLogin(data.token);
+    } catch (error) {
+      const msg = renderAxiosOrAuthError(error);
+      ErrorMessage(msg);
+    } finally {
+      setLoading(false);
+      setFormData({ email: "", password: "" });
+    }
+  };
+
+  const handle2FAVerify = async (otp: string) => {
+    if (!pendingUserId) return;
+    try {
+      setLoading(true);
+      const { data } = await AuthService.verify2FA({
+        userId: pendingUserId,
+        otp,
+      });
+      setShow2FA(false);
+      completeLogin(data.token);
+    } catch (error) {
+      const msg = renderAxiosOrAuthError(error);
+      ErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handle2FAResend = async () => {
+    if (!formData.email || !formData.password) return;
+    try {
+      const { data } = await AuthService.signIn({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (data.requires2FA) setPendingUserId(data.userId);
+    } catch (error) {
+      ErrorMessage("Failed to resend OTP");
+    }
+  };
 
   const handleGoogleSignIn = () => {
     const redirect =
       localStorage.getItem("redirectAfterAuth") || "/market/marketplace";
-
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/redirect?state=${encodeURIComponent(
-      redirect,
-    )}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/redirect?state=${encodeURIComponent(redirect)}`;
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Form */}
+      {/* Left Side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="my-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Sign In</h1>
+          {/* Logo — navigates home */}
+          <button
+            onClick={() => router.push("/")}
+            className="mb-8 inline-block"
+          >
+            <Image
+              src="/assets/svg/logo-dark.svg"
+              alt="Farmstarck"
+              width={160}
+              height={40}
+              className="h-10 w-auto"
+            />
+          </button>
+
+          <div className="my-3">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h1>
             <p className="text-gray-600">Continue your journey in few clicks</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Google Sign In */}
+            {/* Google */}
             <div className="relative">
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="relative
-                w-full flex items-center justify-center gap-3
-                py-3.5 px-6 rounded-full
-                border border-gray-300
-                bg-white hover:bg-gray-50
-                transition-colors
-                font-medium text-gray-700
-              "
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors font-medium text-gray-700"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -129,21 +164,19 @@ const SignIn = () => {
                 </svg>
                 Sign in with Google
               </button>
-              {lastMethod && lastMethod === "google" && (
-                <div className="bg-main-green  text-white bg-dark-primary  font-semibold text-center rounded-full text-xs px-2 py-1 absolute top-0 right-2">
+              {lastMethod === "google" && (
+                <div className="bg-dark-primary text-white font-semibold text-center rounded-full text-xs px-2 py-1 absolute top-0 right-2">
                   Last used
                 </div>
               )}
             </div>
 
-            {/* Divider */}
             <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-gray-300"></div>
+              <div className="flex-1 h-px bg-gray-300" />
               <span className="text-sm text-gray-500">OR</span>
-              <div className="flex-1 h-px bg-gray-300"></div>
+              <div className="flex-1 h-px bg-gray-300" />
             </div>
 
-            {/* Email Input */}
             <div className="relative">
               <AuthInput
                 label="Email Address"
@@ -153,14 +186,13 @@ const SignIn = () => {
                 onChange={(value) => setFormData({ ...formData, email: value })}
                 icon="email"
               />
-              {lastMethod && lastMethod === "password" && (
-                <div className="bg-main-green  text-white bg-dark-primary  font-semibold text-center rounded-full text-xs px-2 py-1 absolute top-7 right-2">
+              {lastMethod === "password" && (
+                <div className="bg-dark-primary text-white font-semibold text-center rounded-full text-xs px-2 py-1 absolute top-7 right-2">
                   Last used
                 </div>
               )}
             </div>
 
-            {/* Password Input */}
             <AuthInput
               label="Password"
               type="password"
@@ -172,7 +204,6 @@ const SignIn = () => {
               icon="lock"
             />
 
-            {/* Keep Logged In & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-start gap-2 cursor-pointer">
                 <div className="relative mt-0.5">
@@ -182,7 +213,7 @@ const SignIn = () => {
                     onChange={(e) => setKeepLoggedIn(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-4 h-4 border-2 border-gray-300 rounded peer-checked:bg-primary peer-checked:border-0 transition-all flex items-center justify-center  peer-focus:ring-primary peer-focus:ring-offset-1">
+                  <div className="w-4 h-4 border-2 border-gray-300 rounded peer-checked:bg-primary peer-checked:border-0 transition-all flex items-center justify-center">
                     {keepLoggedIn && (
                       <Check className="w-3 h-3 text-white" strokeWidth={3} />
                     )}
@@ -198,16 +229,13 @@ const SignIn = () => {
               </Link>
             </div>
 
-            {/* Sign In Button */}
             <button
-              type="button"
-              onClick={()=> navigate('dashboard/merchant')}
-              className=" w-full py-3.5 rounded-full bg-primary hover:bg-[#00DD00] text-white font-semibold transition-colors shadow-sm hover:shadow-md "
+              type="submit"
+              className="w-full py-3.5 rounded-full bg-primary hover:bg-[#00DD00] text-white font-semibold transition-colors shadow-sm hover:shadow-md"
             >
               Log In
             </button>
 
-            {/* Sign Up Link */}
             <p className="text-center text-sm text-gray-600">
               Don&apos;t have an account?{" "}
               <Link
@@ -221,16 +249,29 @@ const SignIn = () => {
         </div>
       </div>
 
-      {/* Right Side - Branding */}
+      {/* Right Side */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center relative overflow-hidden">
         <Image
-          src={`/assets/images/auth/logo.png`}
+          src="/assets/images/auth/logo.png"
           width={400}
           height={400}
-          lazyBoundary="200"
           alt="logo image"
         />
       </div>
+
+      <OtpVerification
+        isOpen={show2FA}
+        onClose={() => {
+          setShow2FA(false);
+          setPendingUserId(null);
+        }}
+        verificationType="email"
+        contactInfo={twoFASentTo}
+        otpLength={6}
+        expiryTime={300}
+        onVerifySuccess={handle2FAVerify}
+        onResend={handle2FAResend}
+      />
 
       <ApiLoader loading={loading} />
     </div>

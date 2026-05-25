@@ -149,7 +149,7 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
                       ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}
                   `}
         >
-          <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+          <div className="sticky top-0 bg-white shadow-sm p-4 flex justify-between items-center">
             <div>
               <h3 className="text-lg font-bold text-dark-green">Filters</h3>
               {hasActiveFilters && (
@@ -186,13 +186,28 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               }
               hasActiveFilters={hasActiveFilters}
               onClearAll={actions?.clearAll as () => void}
+              selectedRating={filters?.minRating}
+              setSelectedRating={
+                actions?.setMinRating as (rating?: number) => void
+              }
             />
           </div>
 
-          <div className="sticky bottom-0 bg-white border-t p-4">
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex gap-3">
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  actions?.clearAll();
+                  closeFilter();
+                }}
+                className="flex-1 py-3 border border-primary text-primary rounded-lg font-semibold text-sm hover:bg-primary/5 transition-colors"
+              >
+                Clear All
+              </button>
+            )}
             <button
               onClick={closeFilter}
-              className="w-full bg-primary text-white py-3 rounded-lg font-semibold"
+              className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold text-sm"
             >
               Apply Filters
             </button>
@@ -220,6 +235,10 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               }
               hasActiveFilters={hasActiveFilters}
               onClearAll={actions?.clearAll as () => void}
+              selectedRating={filters?.minRating}
+              setSelectedRating={
+                actions?.setMinRating as (rating?: number) => void
+              }
             />
           </div>
 

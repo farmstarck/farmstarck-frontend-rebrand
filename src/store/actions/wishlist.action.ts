@@ -1,52 +1,39 @@
 import WishlistService from "@/services/wishlist.service";
-import { Product, WishlistItem } from "@/types/prisma-schema-types";
 import { useWishlistStore } from "@/store/slices/cart.slice";
-import { useAuthStore } from "../slices/auth.slice";
+import { useAuthStore } from "@/store/slices/auth.slice";
+import { Product } from "@/types/prisma-schema-types";
+import { WishlistItemResponse } from "@/types";
 
-/* ================= ADD TO WISHLIST ================= */
+const getStores = () => ({
+  ...useWishlistStore.getState(),
+  ...useAuthStore.getState(),
+});
+
 export const addToWishlistAction = async (item: Product) => {
-  const { addToWishlist } = useWishlistStore.getState();
-  const { isAuthenticated } = useAuthStore.getState();
-
-  // Instant UI update
+  const { addToWishlist, isAuthenticated } = getStores();
   addToWishlist(item);
-
   if (!isAuthenticated) return;
-  // Background sync
   try {
-    await WishlistService.addToWishlist({
-      productId: item.id,
-    });
+    await WishlistService.addToWishlist(item.id);
   } catch (err) {
     console.error("Failed to sync wishlist:", err);
-    // optional: rollback / toast
   }
 };
 
-/* ================= REMOVE ================= */
 export const removeFromWishlistAction = async (productId: string) => {
-  const { removeFromWishlist } = useWishlistStore.getState();
-  const { isAuthenticated } = useAuthStore.getState();
-
+  const { removeFromWishlist, isAuthenticated } = getStores();
   removeFromWishlist(productId);
-
   if (!isAuthenticated) return;
   try {
-    await WishlistService.removeFromWishlist({
-      productId,
-    });
+    await WishlistService.removeFromWishlist(productId);
   } catch (err) {
-    console.error("Failed to remove item:", err);
+    console.error("Failed to remove wishlist item:", err);
   }
 };
 
-/* ================= CLEAR ================= */
 export const clearWishlistAction = async () => {
-  const { clearWishlist } = useWishlistStore.getState();
-  const { isAuthenticated } = useAuthStore.getState();
-
+  const { clearWishlist, isAuthenticated } = getStores();
   clearWishlist();
-
   if (!isAuthenticated) return;
   try {
     await WishlistService.clearWishlist();
@@ -55,34 +42,41 @@ export const clearWishlistAction = async () => {
   }
 };
 
-/* ================= HYDRATE ================= */
-
 export const hydrateWishlistOnLoginAction = async () => {
   const { wishlist, clearWishlist, addToWishlist } =
     useWishlistStore.getState();
 
-  const { data: remoteWishlist } = await WishlistService.getWishlist();
+  // Fetch remote wishlist — new shape returns WishlistItemResponse[]
+  const remoteData = await WishlistService.getWishlist();
+  const remoteItems: WishlistItemResponse[] = remoteData?.wishlistItem ?? [];
 
-  const merged = new Map<string, Product>();
+  // Build merged map — local Zustand store uses Product shape
+  // Remote items may have no productId (deleted products) — skip those for Zustand
+  const merged = new Map<string, Product>(wishlist.map((p) => [p.id, p]));
 
-  // Local wishlist first
-  wishlist.forEach((product) => {
-    merged.set(product.id, product);
-  });
-
-  // Merge backend wishlist
-  remoteWishlist?.wishlistItem?.forEach((item: WishlistItem) => {
-    if (item.product) {
-      merged.set(item.product.id, item.product);
+  remoteItems.forEach((item) => {
+    // Only add to Zustand store if product still exists
+    if (!item.productId || !item.isAvailable) return;
+    if (!merged.has(item.productId)) {
+      // Build a minimal Product shape from the snapshot for Zustand
+      merged.set(item.productId, {
+        id: item.productId,
+        name: item.productTitle,
+        imageUrl: item.productImage,
+        pricePerUnit: item.livePrice,
+        sku: item.productSku ?? "",
+      } as Product);
     }
   });
 
-  // Replace store in one go
   clearWishlist();
   merged.forEach((product) => addToWishlist(product));
 
-  // Sync merged wishlist back to backend
-  await WishlistService.bulkSync(
-    Array.from(merged.keys()).map((productId) => ({ productId })),
-  );
+  // Sync only valid productIds back to backend
+  const validProductIds = Array.from(merged.keys());
+  if (validProductIds.length) {
+    await WishlistService.bulkSync(
+      validProductIds.map((productId) => ({ productId })),
+    );
+  }
 };

@@ -5,23 +5,49 @@ import {
   IndependentFilter,
 } from "@/components/common/MarketPlace/Categories/IndependentFilter";
 import { Product } from "@/types/prisma-schema-types";
+import { RatingFilter } from "./RatingFilter";
+import { SlidersHorizontal, X } from "lucide-react";
 
 interface FiltersPanelProps {
   products: Product[];
   locations: string[];
   additionalFilters: CategoryGroup[];
-
   selectedLocations?: string[];
   setSelectedLocations?: (v: string[]) => void;
-
   selectedFilters?: string[];
   setSelectedFilters?: (v: string[]) => void;
-
   onPriceChange: (min: number, max: number) => void;
-
   hasActiveFilters: boolean;
   onClearAll: () => void;
+  selectedRating?: number;
+  setSelectedRating?: (rating?: number) => void;
 }
+
+// ── Section wrapper ───────────────────────────────────────────────
+const FilterSection = ({
+  label,
+  onClear,
+  children,
+}: {
+  label: string;
+  onClear?: () => void;
+  children: React.ReactNode;
+}) => (
+  <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <p className="text-sm font-bold text-gray-800">{label}</p>
+      {onClear && (
+        <button
+          onClick={onClear}
+          className="text-xs text-primary font-semibold hover:underline transition-colors"
+        >
+          Clear
+        </button>
+      )}
+    </div>
+    <div className="p-3">{children}</div>
+  </div>
+);
 
 export const FiltersPanel = ({
   products,
@@ -34,55 +60,84 @@ export const FiltersPanel = ({
   onPriceChange,
   hasActiveFilters,
   onClearAll,
+  selectedRating,
+  setSelectedRating,
 }: FiltersPanelProps) => {
   return (
-    <div className="space-y-4">
-      {/* Price */}
-      <PriceRangeFilter products={products} onFilter={onPriceChange} />
-
-      {/* Clear all */}
-      {hasActiveFilters && (
-        <div
-          className={`
-                    overflow-hidden
-                    transition-all duration-300 ease-in-out
-                    ${
-                      hasActiveFilters
-                        ? "max-h-20 opacity-100 translate-y-0"
-                        : "max-h-0 opacity-0 -translate-y-2"
-                    }
-                `}
-        >
+    <div className="space-y-3">
+      {/* ── Header with clear all ─────────────────────────────── */}
+      <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal size={15} className="text-primary" />
+          <p className="text-sm font-bold text-gray-800">Filters</p>
+          {hasActiveFilters && (
+            <span className="bg-primary/10 text-primary text-[10px] font-bold rounded-full px-2 py-0.5 leading-none border border-primary/20">
+              Active
+            </span>
+          )}
+        </div>
+        {hasActiveFilters && (
           <button
             onClick={onClearAll}
-            className="
-            w-full text-sm bg-primary text-white 
-            px-4 rounded-md py-2.5 
-            hover:bg-primary/90 
-            transition-all font-medium
-          "
+            className="flex items-center gap-1.5 text-xs text-red-500 font-semibold bg-red-50 hover:bg-red-100 border border-red-100 px-2.5 py-1.5 rounded-lg transition-colors"
           >
-            Clear all filters
+            <X size={11} />
+            Clear all
           </button>
-        </div>
+        )}
+      </div>
+      {/* ── Price ─────────────────────────────────────────────── */}
+      <FilterSection label="Price Range">
+        <PriceRangeFilter products={products} onFilter={onPriceChange} />
+      </FilterSection>
+
+      {/* ── Rating ────────────────────────────────────────────── */}
+      {setSelectedRating && (
+        <FilterSection
+          label="Rating"
+          onClear={
+            selectedRating ? () => setSelectedRating(undefined) : undefined
+          }
+        >
+          <RatingFilter
+            selected={selectedRating}
+            onSelect={setSelectedRating}
+          />
+        </FilterSection>
       )}
 
-      {/* Location */}
+      {/* ── Location ──────────────────────────────────────────── */}
       {locations.length > 0 && (
-        <LocationFilter
-          locations={locations}
-          selected={selectedLocations || []}
-          setSelected={setSelectedLocations || (() => {})}
-        />
+        <FilterSection
+          label="Location"
+          onClear={
+            selectedLocations?.length
+              ? () => setSelectedLocations?.([])
+              : undefined
+          }
+        >
+          <LocationFilter
+            locations={locations}
+            selected={selectedLocations || []}
+            setSelected={setSelectedLocations || (() => {})}
+          />
+        </FilterSection>
       )}
 
-      {/* Additional */}
+      {/* ── Additional (count, quantity, discount etc.) ────────── */}
       {additionalFilters.length > 0 && (
-        <IndependentFilter
-          categoryGroups={additionalFilters}
-          selected={selectedFilters || []}
-          setSelected={setSelectedFilters || (() => {})}
-        />
+        <FilterSection
+          label="More Filters"
+          onClear={
+            selectedFilters?.length ? () => setSelectedFilters?.([]) : undefined
+          }
+        >
+          <IndependentFilter
+            categoryGroups={additionalFilters}
+            selected={selectedFilters || []}
+            setSelected={setSelectedFilters || (() => {})}
+          />
+        </FilterSection>
       )}
     </div>
   );

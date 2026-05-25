@@ -83,15 +83,15 @@ const Footer = () => {
           name: "Marketplace",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/procurement",
           name: "Procurement",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/foodvault",
           name: "Food Vault",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/smartinventory",
           name: "Inventory",
         },
       ],
@@ -100,19 +100,19 @@ const Footer = () => {
       title: "Your Journey",
       content: [
         {
-          url: "/become-a-farmer",
+          url: "/marketing/farm_empowerment",
           name: "Farmer",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/become_merchant",
           name: "Merchant",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/business_journey",
           name: "Business",
         },
         {
-          url: "/investment-opportunity",
+          url: "/marketing/investment",
           name: "Investment",
         },
       ],
@@ -121,11 +121,11 @@ const Footer = () => {
       title: "Resources",
       content: [
         {
-          url: "/blog",
+          url: "/marketing/blog",
           name: "Blog",
         },
         {
-          url: "/under-construction",
+          url: "/marketing/faqs",
           name: "FAQs",
         },
       ],
@@ -407,19 +407,19 @@ const Footer = () => {
               </h2>
               <ul className="flex flex-col gap-2 font-thin text-sm">
                 <Link
-                  href="/marketing/becomeafarmer"
+                  href="/marketing/farm_empowerment"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Farmers</li>
                 </Link>
                 <Link
-                  href="/under-construction"
+                  href="/business/become_merchant"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Merchant</li>
                 </Link>
                 <Link
-                  href="/under-construction"
+                  href="/business/business_journey"
                   className="text-white md:text-base font-footerBody   transition ease-out duration-100 hover:text-opacity-80"
                 >
                   <li>Business</li>

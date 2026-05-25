@@ -2,47 +2,53 @@ import api from "@/lib/axios-client";
 import { CheckoutItem } from "@/store/slices/checkout.slice";
 import { PaymentMethod, ShippingMethod } from "@/types/prisma-schema-types";
 
-interface InitiatePaymentProps {
+export interface InitiateOrderPaymentProps {
   provider: PaymentMethod;
   shippingMethod: ShippingMethod;
   items: CheckoutItem[];
   email: string;
 }
 
-interface VerifyPaymentProps {
+export interface InitiateWalletPaymentProps {
+  paymentMethod: PaymentMethod;
+  amount: number;
+  email: string;
+  callback_url: string;
+}
+
+export interface VerifyPaymentProps {
   reference: string;
-  provider: PaymentMethod | null;
+  provider: PaymentMethod;
   transactionId?: string | null;
 }
 
-interface InitiateFlutterwavePaymentProps {
-  email: string;
+export interface FundWalletAfterVerifyProps {
   amount: number;
-  redirect_url: string;
+  paymentDetails: {
+    paymentMethod: PaymentMethod;
+    paymentReference: string;
+  };
 }
 
-const Services = {
-  initiateOrderPayment: async (data: InitiatePaymentProps) => {
-    const response = await api.post("/api/order/initiate-payment", data);
-    return response.data;
-  },
+const PaymentService = {
+  initiateOrderPayment: (data: InitiateOrderPaymentProps) =>
+    api.post("/api/order/initiate-payment", data).then((r) => r.data),
 
-  verifyOrderPayment: async (data: VerifyPaymentProps) => {
-    const response = await api.post(`/api/order/verify-payment`, data);
-    return response.data;
-  },
+  verifyOrderPayment: (data: VerifyPaymentProps) =>
+    api.post("/api/order/verify-payment", data).then((r) => r.data),
 
-  initiateFlutterwavePayment: async (data: InitiateFlutterwavePaymentProps) => {
-    const response = await api.post("/api/flutterwave/initiate-payment", data);
-    return response.data;
-  },
+  initiateWalletPayment: (data: InitiateWalletPaymentProps) =>
+    api.post("/api/wallet/initiate-payment", data).then((r) => r.data),
 
-  verifyFlutterwavePayment: async (transactionId: string) => {
-    const response = await api.post(
-      `/api/flutterwave/verify-payment/${transactionId}`,
-    );
-    return response.data;
-  },
+  verifyWalletPayment: (data: VerifyPaymentProps) =>
+    api.post("/api/wallet/verify-payment", data).then((r) => r.data),
+
+  fundWalletAfterVerify: (data: FundWalletAfterVerifyProps) =>
+    api.post("/api/wallet", data).then((r) => r.data),
+  getOrderFeeInfo: (data: {
+    items: CheckoutItem[];
+    shippingMethod: ShippingMethod;
+  }) => api.post("/api/order/fee-info", data).then((r) => r.data),
 };
 
-export default Services;
+export default PaymentService;

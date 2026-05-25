@@ -8,6 +8,7 @@ export enum SignUpType {
 export enum PaymentMethod {
   paystack = "paystack",
   flutterwave = "flutterwave",
+  smartcash = "smartcash",
   wallet = "wallet",
   whatsapp = "whatsapp",
 }
@@ -19,16 +20,62 @@ export enum ShippingMethod {
 
 export enum ProductStatus {
   pending = "pending",
-  active = "active",
-  inactive = "inactive",
+  approved = "approved",
+  rejected = "rejected",
 }
 
 export enum OrderStatus {
+  pending = "pending",
+  partially_shipped = "partially_shipped",
+  shipped = "shipped",
+  partially_delivered = "partially_delivered",
+  cancelled = "cancelled",
+  delivered = "delivered",
+}
+
+export enum OrderItemStatus {
   pending = "pending",
   ready_to_ship = "ready_to_ship",
   shipped = "shipped",
   cancelled = "cancelled",
   delivered = "delivered",
+  out_of_stock = "out_of_stock",
+}
+
+export enum SellerOrderStatus {
+  pending = "pending",
+  partially_shipped = "partially_shipped",
+  shipped = "shipped",
+  partially_delivered = "partially_delivered",
+  delivered = "delivered",
+  cancelled = "cancelled",
+}
+
+export enum SellerProductStatus {
+  low_stock = "low stock",
+  in_stock = "in stock",
+  out_of_stock = "out of stock",
+}
+
+export enum PayoutStatus {
+  pending = "pending",
+  processing = "processing",
+  success = "success",
+  failed = "failed",
+}
+
+export enum AutoPayoutSchedule {
+  none = "none", // manual only
+  immediate = "immediate", // 48hrs after eligible
+  weekly = "weekly",
+  monthly = "monthly",
+}
+
+export enum RefundStatus {
+  pending = "pending",
+  processing = "processing",
+  success = "success",
+  failed = "failed",
 }
 
 export enum VerificationStatus {
@@ -64,6 +111,7 @@ export enum ProductQuantityType {
 export enum TransactionType {
   credit = "credit",
   debit = "debit",
+  refund = "refund",
 }
 
 export enum CountType {
@@ -77,6 +125,34 @@ export enum CountType {
   basket = "basket",
   each = "each",
   pack = "pack",
+}
+
+export enum NotificationType {
+  order = "order",
+  payment = "payment",
+  refund = "refund",
+  service = "service",
+  promotion = "promotion",
+  system = "system",
+}
+export enum ActivityType {
+  order_placed = "order_placed",
+  order_cancelled = "order_cancelled",
+  order_delivered = "order_delivered",
+  payment_made = "payment_made",
+  wallet_funded = "wallet_funded",
+  wallet_debited = "wallet_debited",
+  refund_requested = "refund_requested",
+  refund_processed = "refund_processed",
+  product_reviewed = "product_reviewed",
+  address_added = "address_added",
+  address_updated = "address_updated",
+  profile_updated = "profile_updated",
+  product_added = "product_added",
+  product_updated = "product_updated",
+  product_deleted = "product_deleted",
+  payout_requested = "payout_requested",
+  payout_processed = "payout_processed",
 }
 
 export interface User {
@@ -266,8 +342,11 @@ export interface WalletTransaction {
   amount: number;
   type: TransactionType;
   reference?: string;
+  description?: string;
   metadata?: Record<string, unknown>;
   createdAt: string;
+
+  wallet: Wallet;
 }
 
 export interface Category {
@@ -322,16 +401,21 @@ export interface Product {
 
   produceType?: string;
   quantityPerUnit?: number;
+  isActive: boolean;
 
   sku: string;
   imageUrl: string;
   images: string[];
   location: string;
 
+  rejectionReason?: string;
+  rejectionScreenshots: string[];
+
   expiryDate?: string;
   specifications?: Record<string, unknown>;
 
   ratingSum: number;
+  ratingCount: number;
   popularity: number;
   viewCount: number;
   soldCount: number;
@@ -351,6 +435,7 @@ export interface Order {
   totalAmount: number;
   status: OrderStatus;
   shippingFee: number;
+  serviceCharge: number;
   paymentMethod?: PaymentMethod;
   shippingMethod: ShippingMethod;
   addressId?: string;
@@ -371,12 +456,83 @@ export interface Order {
 export interface OrderItem {
   id: string;
   orderId: string;
-  productId: string;
+  sellerOrderId: string;
+  productId?: string;
+  productTitle: string;
+  productImage?: string;
+  productSku?: string;
   price: number;
   quantity: number;
-  sellerId?: string;
+  status: OrderItemStatus;
+
+  shippedAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
+
+  sellerOrder: SellerOrder;
+  product?: Product;
+  order: Order;
+}
+
+export interface SellerOrder {
+  id: string;
+  orderId: string;
+  sellerId: string;
+  subTotal: number;
+  commission: number;
+  sellerEarning: number;
+  status: SellerOrderStatus;
+  paidOut: boolean;
+  paidOutAt?: string;
+
+  eligibleForPayout: boolean;
+  eligibleAt?: string;
+
+  shippedAt?: string;
+  deliveredAt?: string;
+  cancelledAt?: string;
   createdAt: string;
-  product: Product;
+
+  order: Order;
+  seller: User;
+  items: OrderItem[];
+  payouts: Payout[];
+}
+
+export interface Payout {
+  id: string;
+  sellerOrderId: string;
+  bankDetailId: string;
+  amount: number;
+  transferReference?: string;
+  status: PayoutStatus;
+  createdAt: string;
+  paidAt?: string;
+  sellerOrder: SellerOrder;
+  bankAccount: BankDetail;
+}
+
+export interface Bank {
+  id: string;
+  name: string;
+  code: string;
+  createdAt: string;
+  bankDetails: BankDetail[];
+}
+
+export interface BankDetail {
+  id: string;
+  userId: string;
+  bankId: string;
+  accountNumber: string;
+  accountHolderName: string;
+  paystackRecipientCode?: string;
+
+  isDefault: boolean;
+  createdAt: string;
+  user: User;
+  bank: Bank;
+  payouts: Payout[];
 }
 
 export interface Review {

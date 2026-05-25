@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   ShoppingCartIcon,
@@ -23,39 +23,50 @@ const MarketSearch = () => {
   const { wishlist } = useWishlistStore();
   const { user, isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
-
-  const [profileOpen, setProfileOpen] = React.useState(false);
-
-  // Check if cart and wishlist have items
-  const hasItemsInCart = cart.length > 0;
-  const hasFavorites = wishlist.length > 0;
   const { navigate } = useNavigate();
 
+  const [profileOpen, setProfileOpen] = React.useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const hasItemsInCart = cart.length > 0;
+  const hasFavorites = wishlist.length > 0;
+
+  // ← useRef-based outside click — same pattern as main navbar
   useEffect(() => {
-    const close = () => setProfileOpen(false);
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className="relative bg-dark-primary w-full p-5  text-white flex items-center justify-between">
+    <div className="relative bg-dark-primary w-full px-4 lg:px-6 py-4 text-white flex items-center justify-between gap-4">
+      {/* Logo */}
       <Image
         src="/assets/svg/logo-primary.svg"
-        alt="farmstarck logo"
+        alt="Farmstarck"
         width={192}
         height={48}
-        className="w-32 md:w-48 lg:block hidden"
+        className="w-32 md:w-44 lg:block hidden shrink-0"
       />
-      <div className="w-3/5 lg:w-[50%] p-2 flex items-center gap-4 bg-white rounded-lg">
+
+      {/* Search */}
+      <div className="flex-1 lg:max-w-2xl p-2 flex items-center bg-white rounded-lg">
         <CustomSearch />
       </div>
 
-      {/* Cart, Favorites, Sign In */}
-      <div className="flex items-center gap-4">
-        {/* Cart Button with Count */}
+      {/* Right actions */}
+      <div className="flex items-center gap-4 shrink-0">
+        {/* Cart */}
         <button
           onClick={() => navigate("/market/marketplace/cart-items")}
-          className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 text-white hover:opacity-80 transition-opacity"
         >
           <div className="relative">
             {hasItemsInCart ? (
@@ -64,17 +75,17 @@ const MarketSearch = () => {
               <ShoppingCartIcon className="w-6 h-6" />
             )}
             {hasItemsInCart && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-semibold">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5 font-bold">
                 {cart.length > 99 ? "99+" : cart.length}
               </span>
             )}
           </div>
         </button>
 
-        {/* Wishlist Button with Count */}
+        {/* Wishlist */}
         <button
           onClick={() => navigate("/market/marketplace/wishlist-items")}
-          className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 text-white hover:opacity-80 transition-opacity"
         >
           <div className="relative">
             {hasFavorites ? (
@@ -83,57 +94,93 @@ const MarketSearch = () => {
               <HeartIcon className="w-6 h-6" />
             )}
             {hasFavorites && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-semibold">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5 font-bold">
                 {wishlist.length > 99 ? "99+" : wishlist.length}
               </span>
             )}
           </div>
         </button>
-        {/* Auth Section */}
+
+        {/* Auth */}
         {!isAuthenticated ? (
           <Link
             href="/signin"
-            className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
+            className="flex items-center gap-1.5 text-white hover:opacity-80 transition-opacity"
           >
             <UserIcon className="w-6 h-6" />
-            <span className="hidden md:inline">Sign In</span>
+            <span className="hidden md:inline text-sm font-medium">
+              Sign In
+            </span>
           </Link>
         ) : (
-          <div className="relative">
+          <div className="relative" ref={profileRef}>
             {/* Avatar */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setProfileOpen((p) => !p);
-              }}
-              className="w-7 h-7 rounded-full bg-white  text-dark-primary flex items-center justify-center font-extrabold md:w-9 md:h-9"
+              onClick={() => setProfileOpen((p) => !p)}
+              className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white text-dark-primary flex items-center justify-center font-extrabold text-xs hover:opacity-90 transition-opacity"
             >
               {getInitials(user?.fullName)}
             </button>
 
-            {/* Dropdown */}
+            {/* Dropdown — matches main navbar style */}
             {profileOpen && (
-              <div className="absolute right-0 mt-3 w-44 bg-white rounded-md shadow-lg overflow-hidden z-50">
-                <button
-                  onClick={() => {
-                    setProfileOpen(false);
-                    router.push("/dashboard/buyer");
-                  }}
-                  className="w-full text-left px-4 py-2 font-bold text-gray-700 hover:bg-gray-100"
+              <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 py-1">
+                {/* User info header */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+                    Signed in as
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">
+                    {user?.fullName}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {user?.email}
+                  </p>
+                </div>
+
+                {/* Nav links */}
+                <Link
+                  href="/dashboard"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Dashboard
-                </button>
-
-                <button
-                  onClick={async () => {
-                    setProfileOpen(false);
-                    await logout();
-                    router.push("/signin");
-                  }}
-                  className="w-full text-left px-4 py-2 font-bold text-red-600 hover:bg-gray-100"
+                </Link>
+                <Link
+                  href="/dashboard/orders"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  Logout
-                </button>
+                  My Orders
+                </Link>
+                <Link
+                  href="/dashboard/my-wallet"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  My Wallet
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Settings
+                </Link>
+
+                {/* Logout */}
+                <div className="border-t border-gray-100 mt-1 pt-1">
+                  <button
+                    onClick={async () => {
+                      setProfileOpen(false);
+                      await logout();
+                      router.push("/signin");
+                    }}
+                    className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -91,7 +91,6 @@ const WishListItems = () => {
               <div className="col-span-2">Image</div>
               <div className="col-span-3">Item Description</div>
               <div className="col-span-2">Price</div>
-              {/* <div className="col-span-2">Date Added</div> */}
               <div className="col-span-2">Availability</div>
               <div className="col-span-1">Actions</div>
             </div>
@@ -108,9 +107,11 @@ const WishListItems = () => {
                     {/* Header Row with Image and Delete */}
                     <div className="flex justify-between items-start gap-3">
                       <div className="flex items-start gap-3 flex-1">
-                        <img
+                        <Image
                           src={item.imageUrl}
                           alt={item.name}
+                          height={50}
+                          width={50}
                           className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
@@ -144,14 +145,7 @@ const WishListItems = () => {
                           ₦{item?.pricePerUnit?.toLocaleString()}
                         </p>
                       </div>
-                      {/* <div>
-                        <span className="text-gray-500 text-xs">
-                          Date Added:
-                        </span>
-                        <p className="font-semibold text-gray-900">
-                          22/11/2025
-                        </p>
-                      </div> */}
+
                       <div>
                         <span className="text-gray-500 text-xs">
                           Availability:
@@ -192,9 +186,11 @@ const WishListItems = () => {
                   <div className="hidden md:grid grid-cols-10 gap-4 items-center">
                     {/* Image */}
                     <div className="col-span-2">
-                      <img
+                      <Image
                         src={item.imageUrl}
                         alt={item.name}
+                        height={50}
+                        width={50}
                         className="lg:w-24 lg:h-24 md:w-20 md:h-20 object-cover rounded-lg"
                       />
                     </div>
@@ -284,6 +280,7 @@ const WishListItems = () => {
         closeModal={() => setShowClearModal(false)}
         isOpen={showClearModal}
         onConfirm={handleClearAll}
+        confirm_text="Clear All"
       />
     </>
   );

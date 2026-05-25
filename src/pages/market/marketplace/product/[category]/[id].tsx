@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Heart,
   ShoppingCart,
@@ -16,7 +16,6 @@ import { buildWhatsappMessage, SuccessMessage } from "@/utils/PageUtils";
 import BaseLoader from "@/Loaders/BaseLoader";
 import DeliveryAccordion from "@/components/common/MarketPlace/DeliveryAccordion";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
-import ProductService from "@/services/product.service";
 import { Product } from "@/types/prisma-schema-types";
 import {
   addToCartAction,
@@ -28,142 +27,111 @@ import {
   addToWishlistAction,
 } from "@/store/actions/wishlist.action";
 import { ProductFilter } from "@/hooks/useProductFilter";
+import { useQueries } from "@tanstack/react-query";
+import { productQueries } from "@/queries/product.queries";
+
+const RELATED_FILTER = { page: 1, size: 5 } as ProductFilter;
 
 const ProductDetailPage = () => {
-  const { cart } = useCartStore();
-  const { wishlist } = useWishlistStore();
   const router = useRouter();
   const { id: productId } = router.query;
-  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
-    return cart.reduce(
-      (acc, item) => {
-        acc[item.id] = item.cartQuantity ?? 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-  });
-  const [quantity, setQuantity] = useState<number>(1);
-
-  const [product, setProduct] = useState<Product | null>(null);
+  const { cart } = useCartStore();
+  const { wishlist } = useWishlistStore();
   const [selectedImage, setSelectedImage] = useState<string>("");
-  const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(
-    null,
-  );
-  const [loading, setLoading] = useState(true);
-  const [isInCart, setIsInCart] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Fetch products
-  useEffect(() => {
-    if (!router.isReady) return;
-    ProductService.getProductById(productId as string)
-      .then((res) => {
-        setProduct(res.data.data);
-        setSelectedImage(res.data.data.imageUrl);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-
-    ProductService.getRelatedProducts(
-      productId as string,
+  // ── Queries ──────────────────────────────────────────────────────
+  const [productQuery, relatedQuery] = useQueries({
+    queries: [
       {
-        page: 1,
-        size: 5,
-      } as ProductFilter,
-    )
-      .then((res) => setRelatedProducts(res.data.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [router.isReady, productId]);
+        ...productQueries.productById(productId as string),
+        select: (res: any) => res.data.data as Product,
+      },
+      {
+        ...productQueries.relatedProducts(productId as string, RELATED_FILTER),
+        select: (res: any) => res.data.data as Product[],
+      },
+    ],
+  });
 
-  useEffect(() => {
-    if (!product) return;
+  const product = productQuery.data ?? null;
+  const relatedProducts = relatedQuery.data ?? [];
+  const loading = productQuery.isLoading || !router.isReady;
 
-    const foundInCart = cart.find((item) => item.id === productId);
-    setIsInCart(!!foundInCart);
+  // ── Derived state ────────────────────────────────────────────────
 
-    const foundInWishlist = wishlist.find((item) => item.id === productId);
-    setIsWishlisted(!!foundInWishlist);
-  }, [cart, wishlist, product]);
+  // Set initial image once product loads
+  const displayImage = selectedImage || product?.imageUrl || "";
 
-  const handleQuantityChange = (id: string, value: number) => {
+  const cartQuantity = useMemo(() => {
+    const found = cart.find((item) => item.id === productId);
+    return found?.cartQuantity ?? 1;
+  }, [cart, productId]);
+
+  const isInCart = useMemo(
+    () => cart.some((item) => item.id === productId),
+    [cart, productId],
+  );
+
+  const isWishlisted = useMemo(
+    () => wishlist.some((item) => item.id === productId),
+    [wishlist, productId],
+  );
+
+  // ── Handlers ─────────────────────────────────────────────────────
+  const handleQuantityChange = (value: number) => {
     if (value < 1) return;
-    setQuantity(value);
-
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
-
-    updateCartQuantityAction(id, value); // sync with backend / store
+    updateCartQuantityAction(productId as string, value);
   };
 
-  const renderStars = (rating: number) => {
-    return [...Array(5)].map((_, index) => (
+  const toggleCart = (item: Product) => {
+    if (isInCart) {
+      removeFromCartAction(item.id);
+      SuccessMessage("Item removed from cart");
+    } else {
+      addToCartAction(item);
+      SuccessMessage("Item added to cart");
+    }
+  };
+
+  const toggleWishlist = (item: Product) => {
+    if (isWishlisted) {
+      removeFromWishlistAction(item.id);
+      SuccessMessage("Item removed from wishlist");
+    } else {
+      addToWishlistAction(item);
+      SuccessMessage("Item added to wishlist");
+    }
+  };
+
+  const handleBuyViaWhatsapp = (item: Product) => {
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+    if (!whatsappNumber) return;
+    const message = encodeURIComponent(
+      buildWhatsappMessage(item, cartQuantity),
+    );
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+  };
+
+  const renderStars = (rating: number) =>
+    [...Array(5)].map((_, i) => (
       <Star
-        key={index}
+        key={i}
         size={16}
         className={
-          index < Math.floor(rating)
+          i < Math.floor(rating)
             ? "fill-yellow-400 text-yellow-400"
             : "fill-gray-300 text-gray-300"
         }
       />
     ));
-  };
 
-  // Add/Remove from Cart
-  const addToCartFunction = (item: Product) => {
-    const foundItem = cart.find((it) => it.id === item.id);
-    if (foundItem) {
-      removeFromCartAction(item.id);
-      SuccessMessage("Item removed from cart");
-      setIsInCart(false);
-    } else {
-      addToCartAction(item);
-      SuccessMessage("Item added to cart");
-      setIsInCart(true);
-    }
-  };
+  // ── Guards ───────────────────────────────────────────────────────
+  if (loading) return <BaseLoader />;
 
-  // Add/Remove from Wishlist
-  const toggleWishlist = (item: Product) => {
-    const foundWish = wishlist.find((it) => it.id === item.id);
-    if (foundWish) {
-      removeFromWishlistAction(item.id);
-      SuccessMessage("Item removed from wishlist");
-      setIsWishlisted(false);
-    } else {
-      addToWishlistAction(item);
-      SuccessMessage("Item added to wishlist");
-      setIsWishlisted(true);
-    }
-  };
-
-  // Handle buy via whatsapp
-  const handleBuyViaWhatsapp = (item: Product) => {
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
-    if (!whatsappNumber) return;
-    const message = encodeURIComponent(buildWhatsappMessage(item, quantity));
-
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
-  };
-
-  // Loading state
-  if (loading || !router.isReady) {
-    return (
-      <>
-        <BaseLoader />
-      </>
-    );
-  }
-
-  // Product not found state
   if (!product) {
     return (
       <div className="min-h-screen bg-[#E8F5E9] py-6">
-        <div className="max-w-7xl  mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center justify-center h-[60vh]">
             <div className="bg-white rounded-lg shadow-sm p-8 max-w-md text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -178,7 +146,7 @@ const ProductDetailPage = () => {
               </p>
               <button
                 onClick={() => router.push("/market/marketplace")}
-                className="bg-[#00C700] text-white px-6 py-3 rounded-lg  hover:bg-[#00B000] transition-colors"
+                className="bg-[#00C700] text-white px-6 py-3 rounded-lg hover:bg-[#00B000] transition-colors"
               >
                 Back to Marketplace
               </button>
@@ -191,15 +159,15 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen satoshi bg-lite py-3 lg:py-5">
-      <div className="lg:max-w-7xl  mx-auto px-4">
+      <div className="lg:max-w-7xl mx-auto px-4">
         <div className="mb-5">
           <Navigation
             routes={[
               {
-                name: product?.category?.name || "",
-                href: `/market/marketplace/${product?.category?.name}`,
+                name: product.category?.name || "",
+                href: `/market/marketplace/${product.category?.name}`,
               },
-              { name: product.name, href: `#` },
+              { name: product.name, href: "#" },
             ]}
           />
         </div>
@@ -208,15 +176,15 @@ const ProductDetailPage = () => {
         <div className="rounded-lg p-1 lg:p-5 mb-6 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-8">
             {/* Left - Images */}
-            <div className="flex  md:flex-row flex-col-reverse gap-4 md:gap-6 w-full">
-              {/* Thumbnail Column */}
+            <div className="flex md:flex-row flex-col-reverse gap-4 md:gap-6 w-full">
+              {/* Thumbnails */}
               <div className="flex md:flex-col flex-row gap-3 md:overflow-visible overflow-x-auto scrollbar-hide">
                 {product.images.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(img)}
                     className={`w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 overflow-hidden transition-all duration-300 flex-shrink-0 p-0.5 ${
-                      selectedImage === img
+                      displayImage === img
                         ? "border-primary bg-primary bg-opacity-10"
                         : "border-gray-200 hover:border-primary hover:bg-gray-50"
                     }`}
@@ -232,21 +200,18 @@ const ProductDetailPage = () => {
                 ))}
               </div>
 
-              {/* Main Image Container */}
+              {/* Main Image */}
               <div className="flex-1">
                 <div className="relative bg-white rounded-2xl overflow-hidden border border-gray-200 p-2 h-[300px] md:h-full">
-                  {/* Main Image */}
                   <div className="relative h-full">
                     <Image
-                      src={selectedImage}
+                      src={displayImage}
                       alt={product.name}
                       fill
                       className="object-contain rounded-lg"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
-
-                  {/* Wishlist Button */}
                   <button
                     onClick={() => toggleWishlist(product)}
                     className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-300 ${
@@ -285,29 +250,17 @@ const ProductDetailPage = () => {
               <div className="mb-6 w-full">
                 <div className="flex items-center justify-between w-full gap-2 bg-white rounded-lg p-1 lg:w-fit">
                   <button
-                    onClick={() =>
-                      handleQuantityChange(
-                        product.id,
-                        (quantities[product.id] ?? 1) - 1,
-                      )
-                    }
-                    disabled={(quantities[product.id] ?? 1) <= 1}
+                    onClick={() => handleQuantityChange(cartQuantity - 1)}
+                    disabled={cartQuantity <= 1}
                     className="w-10 h-10 flex items-center justify-center bg-dark-green text-white rounded-md hover:bg-dark-green/90 disabled:opacity-50"
                   >
                     <Minus size={20} />
                   </button>
-
                   <span className="w-16 text-center font-semibold">
-                    {quantities[product.id] ?? 1}
+                    {cartQuantity}
                   </span>
-
                   <button
-                    onClick={() =>
-                      handleQuantityChange(
-                        product.id,
-                        (quantities[product.id] ?? 1) + 1,
-                      )
-                    }
+                    onClick={() => handleQuantityChange(cartQuantity + 1)}
                     className="w-10 h-10 flex items-center justify-center bg-[#00C700] text-white rounded-md hover:bg-[#00B000]"
                   >
                     <Plus size={20} />
@@ -318,7 +271,7 @@ const ProductDetailPage = () => {
               {/* Action Buttons */}
               <div className="space-y-3 w-full mb-6">
                 <button
-                  onClick={() => addToCartFunction(product)}
+                  onClick={() => toggleCart(product)}
                   className={`py-3 md:py-4 text-sm border rounded-lg px-4 flex items-center justify-center w-full gap-2 transition-all duration-300 font-medium ${
                     isInCart
                       ? "border-primary bg-primary text-white"
@@ -329,8 +282,8 @@ const ProductDetailPage = () => {
                   {isInCart ? "Remove" : "Add to Cart"}
                 </button>
                 <button
-                  className="w-full bg-[#1B5E20] text-white py-3 md:py-4 rounded-lg font-semibold hover:bg-[#164418] transition-colors flex items-center justify-center gap-2"
                   onClick={() => handleBuyViaWhatsapp(product)}
+                  className="w-full bg-[#1B5E20] text-white py-3 md:py-4 rounded-lg font-semibold hover:bg-[#164418] transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageCircle size={20} />
                   Buy via Whatsapp
@@ -340,84 +293,223 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Product Information & Seller Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Product Information */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-bold mb-4">Product Information</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Category:</span>
-                <span className="font-semibold capitalize">
-                  {product.category?.name}
-                </span>
+        {/* Product & Seller Information */}
+        {/* ── Description & Specs ─────────────────────────────── */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-5">
+            Product Details
+          </h2>
+
+          <div className="space-y-6">
+            {/* Description */}
+            {product.description && (
+              <div>
+                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">
+                  Description
+                </h3>
+                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
+                  {product.description}
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Sub-Category:</span>
-                <span className="font-semibold capitalize">
-                  {product.subcategory?.name}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Count:</span>
-                <span className="font-semibold capitalize">
-                  {product.countType}
-                </span>
+            )}
+
+            <hr className="border-gray-100" />
+
+            {/* Key Info Grid */}
+            <div>
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">
+                Product Information
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { label: "Category", value: product.category?.name },
+                  { label: "Sub-Category", value: product.subcategory?.name },
+                  { label: "Count Type", value: product.countType },
+                  { label: "Quantity Type", value: product.quantityType },
+                  { label: "Condition", value: product.condition },
+                  { label: "Location", value: product.location },
+                  product.brand && { label: "Brand", value: product.brand },
+                  product.weightRange && {
+                    label: "Weight Range",
+                    value: product.weightRange,
+                  },
+                  product.volumeRange && {
+                    label: "Volume Range",
+                    value: product.volumeRange,
+                  },
+                  product.produceType && {
+                    label: "Produce Type",
+                    value: product.produceType,
+                  },
+                  product.expiryDate && {
+                    label: "Expiry Date",
+                    value: new Date(product.expiryDate).toLocaleDateString(
+                      "en-GB",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      },
+                    ),
+                  },
+                  product.quantityPerUnit && {
+                    label: "Qty Per Unit",
+                    value: `${product.quantityPerUnit} units`,
+                  },
+                ]
+                  .filter(Boolean)
+                  .map((item: any) => (
+                    <div
+                      key={item.label}
+                      className="bg-gray-50 rounded-xl px-4 py-3"
+                    >
+                      <p className="text-xs text-gray-400 font-medium mb-0.5">
+                        {item.label}
+                      </p>
+                      <p className="text-sm font-semibold text-gray-800 capitalize">
+                        {item.value ?? "—"}
+                      </p>
+                    </div>
+                  ))}
               </div>
             </div>
-          </div>
 
-          {/* Seller Information */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-bold mb-4">Seller Information</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Store Name:</span>
-                <span className="font-semibold capitalize">
-                  {product.seller.fullName}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Ratings:</span>
-                <div className="flex items-center gap-2">
-                  <div className="flex">{renderStars(product.ratingSum)}</div>
-                  <span className="text-sm text-gray-600">
-                    {product.ratingSum} ({product?.reviews?.length} Reviews)
-                  </span>
+            {/* Specifications — for machinery/equipment */}
+            {product.specifications &&
+              formatSpecifications(product.specifications).length > 0 && (
+                <>
+                  <hr className="border-gray-100" />
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">
+                      Specifications
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {formatSpecifications(product.specifications).map(
+                        (spec, i) => (
+                          <span
+                            key={i}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/20 text-primary rounded-full text-xs font-semibold"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                            {spec}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+          </div>
+        </div>
+
+        {/* ── Product & Seller Info ────────────────────────────── */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Seller Information
+          </h2>
+          <div className="flex items-start gap-4">
+            {/* Seller avatar */}
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-primary font-bold text-lg">
+                {product.seller?.fullName?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-gray-900 capitalize">
+                {product.seller?.fullName}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex">
+                  {renderStars(
+                    product.ratingCount && product.ratingCount > 0
+                      ? product.ratingSum / product.ratingCount
+                      : 0,
+                  )}
                 </div>
+                <span className="text-sm text-gray-500">
+                  {product.ratingCount && product.ratingCount > 0
+                    ? (product.ratingSum / product.ratingCount).toFixed(1)
+                    : "0"}{" "}
+                  ({product.reviews?.length ?? 0} review
+                  {product.reviews?.length !== 1 ? "s" : ""})
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Product Ratings & Reviews */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-bold mb-6">Product Ratings & Reviews</h2>
-          <div className="space-y-4">
-            {product?.reviews?.map((review) => (
-              <div
-                key={review.id}
-                className="border-b border-gray-200 pb-4 last:border-0"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="text-gray-700 mb-1">
-                      &quot;{review.comment}&quot;
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold text-sm capitalize">
+        {/* ── Reviews ─────────────────────────────────────────── */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900">
+              Ratings & Reviews
+            </h2>
+            {product.reviews?.length > 0 && (
+              <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2">
+                <Star size={16} className="fill-yellow-400 text-yellow-400" />
+                <span className="font-bold text-gray-900 text-sm">
+                  {product.ratingCount && product.ratingCount > 0
+                    ? (product.ratingSum / product.ratingCount).toFixed(1)
+                    : "0"}
+                </span>
+                <span className="text-xs text-gray-400">
+                  / 5 · {product.reviews.length} review
+                  {product.reviews.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {product.reviews?.length === 0 || !product.reviews ? (
+            <div className="flex flex-col items-center py-10 gap-3">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Star size={20} className="text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-semibold text-sm">
+                No reviews yet
+              </p>
+              <p className="text-xs text-gray-400 text-center max-w-xs">
+                Be the first to review this product after purchasing.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {product.reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border-b border-gray-100 pb-4 last:border-0"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-primary font-bold text-xs">
+                          {review.author?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="font-semibold text-sm capitalize text-gray-800">
                         {review.author}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <div className="flex">{renderStars(review.rating)}</div>
-                      <span className="text-sm text-gray-500">
-                        {review.date}
+                      <span className="text-xs text-gray-400">
+                        {new Date(review.date).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
                   </div>
+                  {review.comment && (
+                    <p className="text-gray-600 text-sm leading-relaxed pl-10">
+                      &quot;{review.comment}&quot;
+                    </p>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="my-10">
@@ -426,10 +518,10 @@ const ProductDetailPage = () => {
 
         <div className="mb-10 flex items-start w-full flex-col gap-4">
           <div className="text-lg font-semibold">You might also like</div>
-          <div className="w-full  gap-4">
+          <div className="w-full gap-4">
             <ProductsGrid
               url="/market/marketplace/product"
-              products={relatedProducts ?? []}
+              products={relatedProducts}
             />
           </div>
         </div>

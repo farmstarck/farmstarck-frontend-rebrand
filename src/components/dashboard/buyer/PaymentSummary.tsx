@@ -1,7 +1,7 @@
-import { Order } from "@/types/products"
+import { Order } from "@/types/prisma-schema-types";
 
 interface Props {
-  order: Order
+  order: Order;
 }
 
 export default function PaymentSummary({ order }: Props) {
@@ -15,7 +15,7 @@ export default function PaymentSummary({ order }: Props) {
         <div className="px-6 py-4 space-y-3 text-sm">
           <div>
             <p className="font-semibold text-gray-900 mb-0.5">Payment Method</p>
-            <p className="text-gray-500">{order.paymentMethod}</p>
+            <p className="text-gray-500 capitalize">{order.paymentMethod}</p>
           </div>
 
           <div className="pt-1">
@@ -24,19 +24,22 @@ export default function PaymentSummary({ order }: Props) {
               <div className="flex justify-between">
                 <span>Items Total:</span>
                 <span className="font-medium text-gray-800">
-                  ₦{order.itemsTotal.toLocaleString()}
+                  ₦{order.totalAmount.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Delivery Fees:</span>
                 <span className="font-medium text-gray-800">
-                  ₦{order.deliveryFee.toLocaleString()}
+                  ₦{order.shippingFee.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Service Charge:</span>
                 <span className="font-medium text-gray-800">
-                  ₦{order.serviceCharge < 0 ? `-${Math.abs(order.serviceCharge).toLocaleString()}` : order.serviceCharge.toLocaleString()}
+                  ₦
+                  {order.serviceCharge < 0
+                    ? `-${Math.abs(order.serviceCharge).toLocaleString()}`
+                    : order.serviceCharge.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -51,5 +54,5 @@ export default function PaymentSummary({ order }: Props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

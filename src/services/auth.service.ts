@@ -62,6 +62,8 @@ const Services = {
     const response = await api.post("/api/auth/google/login", data);
     return response.data;
   },
+  verify2FA: (data: { userId: string; otp: string }) =>
+    api.post("/api/auth/verify-2fa", data).then((r) => r.data),
 };
 
 export default Services;

@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import BuyerDashboardLayout from "@/layouts/BuyerDashboardLayout";
 import { useAuthStore } from "@/store/slices/auth.slice";
 import MerchantDashboardLayout from "@/layouts/MerchantDashboardLayout";
+import Providers from "@/providers";
 
 type NextPageWithLayout = AppProps["Component"] & {
   getLayout?: (page: React.ReactNode) => React.ReactNode;
@@ -85,7 +86,6 @@ export default function App({ Component, pageProps }: AppProps) {
       );
     }
 
-
     // If it's a merchant route, use MerchantDashboardLayout
     if (isMerchantRoute) {
       return (
@@ -114,17 +114,15 @@ export default function App({ Component, pageProps }: AppProps) {
   // }
 
   return (
-    <>
+    <Providers>
       {(loading || isLoading) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
           <BaseLoader />
         </div>
       )}
 
-      {/* Pages with appropriate layouts */}
       {getLayout()}
 
-      {/* Global Toast container */}
       <Toaster
         position="top-right"
         reverseOrder={false}
@@ -147,6 +145,6 @@ export default function App({ Component, pageProps }: AppProps) {
           },
         }}
       />
-    </>
+    </Providers>
   );
 }

@@ -39,7 +39,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
         onChange(options[0].value.toString());
       }
     }
-  }, [autoSelectFirst, value, options, onChange]);
+  }, [autoSelectFirst, options]);
 
   // Filter options
   const filteredOptions = options.filter((opt) =>
@@ -58,13 +58,19 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
   }, []);
 
   // Find selected label
-  const selected = options.find((opt) => opt.value === value)?.label;
+  const selected =
+    options.find((opt) => opt.value === value)?.label ??
+    (value ? String(value) : undefined);
   const wrapperClass = width === "full" ? "w-full" : "";
   const wrapperStyle =
     typeof width === "number" ? { width: `${width / 4}rem` } : undefined;
 
   return (
-    <div ref={refDiv} className={`relative ${wrapperClass}`} style={wrapperStyle}>
+    <div
+      ref={refDiv}
+      className={`relative ${wrapperClass}`}
+      style={wrapperStyle}
+    >
       {/* Trigger */}
       <div
         className={`flex items-center gap-2 max-w-3xl px-3 py-3 ${textclass} w-full border border-gray-200 rounded-lg transition-all duration-200 ${
@@ -79,7 +85,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
       >
         {icon && <span className="text-gray-500">{icon}</span>}
         <span
-          className={`flex-1 text-sm ${!value ? "text-gray-400" : "text-gray-700"}`}
+          className={`flex-1 text-sm capitalize ${!value ? "text-gray-400" : "text-gray-700"}`}
         >
           {selected || placeholder}
         </span>
@@ -102,7 +108,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
                 placeholder={searchholder || "search..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full  outline-none text-sm text-gray-700 placeholder-gray-400"
+                className="w-full  outline-none text-sm text-gray-700 placeholder-gray-400 capitalize"
               />
             </div>
           )}
@@ -117,7 +123,7 @@ export const CustomDropDown: React.FC<DropdownProps> = ({
                   setOpen(false);
                   setSearch("");
                 }}
-                className={`px-4 py-2 text-sm cursor-pointer transition-all ${
+                className={`px-4 py-2 text-sm cursor-pointer  capitalize transition-all ${
                   value === option.value
                     ? "bg-[var(--primary)] text-white"
                     : "hover:bg-lite text-gray-700"
