@@ -78,11 +78,50 @@ const StatusBadge = ({ status, quantity, isActive }: StatusBadgeProps) => {
 };
 
 // ── Rejection details modal ────────────────────────────────────────
+export type MerchantProductCardProduct = {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  pricePerUnit: number;
+  discountPerUnit: number;
+  stockQuantity: number;
+  categoryId: string;
+  subcategoryId: string;
+  countType?: string | null;
+  weightRange?: string | null;
+  volumeRange?: string | null;
+  brand?: string | null;
+  quantityType: string;
+  condition: string;
+  status: string;
+  produceType?: string | null;
+  quantityPerUnit?: number;
+  isActive: boolean;
+  sku: string;
+  imageUrl: string;
+  images: string[];
+  location: string;
+  rejectionReason?: string;
+  rejectionScreenshots?: string[];
+  ratingCount?: number;
+  expiryDate?: string | Date | null;
+  specifications?: Record<string, unknown> | null;
+  ratingSum: number;
+  popularity: number;
+  viewCount: number;
+  soldCount: number;
+  deletedAt?: Date | null;
+  createdAt?: Date | string;
+  seller?: Product['seller'];
+  reviews?: Product['reviews'];
+};
+
 const RejectionModal = ({
   product,
   onClose,
 }: {
-  product: Product;
+  product: MerchantProductCardProduct;
   onClose: () => void;
 }) => (
   <ModalLayout onClose={onClose} maxWidth="max-w-lg">
@@ -122,13 +161,13 @@ const RejectionModal = ({
       )}
 
       {/* Screenshot — like Apple's rejection email */}
-      {product.rejectionScreenshots?.length > 0 && (
+      {(product.rejectionScreenshots ?? []).length > 0 && (
         <div className="mb-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-            Screenshots ({product.rejectionScreenshots.length})
+            Screenshots ({(product.rejectionScreenshots ?? []).length})
           </p>
           <div className="flex flex-col gap-3">
-            {product.rejectionScreenshots.map((url: string, i: number) => (
+            {(product.rejectionScreenshots ?? []).map((url: string, i: number) => (
               <div
                 key={i}
                 className="rounded-xl overflow-hidden border border-gray-200"
@@ -180,7 +219,7 @@ export const MerchantProductCard = ({
   product,
   basePath = "/dashboard/merchant/product",
 }: {
-  product: Product;
+  product: MerchantProductCardProduct;
   basePath?: string;
 }) => {
   const [more, setMore] = useState(false);
@@ -217,7 +256,7 @@ export const MerchantProductCard = ({
 
   const { mutate: toggleActive, isPending: isTogglingActive } = useMutation({
     ...productMutations.toggleActive(),
-    onSuccess: (res: any) => {
+    onSuccess: (res: { message: string }) => {
       SuccessMessage(res.message);
       queryClient.invalidateQueries({ queryKey: ["seller-products"] });
     },
@@ -404,7 +443,19 @@ export const MerchantProductCard = ({
             <ProductForm
               isEdit
               productId={product.id as string}
-              initialData={product}
+              initialData={{
+                ...product,
+                countType: product.countType ?? undefined,
+                weightRange: product.weightRange ?? undefined,
+                volumeRange: product.volumeRange ?? undefined,
+                brand: product.brand ?? undefined,
+                produceType: product.produceType ?? undefined,
+                expiryDate:
+                  product.expiryDate instanceof Date
+                    ? product.expiryDate.toISOString().slice(0, 10)
+                    : (product.expiryDate ?? undefined),
+                specifications: product.specifications ?? undefined,
+              }}
               onClose={() => setShowUpdateForm(false)}
             />
           </div>

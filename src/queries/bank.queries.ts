@@ -2,6 +2,8 @@
 import BankService from "@/services/bank.service";
 import { CreateBankPayload } from "@/types";
 
+type BankRecord = { id: string; name: string; code: string };
+
 export const bankQueries = {
   all: ["bank"] as const,
 
@@ -9,8 +11,8 @@ export const bankQueries = {
   banks: () => ({
     queryKey: [...bankQueries.all, "list"] as const,
     queryFn: BankService.getBanks,
-    select: (res: any) =>
-      (res.data ?? res ?? []).map((b: any) => ({
+    select: (res: { data?: BankRecord[] } | BankRecord[]) =>
+      (Array.isArray(res) ? res : (res.data ?? [])).map((b) => ({
         value: b.id,
         label: b.name,
         code: b.code, // needed for verification
@@ -20,7 +22,6 @@ export const bankQueries = {
   userBankDetails: () => ({
     queryKey: [...bankQueries.all, "user-details"] as const,
     queryFn: BankService.getUserBankDetails,
-    select: (res: any) => res.data ?? [],
   }),
 };
 

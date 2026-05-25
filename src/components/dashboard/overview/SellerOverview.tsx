@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
+import { Product } from "@/types/prisma-schema-types";
 import MetricCard from "./MetricCard";
 
 const SELLER_ACTIVITY_ICON: Record<
@@ -83,8 +84,17 @@ const SellerOverview: React.FC = () => {
   );
 
   const { data: productsData } = useQuery({
-    ...productQueries.bestSelling({ page: 1, size: 5 } as any),
-    select: (res: any) => res.data.data,
+    ...productQueries.bestSelling({
+      page: 1,
+      size: 5,
+      subcategoryId: undefined,
+      sortBy: undefined,
+      priceRange: undefined,
+      locations: [],
+      attributes: [],
+      minRating: undefined,
+    }),
+    select: (res: { data: { data: Product[] } }) => res.data.data,
   });
 
   const recentActivities = activityData?.items ?? [];
@@ -197,7 +207,7 @@ const SellerOverview: React.FC = () => {
             </Link>
           </div>
           <div className="space-y-1">
-            {overview.recentOrders.map((order: any) => (
+            {overview.recentOrders.map((order: { id: string; status: string; sellerEarning: number; order?: { orderId: string; buyer?: { fullName: string } } }) => (
               <div
                 key={order.id}
                 className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"

@@ -70,7 +70,7 @@ const PaymentPage = () => {
   // Fetch wallet balance to show on wallet option
   const { data: walletInfo } = useQuery({
     ...walletQueries.info(),
-    select: (res: any) => res.wallet,
+    select: (res: { wallet: { balance: number } }) => res.wallet,
   });
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const PaymentPage = () => {
         shippingMethod: shippingMethod ?? ("store_pickup" as ShippingMethod),
       }),
     enabled: !!items.length && !!shippingMethod,
-    select: (res: any) => res.data,
+    select: (res: { data: { totalAmount?: number; shippingFee?: number; serviceCharge?: number } }) => res.data,
   });
 
   // Use this as the amount:

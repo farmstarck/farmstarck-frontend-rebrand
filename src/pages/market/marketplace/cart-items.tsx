@@ -55,14 +55,14 @@ const CartItems = () => {
         shippingMethod: ShippingMethod.store_pickup, // no shipping at cart stage
       }),
     enabled: cart.length > 0,
-    select: (res: any) => res.data,
+    select: (res: { data: { subtotal: number; serviceCharge: number; totalAmount: number } }) => res.data,
     staleTime: 30 * 1000,
   });
 
   const validationResult = validationResultData?.data;
 
   const getItemValidation = (productId: string) =>
-    validationResult?.items?.find((i: any) => i.productId === productId);
+    validationResult?.items?.find((i: { productId: string; status: string }) => i.productId === productId);
 
   const hasCartIssues = !!(validationResult && !validationResult.valid);
 

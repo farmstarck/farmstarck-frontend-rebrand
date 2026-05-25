@@ -7,7 +7,7 @@ export const wishlistQueries = {
   getWishlist: () => ({
     queryKey: [...wishlistQueries.all, "list"] as const,
     queryFn: WishlistService.getWishlist,
-    select: (res: any) => res.wishlistItem as WishlistItemResponse[],
+    select: (res: { wishlistItem: WishlistItemResponse[] }) => res.wishlistItem,
   }),
 };
 

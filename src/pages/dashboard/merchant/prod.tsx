@@ -8,7 +8,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { MerchantProducts } from "@/data/ProductsData";
-import { ProductCard } from "@/components/dashboard/merchant/MerchantProductCard";
+import { MerchantProductCard as ProductCard } from "@/components/dashboard/merchant/MerchantProductCard";
+import { Product } from "@/types/prisma-schema-types";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const productImgPath = "/assets/images/dashboard/merchant";
@@ -67,6 +68,7 @@ const ManageProducts = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
+  const onSelectProduct = () => {};
 
   const filtered = MerchantProducts.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
@@ -120,7 +122,6 @@ const ManageProducts = () => {
           <ProductCard
             key={product.id}
             product={product}
-            onSelect={onSelectProduct}
           />
         ))}
       </div>

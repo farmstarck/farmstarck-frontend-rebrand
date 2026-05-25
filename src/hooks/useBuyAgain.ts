@@ -28,7 +28,7 @@ export const useBuyAgain = () => {
         pricePerUnit: item.price,
         sku: item.productSku ?? "",
         stockQuantity: 1, // we don't know current stock here — backend validates
-      } as any);
+      } as unknown as Parameters<typeof addToCartAction>[0]);
 
       SuccessMessage(`${item.productTitle} added to cart`);
       navigate("/market/marketplace/cart-items");

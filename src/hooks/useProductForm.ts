@@ -98,7 +98,7 @@ const DEFAULT_FORM: ProductFormData = {
 export const useProductForm = (
   initialData?: Partial<
     Omit<ProductFormData, "specifications"> & {
-      specifications?: string | string[] | Record<string, any>;
+      specifications?: string | string[] | Record<string, unknown>;
     }
   >,
 ) => {
@@ -106,7 +106,7 @@ export const useProductForm = (
   const initialSubcategoryId = useRef(initialData?.subcategoryId ?? "");
 
   // Normalise specifications — backend may return JSON object or string
-  const normaliseSpecs = (raw: any): string[] => {
+  const normaliseSpecs = (raw: unknown): string[] => {
     if (!raw) return [];
     if (Array.isArray(raw)) return raw.map(String);
     if (typeof raw === "object") {
@@ -142,8 +142,8 @@ export const useProductForm = (
   // ── Categories ───────────────────────────────────────────────────
   const { data: categories = [] } = useQuery({
     ...categoryQueries.allCategories(),
-    select: (res: any) =>
-      res.data.data.map((c: any) => ({
+    select: (res: { data: { data: { id: string; name: string; slug: string }[] } }) =>
+      res.data.data.map((c) => ({
         value: c.id,
         label: c.name,
         slug: c.slug,
@@ -155,8 +155,8 @@ export const useProductForm = (
     {
       ...categoryQueries.subCategoriesByCategory(form.categoryId),
       enabled: !!form.categoryId,
-      select: (res: any) =>
-        res.data.data.map((s: any) => ({ value: s.id, label: s.name })),
+      select: (res: { data: { data: { id: string; name: string }[] } }) =>
+        res.data.data.map((s) => ({ value: s.id, label: s.name })),
     },
   );
 
@@ -169,7 +169,7 @@ export const useProductForm = (
       isFirstRender.current
     ) {
       const exists = subCategories.some(
-        (s: any) => s.value === initialSubcategoryId.current,
+        (s: { value: string }) => s.value === initialSubcategoryId.current,
       );
       if (exists) {
         setForm((prev) => ({
@@ -190,7 +190,7 @@ export const useProductForm = (
 
   // ── Derived category type ────────────────────────────────────────
   const selectedCategory = categories.find(
-    (c: any) => c.value === form.categoryId,
+    (c: { value: string; slug: string }) => c.value === form.categoryId,
   );
   const categorySlug = selectedCategory?.slug?.toLowerCase() ?? "";
   const categoryType = getCategoryType(categorySlug);

@@ -16,10 +16,33 @@ import {
   PRODUCE_TYPES,
 } from "@/types";
 
+interface ProductFormInitialData {
+  name?: string;
+  description?: string;
+  categoryId?: string;
+  subcategoryId?: string;
+  location?: string;
+  pricePerUnit?: number;
+  discountPerUnit?: number;
+  stockQuantity?: number;
+  quantityType?: string;
+  countType?: string;
+  condition?: string;
+  produceType?: string;
+  quantityPerUnit?: number;
+  weightRange?: string;
+  volumeRange?: string;
+  brand?: string;
+  expiryDate?: string;
+  imageUrl?: string;
+  images?: string[];
+  specifications?: string | string[] | Record<string, unknown>;
+}
+
 interface Props {
   isEdit?: boolean;
   productId?: string;
-  initialData?: any;
+  initialData?: ProductFormInitialData;
   onClose: () => void;
 }
 

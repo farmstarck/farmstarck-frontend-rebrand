@@ -9,9 +9,32 @@ import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
 import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 
+interface ProductData {
+  name?: string;
+  description?: string;
+  categoryId?: string;
+  subcategoryId?: string;
+  location?: string;
+  pricePerUnit?: number | string;
+  discountPerUnit?: number | string;
+  stockQuantity?: number | string;
+  quantityType?: string;
+  countType?: string | null;
+  condition?: string;
+  produceType?: string | null;
+  quantityPerUnit?: number | string;
+  weightRange?: string | null;
+  volumeRange?: string | null;
+  brand?: string | null;
+  expiryDate?: string | Date | null;
+  images?: string[];
+  imageUrl?: string;
+  specifications?: string | string[] | Record<string, unknown> | null;
+}
+
 interface Props {
   productId: string;
-  initialData: any; // product from API
+  initialData: ProductData;
   onClose: () => void;
 }
 
@@ -59,17 +82,15 @@ const UpdateProduct = ({ productId, initialData, onClose }: Props) => {
     images,
     categories,
     subCategories,
-    showSpecifications,
-    showExpiryDate,
-    showBrand,
-    showProduceType,
-    showWeightVolume,
+    visibility,
     handleChange,
     setThumbnail,
     setImages,
     buildFormData,
     validate,
     setForm,
+    addSpecification,
+    removeSpecification,
   } = useProductForm({
     name: initialData?.name ?? "",
     description: initialData?.description ?? "",
@@ -88,12 +109,18 @@ const UpdateProduct = ({ productId, initialData, onClose }: Props) => {
     volumeRange: initialData?.volumeRange ?? "",
     brand: initialData?.brand ?? "",
     expiryDate: initialData?.expiryDate
-      ? initialData.expiryDate.slice(0, 10)
+      ? (initialData.expiryDate instanceof Date
+          ? initialData.expiryDate.toISOString()
+          : String(initialData.expiryDate)
+        ).slice(0, 10)
       : "",
     specifications: initialData?.specifications
       ? JSON.stringify(initialData.specifications)
       : "",
   });
+
+  const { showSpecifications, showExpiryDate, showBrand, showProduceType, showWeightRange, showVolumeRange } = visibility;
+  const showWeightVolume = showWeightRange || showVolumeRange;
 
   const { mutate: updateProduct } = useMutation({
     mutationFn: () => ProductService.updateProduct(productId, buildFormData()),
@@ -281,21 +308,21 @@ const UpdateProduct = ({ productId, initialData, onClose }: Props) => {
         {showSpecifications && (
           <ProductInputField
             label="Specifications"
-            value={form.specifications}
-            onChange={(v) => handleChange("specifications", v)}
-            placeholder='e.g. {"horsepower": "50HP", "fuel": "diesel"}'
+            value={form.specifications.join('\n')}
+            onChange={(v) => setForm(prev => ({ ...prev, specifications: v.split('\n').filter(Boolean) }))}
+            placeholder='e.g. horsepower: 50HP'
             type="text-area"
           />
         )}
 
         {/* Show existing images as reference */}
-        {initialData?.images?.length > 0 && (
+        {(initialData?.images?.length ?? 0) > 0 && (
           <div>
             <p className="text-sm text-gray-500 mb-2">
               Current images (upload new ones to replace):
             </p>
             <div className="flex gap-2 flex-wrap">
-              {initialData.images.map((img: string, i: number) => (
+              {(initialData.images ?? []).map((img: string, i: number) => (
                 <img
                   key={i}
                   src={img}

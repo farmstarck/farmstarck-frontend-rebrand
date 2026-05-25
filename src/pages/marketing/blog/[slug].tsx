@@ -2,42 +2,56 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { blogQueries } from "@/queries/blog.queries";
-import { ChevronLeft, Calendar, User, Eye, Clock, Share2 } from "lucide-react";
+import { ChevronLeft, Calendar, Eye, Clock, Share2 } from "lucide-react";
 import Link from "next/link";
 import BlogContent from "@/components/common/Marketing/Blog/BlogContent";
 import BlogCard from "@/components/common/Marketing/Blog/BlogCard";
 import MarketingLayout from "@/layouts/MainLayout";
 
-const extractText = (content: any): string => {
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: { blocks: { type: string; data: Record<string, unknown> }[] };
+  tags: string[];
+  headerImage?: string | null;
+  published: boolean;
+  publishedAt?: string | null;
+  createdAt: string;
+  viewCount?: number;
+  author?: { id: string; fullName: string };
+}
+
+const extractText = (content: BlogPost["content"]): string => {
   if (!content?.blocks) return "";
   return content.blocks
-    .filter((b: any) => b.type === "paragraph")
-    .map((b: any) => b.data.text.replace(/<[^>]+>/g, ""))
+    .filter((b) => b.type === "paragraph")
+    .map((b) => (b.data.text as string).replace(/<[^>]+>/g, ""))
     .join(" ");
 };
 
-const getReadTime = (content: any): number => {
+const getReadTime = (content: BlogPost["content"]): number => {
   const words = extractText(content).split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 };
 
-const SingleBlogPost = ({ post: serverPost }: { post?: any }) => {
+const SingleBlogPost = ({ post: serverPost }: { post?: BlogPost | null }) => {
   const router = useRouter();
   const { slug } = router.query;
 
   const { data: post, isLoading } = useQuery({
     ...blogQueries.bySlug(slug as string),
-    select: (res: any) => res,
+    select: (res: BlogPost) => res,
     enabled: !!slug && router.isReady,
-    initialData: serverPost,
+    initialData: serverPost ?? undefined,
   });
 
   const firstTag = post?.tags?.[0];
   const { data: relatedData } = useQuery({
     ...blogQueries.list({ tag: firstTag, size: 4 }),
     enabled: !!firstTag,
-    select: (res: any) =>
-      res.posts?.filter((p: any) => p.slug !== slug).slice(0, 3),
+    select: (res: { posts?: BlogPost[] }) =>
+      res.posts?.filter((p) => p.slug !== slug).slice(0, 3),
   });
 
   const relatedPosts = relatedData ?? [];
@@ -183,12 +197,12 @@ const SingleBlogPost = ({ post: serverPost }: { post?: any }) => {
               <Clock size={12} />
               {readTime} min read
             </div>
-            {post.viewCount > 0 && (
+            {(post.viewCount ?? 0) > 0 && (
               <>
                 <span className="text-gray-200">·</span>
                 <div className="flex items-center gap-1">
                   <Eye size={12} />
-                  {post.viewCount.toLocaleString()} views
+                  {(post.viewCount ?? 0).toLocaleString()} views
                 </div>
               </>
             )}
@@ -241,8 +255,8 @@ const SingleBlogPost = ({ post: serverPost }: { post?: any }) => {
                 <div className="h-px flex-1 bg-gray-200" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {relatedPosts.map((related: any) => (
-                  <BlogCard key={related.id} post={related} />
+                {relatedPosts.map((related: BlogPost) => (
+                  <BlogCard key={related.id} post={{ ...related, headerImage: related.headerImage ?? undefined, publishedAt: related.publishedAt ?? undefined }} />
                 ))}
               </div>
             </div>
@@ -253,7 +267,7 @@ const SingleBlogPost = ({ post: serverPost }: { post?: any }) => {
   );
 };
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps = async (context: { params: { slug: string } }) => {
   const { slug } = context.params;
   try {
     const res = await fetch(

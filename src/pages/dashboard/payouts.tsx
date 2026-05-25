@@ -3,6 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { payoutQueries, payoutMutations } from "@/queries/payout.queries";
 import { QueryPayoutParams } from "@/types";
+import { Payout, SellerOrder } from "@/types/prisma-schema-types";
+import Link from "next/link";
 import { useSellerGuard } from "@/hooks/useSellerGuard";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ErrorMessage, SuccessMessage } from "@/utils/PageUtils";
@@ -65,7 +67,7 @@ const EligibleOrderCard = ({
   onRequest,
   isRequesting,
 }: {
-  order: any;
+  order: SellerOrder;
   onRequest: (sellerOrderId: string) => void;
   isRequesting: boolean;
 }) => {
@@ -131,7 +133,7 @@ const EligibleOrderCard = ({
 };
 
 // ── Payout history row ────────────────────────────────────────────
-const PayoutRow = ({ payout }: { payout: any }) => {
+const PayoutRow = ({ payout }: { payout: Payout }) => {
   const meta = PAYOUT_STATUS_META[payout.status] ?? PAYOUT_STATUS_META.pending;
   const Icon = meta.icon;
 
@@ -204,7 +206,7 @@ const PayoutsPage = () => {
     () => ({
       page,
       size: ITEMS_PER_PAGE,
-      status: selectedStatus as any,
+      status: selectedStatus ?? undefined,
       date: isDateRangeComplete ? "custom" : undefined,
       startDate: isDateRangeComplete ? dateFrom : undefined,
       endDate: isDateRangeComplete ? dateTo : undefined,
@@ -215,13 +217,13 @@ const PayoutsPage = () => {
   // ── Queries ───────────────────────────────────────────────────────
   const { data: eligibleData, isLoading: isLoadingEligible } = useQuery({
     ...payoutQueries.eligible(),
-    select: (res: any) => res.data ?? [],
+    select: (res: { data?: SellerOrder[] }) => res.data ?? [],
   });
 
   const { data: historyData, isLoading: isLoadingHistory } = useQuery({
     ...payoutQueries.history(historyParams),
     enabled: activeTab === "history",
-    select: (res: any) => ({
+    select: (res: { data?: Payout[]; pagination?: { totalPages: number; totalRecords: number; currentPage: number } }) => ({
       payouts: res.data ?? [],
       pagination: res.pagination,
     }),
@@ -230,26 +232,26 @@ const PayoutsPage = () => {
   // ── Summary stats from history ────────────────────────────────────
   const { data: allHistoryData } = useQuery({
     ...payoutQueries.history({ size: 100 }),
-    select: (res: any) => res.data ?? [],
+    select: (res: { data?: Payout[] }) => res.data ?? [],
   });
 
-  const allHistory = allHistoryData?.data ?? [];
-  const eligibleOrders: any[] = eligibleData ?? [];
-  const payouts: any[] = historyData?.payouts.data ?? [];
-  const pagination = historyData?.payouts?.pagination;
+  const allHistory = allHistoryData ?? [];
+  const eligibleOrders: SellerOrder[] = eligibleData ?? [];
+  const payouts: Payout[] = historyData?.payouts ?? [];
+  const pagination = historyData?.pagination;
 
   const stats = useMemo(() => {
     if (!allHistory) return { total: 0, pending: 0, success: 0 };
     return {
       total: allHistory.reduce(
-        (s: number, p: any) =>
+        (s: number, p: Payout) =>
           p.status === "success" ? s + (p.amount ?? 0) : s,
         0,
       ),
-      pending: allHistory.filter((p: any) =>
+      pending: allHistory.filter((p: Payout) =>
         ["pending", "processing"].includes(p.status),
       ).length,
-      success: allHistory.filter((p: any) => p.status === "success").length,
+      success: allHistory.filter((p: Payout) => p.status === "success").length,
     };
   }, [allHistory]);
 
@@ -382,17 +384,17 @@ const PayoutsPage = () => {
                 <p className="text-xs text-blue-700">
                   Payouts are sent to your default bank account. Make sure your
                   bank details are up to date in{" "}
-                  <a
+                  <Link
                     href="/dashboard/settings"
                     className="font-semibold underline"
                   >
                     Settings
-                  </a>
+                  </Link>
                   .
                 </p>
               </div>
 
-              {eligibleOrders.map((order: any) => (
+              {eligibleOrders.map((order: SellerOrder) => (
                 <EligibleOrderCard
                   key={order.id}
                   order={order}
@@ -450,7 +452,7 @@ const PayoutsPage = () => {
           ) : (
             <>
               <div>
-                {payouts.map((payout: any) => (
+                {payouts.map((payout: Payout) => (
                   <PayoutRow key={payout.id} payout={payout} />
                 ))}
               </div>

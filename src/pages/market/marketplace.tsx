@@ -81,7 +81,7 @@ const Marketplace = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
 
-  const chunkArray = (array: any[], size: number) => {
+  const chunkArray = <T,>(array: T[], size: number): T[][] => {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
       result.push(array.slice(i, i + size));

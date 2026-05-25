@@ -5,7 +5,16 @@ const BlogCard = ({
   post,
   onTagClick,
 }: {
-  post: any;
+  post: {
+    slug: string;
+    title: string;
+    content: unknown;
+    tags?: string[];
+    headerImage?: string;
+    author?: { fullName?: string };
+    publishedAt?: string;
+    createdAt: string;
+  };
   onTagClick?: (tag: string) => void;
 }) => {
   const excerpt = extractExcerpt(post.content, 140);

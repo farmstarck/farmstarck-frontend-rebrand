@@ -7,7 +7,7 @@ import SearchAndFilter from "@/components/common/ui/SearchAndFilter";
 import Pagination from "@/components/common/ui/Pagination";
 import MerchantOrderCard from "@/components/dashboard/merchant/MerchantOrderCard";
 import Image from "next/image";
-import { OrderStatus } from "@/types/prisma-schema-types";
+import { OrderStatus, SellerOrder } from "@/types/prisma-schema-types";
 import { useSellerGuard } from "@/hooks/useSellerGuard";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
@@ -51,16 +51,12 @@ const ManageOrders = () => {
 
   const { data, isLoading } = useQuery({
     ...orderQueries.getSellerOrders(params),
-    select: (res: any) => ({
-      orders: res.data,
-      totalPages: res.pagination?.totalPages ?? 1,
-      totalRecords: res.pagination?.totalRecords ?? 0,
-    }),
+    select: (res: { data: { data: SellerOrder[]; pagination?: { totalPages: number; totalRecords: number } } }) => res.data,
   });
 
-  const orders = data?.orders.data ?? [];
-  const totalPages = data?.orders.pagination.totalPages ?? 1;
-  const totalRecords = data?.orders.pagination.totalRecords ?? 0;
+  const orders = data?.data ?? [];
+  const totalPages = data?.pagination?.totalPages ?? 1;
+  const totalRecords = data?.pagination?.totalRecords ?? 0;
 
   const handleClear = () => {
     setSelectedStatus(undefined);
@@ -131,7 +127,7 @@ const ManageOrders = () => {
           </div>
         ) : (
           <div className="p-4 flex flex-col gap-3">
-            {orders.map((order: any) => (
+            {orders.map((order: SellerOrder) => (
               <MerchantOrderCard
                 key={order.id}
                 order={order}

@@ -44,11 +44,11 @@ const ProductDetailPage = () => {
     queries: [
       {
         ...productQueries.productById(productId as string),
-        select: (res: any) => res.data.data as Product,
+        select: (res: { data: { data: Product } }) => res.data.data,
       },
       {
         ...productQueries.relatedProducts(productId as string, RELATED_FILTER),
-        select: (res: any) => res.data.data as Product[],
+        select: (res: { data: { data: Product[] } }) => res.data.data,
       },
     ],
   });
@@ -357,8 +357,8 @@ const ProductDetailPage = () => {
                     value: `${product.quantityPerUnit} units`,
                   },
                 ]
-                  .filter(Boolean)
-                  .map((item: any) => (
+                  .filter((item): item is { label: string; value: string } => Boolean(item))
+                  .map((item) => (
                     <div
                       key={item.label}
                       className="bg-gray-50 rounded-xl px-4 py-3"

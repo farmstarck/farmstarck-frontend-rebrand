@@ -62,7 +62,7 @@ const AutoPaySchedule = () => {
 
       <div className="bg-white rounded-2xl shadow-sm p-6 lg:p-8">
         <p className="text-sm md:text-base text-gray-800 mb-6">
-          Choose when you'd like eligible earnings to be automatically paid out
+          Choose when you&apos;d like eligible earnings to be automatically paid out
           to your default bank account.
         </p>
 

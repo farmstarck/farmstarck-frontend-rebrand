@@ -85,15 +85,18 @@ const OtherProducts = () => {
     queries: [
       {
         ...productQueries.allProducts(SMALL_FILTER),
-        select: (res: any) => res.data.data as Product[],
+        select: (res: unknown) =>
+          (res as { data: { data: Product[] } }).data.data,
       },
       {
         ...productQueries.mostViewed(SMALL_FILTER),
-        select: (res: any) => res.data.data as Product[],
+        select: (res: unknown) =>
+          (res as { data: { data: Product[] } }).data.data,
       },
       {
         ...productQueries.bestSelling(BEST_SELLING_FILTER),
-        select: (res: any) => res.data.data as Product[],
+        select: (res: unknown) =>
+          (res as { data: { data: Product[] } }).data.data,
       },
     ],
   });

@@ -75,8 +75,8 @@ const MyWallet = () => {
 
                     <ul className="flex flex-col gap-4 ">
                         {recentTransactions.map((tx, index) => (
-                            <div className={`${index !== recentTransactions.length - 1 ? "border-b border-b-gray-200 pb-3" : ""} `}>
-                                <li key={tx.id} className="flex px-5 pb-1 items-center justify-between">
+                            <div key={tx.id} className={`${index !== recentTransactions.length - 1 ? "border-b border-b-gray-200 pb-3" : ""} `}>
+                                <li className="flex px-5 pb-1 items-center justify-between">
                                     <div className="flex items-center gap-3">
 
                                         <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${tx.type === 'deposit' ? 'bg-green-500/10' : 'bg-orange-500/10'

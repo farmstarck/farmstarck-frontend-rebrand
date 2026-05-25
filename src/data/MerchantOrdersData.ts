@@ -1,11 +1,13 @@
-import { SellerOrderStatus } from "@/types/prisma-schema-types";
+import { MerchantOrder } from "@/types/products";
 
 /** Helper: human-readable label + styling for each merchant order status */
 export const merchantOrderStatusMeta: Record<
-  SellerOrderStatus,
+  string,
   { label: string; bg: string; text: string }
 > = {
   pending: { label: "Pending", bg: "bg-[#febb29]", text: "text-white" },
+  confirmed: { label: "Confirmed", bg: "bg-blue-100", text: "text-blue-700" },
+  processing: { label: "Processing", bg: "bg-orange-100", text: "text-orange-700" },
   partially_shipped: {
     label: "Partially Shipped",
     bg: "bg-primary",
@@ -20,3 +22,5 @@ export const merchantOrderStatusMeta: Record<
   },
   cancelled: { label: "Cancelled", bg: "bg-red", text: "text-white" },
 };
+
+export const MerchantOrders: MerchantOrder[] = [];

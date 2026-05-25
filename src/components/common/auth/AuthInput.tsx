@@ -9,7 +9,7 @@ interface AuthInputProps {
   onChange: (value: string) => void;
   rounded?: string
   icon?: 'user' | 'email' | 'lock' | 'other';
-  IconToShow?: React.ElementType<any>;
+  IconToShow?: React.ElementType<{ className?: string }>;
   auth?: boolean;
   colored?: boolean;
 }

@@ -36,6 +36,7 @@ const Checkout = () => {
     ...orderQueries.validateCart(checkoutItems),
     enabled: cart.length > 0,
     refetchOnWindowFocus: true,
+    select: (res: { data: { valid: boolean; items: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }[] } }) => res.data,
   });
 
   const { data: orderFeeInfo } = useQuery({
@@ -49,15 +50,15 @@ const Checkout = () => {
             : ShippingMethod.store_pickup,
       }),
     enabled: cart.length > 0,
-    select: (res: any) => res.data,
+    select: (res: { data: { subtotal?: number; shippingFee?: number; serviceCharge?: number; totalAmount?: number } }) => res.data,
   });
 
-  const validationResult = validationResultData?.data;
+  const validationResult = validationResultData;
 
   const hasCartIssues = validationResult && !validationResult.valid;
 
   const getItemValidation = (productId: string) =>
-    validationResult?.items.find((i: any) => i.productId === productId);
+    validationResult?.items.find((i) => i.productId === productId);
 
   // ── Fetch default address (only if none selected yet) ────────────
   const { data: defaultAddress } = useQuery({
@@ -264,8 +265,8 @@ const Checkout = () => {
                   Items needing attention
                 </h3>
                 {validationResult.items
-                  .filter((v: any) => v.status !== "available")
-                  .map((v: any) => {
+                  .filter((v: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }) => v.status !== "available")
+                  .map((v: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }) => {
                     const cartItem = cart.find((c) => c.id === v.productId);
                     return (
                       <div

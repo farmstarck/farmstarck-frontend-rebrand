@@ -8,7 +8,7 @@ const BankService = {
 
   // GET /api/user/bank-details
   getUserBankDetails: () =>
-    api.get("/api/user/bank-details").then((r) => r.data),
+    api.get("/api/user/bank-details").then((r) => r.data.data),
 
   // POST /api/user/add/:bankId
   addBank: (bankId: string, data: CreateBankPayload) =>

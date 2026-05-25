@@ -27,7 +27,7 @@ const WalletPaymentModal = ({
   const { data: walletInfo } = useQuery({
     ...walletQueries.info(),
     enabled: isOpen,
-    select: (res: any) => res.wallet,
+    select: (res: unknown) => (res as { wallet: { balance: number } }).wallet,
   });
 
   const balance = walletInfo?.balance ?? 0;

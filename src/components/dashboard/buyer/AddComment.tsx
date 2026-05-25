@@ -16,7 +16,6 @@ interface ImageFile {
     preview: string;
 }
 const AddComment = ({ isOpen, onClose }: commentProps) => {
-    if (!isOpen) return null
     const [screen, setScreen] = useState<'add' | 'submitted'>('add')
     const [comment, setComment] = useState('')
     const [images, setImages] = useState<ImageFile[]>([])
@@ -24,6 +23,8 @@ const AddComment = ({ isOpen, onClose }: commentProps) => {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
+
+    if (!isOpen) return null
 
 
     const MAX_IMAGES = 5

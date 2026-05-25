@@ -33,14 +33,14 @@ export type InferQueryData<T> =
 // 🔎 Utility type: infer mutation data (TData)
 export type InferMutationData<T> = T extends () => MutationFunction<
   infer D,
-  any
+  unknown
 >
   ? D
   : never;
 
 // 🔎 Utility type: infer mutation variables (TVariables)
 export type InferMutationVariables<T> = T extends () => MutationFunction<
-  any,
+  unknown,
   infer V
 >
   ? V

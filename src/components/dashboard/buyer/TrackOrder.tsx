@@ -40,7 +40,7 @@ const TrackOrderItem = ({ onClose, isOpen, itemId }: TrackOrderItemProps) => {
   const { data, isLoading } = useQuery({
     ...orderQueries.trackOrderItem(itemId),
     enabled: isOpen && !!itemId,
-    select: (res: any) => res.data,
+    select: (res: { data: { productTitle?: string; productImage?: string; status?: string; timeline?: { step?: string; status?: string; timestamp?: string; description?: string }[] } }) => res.data,
   });
 
   if (!isOpen) return null;
@@ -105,7 +105,7 @@ const TrackOrderItem = ({ onClose, isOpen, itemId }: TrackOrderItemProps) => {
           <BaseLoader />
         ) : (
           <div className="space-y-8">
-            {data?.timeline.map((step: any, index: number, arr: any[]) => {
+            {data?.timeline?.map((step: { step?: string; status?: string; timestamp?: string; description?: string }, index: number, arr: { step?: string; status?: string; timestamp?: string; description?: string }[]) => {
               const isLast = index === arr.length - 1;
               const colors =
                 STEP_COLORS[step.status as keyof typeof STEP_COLORS] ??

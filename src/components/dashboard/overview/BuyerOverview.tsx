@@ -16,6 +16,7 @@ import {
 import overviewService from "@/services/overview.service";
 import Link from "next/link";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
+import { Product } from "@/types/prisma-schema-types";
 import MetricCard from "./MetricCard";
 
 const ACTIVITY_ICON: Record<
@@ -81,8 +82,17 @@ const BuyerOverview: React.FC = () => {
   );
 
   const { data: productsData } = useQuery({
-    ...productQueries.bestSelling({ page: 1, size: 5 } as any),
-    select: (res: any) => res.data.data,
+    ...productQueries.bestSelling({
+      page: 1,
+      size: 5,
+      subcategoryId: undefined,
+      sortBy: undefined,
+      priceRange: undefined,
+      locations: [],
+      attributes: [],
+      minRating: undefined,
+    }),
+    select: (res: { data: { data: Product[] } }) => res.data.data,
   });
 
   const recentActivities = activityData?.items ?? [];

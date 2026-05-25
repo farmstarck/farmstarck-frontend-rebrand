@@ -6,7 +6,11 @@ const ProductService = {
   getAllProducts: (filters: ProductFilter) => {
     const res = api
       .get("/api/product", { params: buildProductFilterQuery(filters) })
-      .then((r) => r.data);
+      .then((r) => {
+        console.log(":::::::::CHECKERSSSS", r.data);
+
+        return r.data;
+      });
 
     return res;
   },
@@ -62,7 +66,7 @@ const ProductService = {
   deleteProduct: (id: string) =>
     api.delete(`/api/product/seller/${id}`).then((r) => r.data),
 
-  getSellerProducts: (params?: any) =>
+  getSellerProducts: (params?: Record<string, unknown>) =>
     api.get("/api/product/seller", { params }).then((r) => r.data.data),
 
   getSellerProductById: (id: string) =>

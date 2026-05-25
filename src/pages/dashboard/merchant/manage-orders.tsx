@@ -5,7 +5,8 @@ import {
   MerchantOrders,
   merchantOrderStatusMeta,
 } from "@/data/MerchantOrdersData";
-import { MerchantOrderStatus } from "@/types/products";
+import { MerchantOrder, MerchantOrderItem, MerchantOrderStatus } from "@/types/products";
+import { SellerOrder } from "@/types/prisma-schema-types";
 import MerchantOrderCard from "@/components/dashboard/merchant/MerchantOrderCard";
 import SearchAndFilter from "@/components/common/ui/SearchAndFilter";
 import Pagination from "@/components/common/ui/Pagination";
@@ -45,13 +46,13 @@ const ManageOrders: React.FC = () => {
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
-    return MerchantOrders.filter((order) => {
+    return (MerchantOrders as MerchantOrder[]).filter((order: MerchantOrder) => {
       const q = search.toLowerCase();
       const matchSearch =
         order.orderNumber.toLowerCase().includes(q) ||
         order.buyerName.toLowerCase().includes(q) ||
         order.buyerPhone.includes(q) ||
-        order.items.some((i) => i.productName.toLowerCase().includes(q));
+        order.items.some((i: MerchantOrderItem) => i.productName.toLowerCase().includes(q));
 
       const matchStatus =
         selectedStatuses.length === 0 ||
@@ -195,7 +196,7 @@ const ManageOrders: React.FC = () => {
         ) : (
           <div className="p-4 flex flex-col gap-3">
             {paginated.map((order) => (
-              <MerchantOrderCard key={order.id} order={order} />
+              <MerchantOrderCard key={order.id} order={order as unknown as SellerOrder} />
             ))}
           </div>
         )}

@@ -103,7 +103,7 @@ const PayoutAccount = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {bankDetails.map((detail: any) => (
+            {(bankDetails as { id: string; bank?: { name?: string }; isDefault?: boolean; paystackRecipientCode?: string; accountNumber: string; accountHolderName: string }[]).map((detail) => (
               <BankCard
                 key={detail.id}
                 detail={detail}
@@ -119,7 +119,7 @@ const PayoutAccount = () => {
           <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
             <p className="text-xs text-blue-700">
               Your <strong>default account</strong> is used for all automatic
-              and manual payouts. Make sure it's correct before requesting a
+              and manual payouts. Make sure it&apos;s correct before requesting a
               payout.
             </p>
           </div>

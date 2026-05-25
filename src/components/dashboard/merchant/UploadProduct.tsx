@@ -36,6 +36,7 @@ const UploadProduct = ({setOpenModal}:props) => {
   });
 
   const [images, setImages] = useState<File[]>([]);
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [showTransitions, setShowTransitions] = useState(false);
   const [screen, setScreen] = useState<"confirm" | "success" | "loading">(
     "confirm",
@@ -240,7 +241,7 @@ const UploadProduct = ({setOpenModal}:props) => {
           type="text-area"
         />
 
-        <ProductImageUpload images={images} onChange={setImages} />
+        <ProductImageUpload images={images} onChange={setImages} thumbnail={thumbnail} onThumbnailChange={setThumbnail} />
 
         {/* Submit */}
         <button
