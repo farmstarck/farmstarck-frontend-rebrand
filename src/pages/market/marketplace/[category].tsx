@@ -11,6 +11,7 @@ import { Product } from "@/types/prisma-schema-types";
 import { FiltersPanel } from "@/components/common/MarketPlace/FiltersPanel";
 import { useQuery } from "@tanstack/react-query";
 import { categoryQueries } from "@/queries/category.queries";
+import ProductCardSkeletonGrid from "@/components/common/Skeletons/ProductCardSkeletonGrid";
 
 const DynamicCategories = () => {
   const router = useRouter();
@@ -29,7 +30,11 @@ const DynamicCategories = () => {
     select: (res) => res.data.data,
   });
 
-  const { data: products = [] } = useQuery({
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    isFetching: productsFetching,
+  } = useQuery({
     ...categoryQueries.productsByCategory(categoryData?.id ?? "", filters),
     select: (res) => res.data.data as Product[],
   });
@@ -43,7 +48,8 @@ const DynamicCategories = () => {
   const totalActiveFilters =
     filters.locations.length +
     filters.attributes.length +
-    (filters.priceRange ? 1 : 0);
+    (filters.priceRange ? 1 : 0) +
+    (filters.locationLga ? 1 : 0);
 
   const hasActiveFilters = totalActiveFilters > 0;
 
@@ -120,6 +126,8 @@ const DynamicCategories = () => {
               additionalFilters={categoryData?.filters ?? []}
               selectedLocations={filters.locations}
               setSelectedLocations={actions.setLocations}
+              selectedLocationLga={filters.locationLga}
+              setSelectedLocationLga={actions.setLocationLga}
               selectedFilters={filters.attributes}
               setSelectedFilters={actions.setAttributes}
               onPriceChange={actions.setPriceRange}
@@ -147,6 +155,8 @@ const DynamicCategories = () => {
               additionalFilters={categoryData?.filters ?? []}
               selectedLocations={filters.locations}
               setSelectedLocations={actions.setLocations}
+              selectedLocationLga={filters.locationLga}
+              setSelectedLocationLga={actions.setLocationLga}
               selectedFilters={filters.attributes}
               setSelectedFilters={actions.setAttributes}
               onPriceChange={actions.setPriceRange}
@@ -156,22 +166,35 @@ const DynamicCategories = () => {
           </div>
 
           <div className="col-span-1 md:col-span-3">
-            {products.length === 0 ? (
-              <div className="w-full text-center flex flex-col items-center">
-                <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
-                  <img
-                    src="/assets/images/marketplaces/notfound.png"
-                    alt="not found"
-                    className="object-contain"
-                  />
-                </div>
-                <p className="font-semibold text-primary text-lg">Not Found</p>
-                <p className="text-sm text-gray-500 max-w-xs mt-2">
-                  No product(s) match your filters.
-                </p>
-              </div>
+            {productsLoading ? (
+              <ProductCardSkeletonGrid count={12} />
             ) : (
-              <ProductsGrid products={products} />
+              <div className="relative">
+                {productsFetching && (
+                  <div className="absolute inset-0 bg-white/60 rounded-2xl z-10 flex items-center justify-center">
+                    <div className="w-8 h-8 border-[3px] border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                {products.length === 0 ? (
+                  <div className="w-full text-center flex flex-col items-center">
+                    <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
+                      <img
+                        src="/assets/images/marketplaces/notfound.png"
+                        alt="not found"
+                        className="object-contain"
+                      />
+                    </div>
+                    <p className="font-semibold text-primary text-lg">Not Found</p>
+                    <p className="text-sm text-gray-500 max-w-xs mt-2">
+                      No product(s) match your filters.
+                    </p>
+                  </div>
+                ) : (
+                  <div className={productsFetching ? "opacity-50 pointer-events-none" : ""}>
+                    <ProductsGrid products={products} />
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

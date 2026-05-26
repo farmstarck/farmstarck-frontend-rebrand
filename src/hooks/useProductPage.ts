@@ -20,7 +20,7 @@ type ProductQueryFactory = (filters: ProductFilter) => {
 export const useProductPage = (queryFactory: ProductQueryFactory) => {
   const { filters, actions } = useProductFilters();
 
-  const { data: productsData } = useQuery({
+  const { data: productsData, isLoading, isFetching } = useQuery({
     ...queryFactory(filters),
     select: (res: ProductApiResponse) => ({
       products: res.data.data,
@@ -51,7 +51,8 @@ export const useProductPage = (queryFactory: ProductQueryFactory) => {
     filters.locations.length +
     filters.attributes.length +
     (filters.priceRange ? 1 : 0) +
-    (filters.minRating ? 1 : 0);
+    (filters.minRating ? 1 : 0) +
+    (filters.locationLga ? 1 : 0);
 
   return {
     products: productsData?.products ?? [],
@@ -63,5 +64,7 @@ export const useProductPage = (queryFactory: ProductQueryFactory) => {
     actions,
     hasActiveFilters: totalActiveFilters > 0,
     totalActiveFilters,
+    isLoading,
+    isFetching,
   };
 };

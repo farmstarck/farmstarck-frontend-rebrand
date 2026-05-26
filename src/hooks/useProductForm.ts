@@ -47,6 +47,7 @@ export type ProductFormData = {
   categoryId: string;
   subcategoryId: string;
   location: string;
+  locationLga: string;
   pricePerUnit: string;
   discountPerUnit: string;
   stockQuantity: string;
@@ -58,7 +59,6 @@ export type ProductFormData = {
   weightRange: string;
   volumeRange: string;
   brand: string;
-  expiryDate: string;
   specifications: string[]; // array — each item is one spec line
 };
 
@@ -69,7 +69,6 @@ export type FieldVisibility = {
   showBrand: boolean;
   showCondition: boolean;
   showSpecifications: boolean;
-  showExpiryDate: boolean;
   showQuantityPerUnit: boolean;
   categoryType: CategoryType;
 };
@@ -80,6 +79,7 @@ const DEFAULT_FORM: ProductFormData = {
   categoryId: "",
   subcategoryId: "",
   location: "",
+  locationLga: "",
   pricePerUnit: "",
   discountPerUnit: "",
   stockQuantity: "",
@@ -91,7 +91,6 @@ const DEFAULT_FORM: ProductFormData = {
   weightRange: "",
   volumeRange: "",
   brand: "",
-  expiryDate: "",
   specifications: [],
 };
 
@@ -188,6 +187,12 @@ export const useProductForm = (
     initialSubcategoryId.current = "";
   }, [form.categoryId]);
 
+  // Reset LGA when state (location) changes
+  useEffect(() => {
+    if (isFirstRender.current) return;
+    setForm((prev) => ({ ...prev, locationLga: "" }));
+  }, [form.location]);
+
   // ── Derived category type ────────────────────────────────────────
   const selectedCategory = categories.find(
     (c: { value: string; slug: string }) => c.value === form.categoryId,
@@ -218,9 +223,6 @@ export const useProductForm = (
     // Machinery only
     showSpecifications: categoryType === "machinery",
     showCondition: categoryType === "machinery",
-
-    // Food & Feeds (perishable)
-    showExpiryDate: categoryType === "food" || categoryType === "feeds",
   };
 
   // ── Handlers ─────────────────────────────────────────────────────
@@ -259,6 +261,7 @@ export const useProductForm = (
     fd.append("categoryId", form.categoryId);
     fd.append("subcategoryId", form.subcategoryId);
     fd.append("location", form.location);
+    if (form.locationLga) fd.append("locationLga", form.locationLga);
     fd.append("pricePerUnit", form.pricePerUnit);
     fd.append("stockQuantity", form.stockQuantity);
     fd.append("quantityType", form.quantityType);
@@ -282,12 +285,6 @@ export const useProductForm = (
       fd.append("volumeRange", form.volumeRange);
 
     if (visibility.showBrand && form.brand) fd.append("brand", form.brand);
-
-    if (visibility.showExpiryDate && form.expiryDate)
-      fd.append("expiryDate", form.expiryDate);
-
-    if (visibility.showCondition && form.condition)
-      fd.append("condition", form.condition);
 
     if (visibility.showSpecifications && form.specifications.length > 0) {
       // Convert array to JSON object: ["horsepower: 50HP"] → { "horsepower": "50HP" }
@@ -317,7 +314,8 @@ export const useProductForm = (
     if (!form.description) return "Description is required";
     if (!form.categoryId) return "Category is required";
     if (!form.subcategoryId) return "Sub-category is required";
-    if (!form.location) return "Location is required";
+    if (!form.location) return "State is required";
+    if (!form.locationLga) return "LGA is required";
     if (!form.pricePerUnit) return "Price is required";
     if (!form.stockQuantity) return "Stock quantity is required";
     if (!form.quantityType) return "Quantity type is required";

@@ -138,7 +138,7 @@ const SingleProduct = () => {
           <div className="flex flex-col gap-4 text-xs sm:text-sm mb-8">
             {[
               { label: "Product Name", value: productData.name },
-              { label: "Location", value: productData.location },
+              { label: "Location", value: [productData.locationLga, productData.location].filter(Boolean).join(", ") || "—" },
               {
                 label: "Price",
                 value: `₦${Number(productData.pricePerUnit).toLocaleString()}`,
@@ -294,10 +294,6 @@ const SingleProduct = () => {
                 volumeRange: productData.volumeRange ?? undefined,
                 brand: productData.brand ?? undefined,
                 produceType: productData.produceType ?? undefined,
-                expiryDate:
-                  productData.expiryDate instanceof Date
-                    ? productData.expiryDate.toISOString().slice(0, 10)
-                    : (productData.expiryDate ?? undefined),
                 specifications: productData.specifications ?? undefined,
               } : undefined}
               onClose={() => setShowUpdateForm(false)}

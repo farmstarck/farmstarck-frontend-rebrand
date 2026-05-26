@@ -5,6 +5,7 @@ export interface ProductFilter {
   sortBy: string | undefined;
   priceRange: { min: number; max: number } | undefined;
   locations: string[];
+  locationLga?: string;
   attributes: string[];
   minRating: number | undefined;
   page: number;
@@ -16,6 +17,7 @@ export interface ProductFilterActions {
   setSortBy: (sort: string) => void;
   setPriceRange: (min: number, max: number) => void;
   setLocations: (locations: string[]) => void;
+  setLocationLga: (lga?: string) => void;
   setAttributes: (attributes: string[]) => void;
   setMinRating: (rating?: number) => void;
   setPage: (page: number) => void;
@@ -28,6 +30,7 @@ export const useProductFilters = () => {
     sortBy: undefined,
     priceRange: undefined,
     locations: [],
+    locationLga: undefined,
     attributes: [],
     minRating: undefined,
     page: 1,
@@ -46,12 +49,13 @@ export const useProductFilters = () => {
     setPriceRange: (min: number, max: number) =>
       setFilters((f) => ({ ...f, priceRange: { min, max }, page: 1 })),
     setLocations: (locations: string[]) =>
-      setFilters((f) => ({ ...f, locations, page: 1 })),
+      setFilters((f) => ({ ...f, locations, locationLga: undefined, page: 1 })),
+    setLocationLga: (lga?: string) =>
+      setFilters((f) => ({ ...f, locationLga: lga || undefined, page: 1 })),
     setAttributes: (attributes: string[]) =>
       setFilters((f) => ({ ...f, attributes, page: 1 })),
-    setMinRating: (
-      rating?: number, // ← add
-    ) => setFilters((f) => ({ ...f, minRating: rating, page: 1 })),
+    setMinRating: (rating?: number) =>
+      setFilters((f) => ({ ...f, minRating: rating, page: 1 })),
     setPage: (page: number) => setFilters((f) => ({ ...f, page })),
     clearAll: () =>
       setFilters({
@@ -59,8 +63,9 @@ export const useProductFilters = () => {
         sortBy: undefined,
         priceRange: undefined,
         locations: [],
+        locationLga: undefined,
         attributes: [],
-        minRating: undefined, // ← add
+        minRating: undefined,
         page: 1,
         size: 10,
       }),

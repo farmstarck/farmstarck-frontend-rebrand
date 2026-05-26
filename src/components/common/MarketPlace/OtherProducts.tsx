@@ -15,6 +15,7 @@ import { ProductFilter } from "@/hooks/useProductFilter";
 import ProductCard from "./ProductCard";
 import { useQueries } from "@tanstack/react-query";
 import { productQueries } from "@/queries/product.queries";
+import ProductCardSkeleton from "@/components/common/Skeletons/ProductCardSkeleton";
 
 const FEATURES = [
   {
@@ -56,9 +57,17 @@ type ProductSectionProps = {
   title: string;
   route: string;
   products: Product[];
+  isLoading?: boolean;
+  skeletonCount?: number;
 };
 
-const ProductSection = ({ title, route, products }: ProductSectionProps) => {
+const ProductSection = ({
+  title,
+  route,
+  products,
+  isLoading,
+  skeletonCount = 8,
+}: ProductSectionProps) => {
   const router = useRouter();
   return (
     <div className="w-full">
@@ -71,17 +80,26 @@ const ProductSection = ({ title, route, products }: ProductSectionProps) => {
           View All
         </button>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+          {Array.from({ length: skeletonCount }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 const OtherProducts = () => {
-  const [allProducts, mostViewed, bestSelling] = useQueries({
+  const [allProductsQuery, mostViewedQuery, bestSellingQuery] = useQueries({
     queries: [
       {
         ...productQueries.allProducts(SMALL_FILTER),
@@ -107,13 +125,17 @@ const OtherProducts = () => {
         <ProductSection
           title="All Products"
           route="marketplace/allproducts"
-          products={allProducts.data ?? []}
+          products={allProductsQuery.data ?? []}
+          isLoading={allProductsQuery.isLoading}
+          skeletonCount={8}
         />
 
         <ProductSection
           title="Most Viewed Products"
           route="marketplace/most_viewed"
-          products={mostViewed.data ?? []}
+          products={mostViewedQuery.data ?? []}
+          isLoading={mostViewedQuery.isLoading}
+          skeletonCount={8}
         />
 
         {/* WhatsApp CTA Banner */}
@@ -140,7 +162,9 @@ const OtherProducts = () => {
         <ProductSection
           title="Best Selling Products"
           route="marketplace/best_selling"
-          products={bestSelling.data ?? []}
+          products={bestSellingQuery.data ?? []}
+          isLoading={bestSellingQuery.isLoading}
+          skeletonCount={4}
         />
       </div>
 
@@ -175,7 +199,7 @@ const OtherProducts = () => {
               key={feature.title}
               className="flex items-center flex-col gap-3 p-4 rounded-lg"
             >
-              <div className="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+              <div className="shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                 <Icon className="w-6 h-6 text-white" />
               </div>
               <div className="flex items-center flex-col">

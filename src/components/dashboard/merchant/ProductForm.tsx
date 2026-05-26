@@ -22,6 +22,7 @@ interface ProductFormInitialData {
   categoryId?: string;
   subcategoryId?: string;
   location?: string;
+  locationLga?: string;
   pricePerUnit?: number;
   discountPerUnit?: number;
   stockQuantity?: number;
@@ -33,7 +34,6 @@ interface ProductFormInitialData {
   weightRange?: string;
   volumeRange?: string;
   brand?: string;
-  expiryDate?: string;
   imageUrl?: string;
   images?: string[];
   specifications?: string | string[] | Record<string, unknown>;
@@ -80,7 +80,6 @@ const ProductForm = ({
     "confirm",
   );
   const [specInput, setSpecInput] = useState("");
-  const { stateOptions } = useStatesAndLgas();
 
   const {
     form,
@@ -104,6 +103,7 @@ const ProductForm = ({
           categoryId: initialData.categoryId ?? "",
           subcategoryId: initialData.subcategoryId ?? "",
           location: initialData.location ?? "",
+          locationLga: initialData.locationLga ?? "",
           pricePerUnit: String(initialData.pricePerUnit ?? ""),
           discountPerUnit: String(initialData.discountPerUnit ?? ""),
           stockQuantity: String(initialData.stockQuantity ?? ""),
@@ -115,11 +115,15 @@ const ProductForm = ({
           weightRange: initialData.weightRange ?? "",
           volumeRange: initialData.volumeRange ?? "",
           brand: initialData.brand ?? "",
-          expiryDate: initialData.expiryDate?.slice(0, 10) ?? "",
           specifications: initialData.specifications,
         }
       : undefined,
   );
+
+  // ── State + LGA options (depends on form.location) ───────────────
+  const { stateOptions, lgaOptions } = useStatesAndLgas({
+    selectedState: form.location,
+  });
 
   // ── Mutations ─────────────────────────────────────────────────────
   const { mutate: createProduct } = useMutation({
@@ -182,7 +186,6 @@ const ProductForm = ({
     showVolumeRange,
     showBrand,
     showSpecifications,
-    showExpiryDate,
     showQuantityPerUnit,
   } = visibility;
 
@@ -191,7 +194,6 @@ const ProductForm = ({
     showWeightRange ||
     showVolumeRange ||
     showBrand ||
-    showExpiryDate ||
     showSpecifications ||
     showCondition;
 
@@ -256,14 +258,27 @@ const ProductForm = ({
                 disabled={!form.categoryId}
               />
             </div>
-            <ProductInputField
-              label="Location"
-              required
-              value={form.location}
-              onChange={(v) => handleChange("location", v)}
-              placeholder="Select your state"
-              options={stateOptions}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ProductInputField
+                label="State"
+                required
+                value={form.location}
+                onChange={(v) => handleChange("location", v)}
+                placeholder="Select your state"
+                options={stateOptions}
+              />
+              <ProductInputField
+                label="LGA"
+                required
+                value={form.locationLga}
+                onChange={(v) => handleChange("locationLga", v)}
+                placeholder={
+                  form.location ? "Select LGA" : "Select a state first"
+                }
+                options={lgaOptions}
+                disabled={!form.location}
+              />
+            </div>
           </Section>
 
           {/* Pricing */}
@@ -342,21 +357,6 @@ const ProductForm = ({
                   options={PRODUCE_TYPES}
                   placeholder="Fresh or Processed?"
                 />
-              )}
-
-              {/* Food + Feeds — expiry */}
-              {showExpiryDate && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="date"
-                    value={form.expiryDate}
-                    onChange={(e) => handleChange("expiryDate", e.target.value)}
-                    className="w-full px-3 py-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition"
-                  />
-                </div>
               )}
 
               {/* Weight — Food, Feeds, Agrochem, Machinery */}

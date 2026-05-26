@@ -7,6 +7,7 @@ import Button from "@/ui/Button";
 import ModalLayout from "@/layouts/ModalLayout";
 import UploadProduct from "@/components/dashboard/merchant/UploadProduct";
 import { MerchantProductCard, MerchantProductCardProduct } from "@/components/dashboard/merchant/MerchantProductCard";
+import MerchantProductCardSkeleton from "@/components/common/Skeletons/MerchantProductCardSkeleton";
 import SearchAndFilter from "@/components/common/ui/SearchAndFilter";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useSellerGuard } from "@/hooks/useSellerGuard";
@@ -142,8 +143,10 @@ const ManageProduct = () => {
 
         {/* Loading */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col gap-2.5">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <MerchantProductCardSkeleton key={i} />
+            ))}
           </div>
         ) : products.length === 0 ? (
           /* Empty state */

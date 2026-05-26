@@ -407,6 +407,7 @@ export interface Product {
   imageUrl: string;
   images: string[];
   location: string;
+  locationLga?: string;
 
   rejectionReason?: string;
   rejectionScreenshots: string[];

@@ -156,7 +156,9 @@ const ProductCard = ({ product }: { product: Product }) => {
         {/* Location */}
         <div className="flex items-center gap-0.5 text-primary font-semibold text-[10px] sm:text-xs mt-0.5">
           <MapPin size={10} />
-          <span className="capitalize truncate">{product.location}</span>
+          <span className="capitalize truncate">
+            {[product.locationLga, product.location].filter(Boolean).join(", ") || "—"}
+          </span>
         </div>
 
         {/* Rating */}
