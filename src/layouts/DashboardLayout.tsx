@@ -125,7 +125,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <div className="p-6 border-t border-white/20">
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[#33d233] rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[#00cd00] rounded-lg transition-colors"
             >
               <LogOutIcon size={20} />
               <span>Log out</span>
@@ -241,7 +241,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 )}
               </button>
 
-              <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite transition-colors">
+              <button
+                onClick={() => navigate("/dashboard/settings/profile")}
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-lite border border-lite transition-colors"
+              >
                 <User size={20} className="text-primary fill-primary" />
               </button>
             </div>

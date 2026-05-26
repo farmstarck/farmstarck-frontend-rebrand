@@ -9,6 +9,7 @@ import { Product, SubCategory } from "@/types/prisma-schema-types";
 import { CategoryHeader } from "./Categories/CategoryHeader";
 import { FiltersPanel } from "./FiltersPanel";
 import { ProductFilter, ProductFilterActions } from "@/hooks/useProductFilter";
+import ProductCardSkeletonGrid from "@/components/common/Skeletons/ProductCardSkeletonGrid";
 
 export interface FilterGroup {
   groupName: string;
@@ -29,6 +30,8 @@ interface ProductFilterLayoutProps {
   totalPages: number;
   currentPage: number;
   showPagination?: boolean;
+  isLoading?: boolean;
+  isFetching?: boolean;
 }
 
 // General filters for "All Products" page
@@ -72,6 +75,8 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
   totalPages,
   currentPage,
   showPagination,
+  isLoading,
+  isFetching,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -177,6 +182,10 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               setSelectedLocations={
                 actions?.setLocations as (locations: string[]) => void
               }
+              selectedLocationLga={filters?.locationLga}
+              setSelectedLocationLga={
+                actions?.setLocationLga as (lga?: string) => void
+              }
               selectedFilters={filters?.attributes}
               setSelectedFilters={
                 actions?.setAttributes as (attributes: string[]) => void
@@ -226,6 +235,10 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               setSelectedLocations={
                 actions?.setLocations as (locations: string[]) => void
               }
+              selectedLocationLga={filters?.locationLga}
+              setSelectedLocationLga={
+                actions?.setLocationLga as (lga?: string) => void
+              }
               selectedFilters={filters?.attributes}
               setSelectedFilters={
                 actions?.setAttributes as (attributes: string[]) => void
@@ -244,22 +257,36 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
 
           {/* Products */}
           <div className="col-span-1 md:col-span-3">
-            {products?.length === 0 ? (
-              <div className="w-full text-center flex flex-col items-center">
-                <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
-                  <img
-                    src="/assets/images/marketplaces/notfound.png"
-                    alt="not found"
-                    className="object-contain"
-                  />
-                </div>
-                <p className="font-semibold text-primary text-lg">Not Found</p>
-                <p className="text-sm text-gray-500 max-w-xs mt-2">
-                  No product(s) match your filters.
-                </p>
-              </div>
+            {isLoading ? (
+              <ProductCardSkeletonGrid count={12} />
             ) : (
-              <ProductsGrid products={products ?? []} />
+              <div className="relative">
+                {/* Subtle overlay when refetching on filter/page change */}
+                {isFetching && (
+                  <div className="absolute inset-0 bg-white/60 rounded-2xl z-10 flex items-center justify-center">
+                    <div className="w-8 h-8 border-[3px] border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                {products?.length === 0 ? (
+                  <div className="w-full text-center flex flex-col items-center">
+                    <div className="w-32 h-32 lg:w-52 lg:h-52 relative">
+                      <img
+                        src="/assets/images/marketplaces/notfound.png"
+                        alt="not found"
+                        className="object-contain"
+                      />
+                    </div>
+                    <p className="font-semibold text-primary text-lg">Not Found</p>
+                    <p className="text-sm text-gray-500 max-w-xs mt-2">
+                      No product(s) match your filters.
+                    </p>
+                  </div>
+                ) : (
+                  <div className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+                    <ProductsGrid products={products ?? []} />
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

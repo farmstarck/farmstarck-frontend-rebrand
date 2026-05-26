@@ -102,6 +102,7 @@ export type MerchantProductCardProduct = {
   imageUrl: string;
   images: string[];
   location: string;
+  locationLga?: string;
   rejectionReason?: string;
   rejectionScreenshots?: string[];
   ratingCount?: number;
@@ -450,10 +451,6 @@ export const MerchantProductCard = ({
                 volumeRange: product.volumeRange ?? undefined,
                 brand: product.brand ?? undefined,
                 produceType: product.produceType ?? undefined,
-                expiryDate:
-                  product.expiryDate instanceof Date
-                    ? product.expiryDate.toISOString().slice(0, 10)
-                    : (product.expiryDate ?? undefined),
                 specifications: product.specifications ?? undefined,
               }}
               onClose={() => setShowUpdateForm(false)}

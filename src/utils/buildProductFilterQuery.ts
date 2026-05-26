@@ -19,6 +19,11 @@ export function buildProductFilterQuery(filters: ProductFilter) {
     query.location = filters.locations[0];
   }
 
+  // lga
+  if (filters.locationLga) {
+    query.locationLga = filters.locationLga;
+  }
+
   // size
   if (filters.size) {
     query.size = filters.size;

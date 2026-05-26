@@ -349,7 +349,9 @@ export const allStates = nigerianStatesWithLGAs.map(state => state.state);
 
 // // Get all LGAs for a specific state
 export const fetchLGAs = (param: string) => {
-    return nigerianStatesWithLGAs.find(state => state.state === param)?.lgas || [];
+    return nigerianStatesWithLGAs.find(
+        state => state.state.toLowerCase() === param.toLowerCase()
+    )?.lgas || [];
 }
 
 // Get capital of a state

@@ -26,7 +26,6 @@ interface ProductData {
   weightRange?: string | null;
   volumeRange?: string | null;
   brand?: string | null;
-  expiryDate?: string | Date | null;
   images?: string[];
   imageUrl?: string;
   specifications?: string | string[] | Record<string, unknown> | null;
@@ -108,18 +107,12 @@ const UpdateProduct = ({ productId, initialData, onClose }: Props) => {
     weightRange: initialData?.weightRange ?? "",
     volumeRange: initialData?.volumeRange ?? "",
     brand: initialData?.brand ?? "",
-    expiryDate: initialData?.expiryDate
-      ? (initialData.expiryDate instanceof Date
-          ? initialData.expiryDate.toISOString()
-          : String(initialData.expiryDate)
-        ).slice(0, 10)
-      : "",
     specifications: initialData?.specifications
       ? JSON.stringify(initialData.specifications)
       : "",
   });
 
-  const { showSpecifications, showExpiryDate, showBrand, showProduceType, showWeightRange, showVolumeRange } = visibility;
+  const { showSpecifications, showBrand, showProduceType, showWeightRange, showVolumeRange } = visibility;
   const showWeightVolume = showWeightRange || showVolumeRange;
 
   const { mutate: updateProduct } = useMutation({
@@ -291,18 +284,6 @@ const UpdateProduct = ({ productId, initialData, onClose }: Props) => {
             onChange={(v) => handleChange("brand", v)}
             placeholder="e.g. John Deere"
           />
-        )}
-
-        {showExpiryDate && (
-          <div className="flex flex-col gap-1 w-full">
-            <label className="text-sm text-dark font-normal">Expiry Date</label>
-            <input
-              type="date"
-              value={form.expiryDate}
-              onChange={(e) => handleChange("expiryDate", e.target.value)}
-              className="w-full px-3 py-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-primary transition"
-            />
-          </div>
         )}
 
         {showSpecifications && (

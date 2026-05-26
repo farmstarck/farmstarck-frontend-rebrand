@@ -7,6 +7,7 @@ import {
 import { Product } from "@/types/prisma-schema-types";
 import { RatingFilter } from "./RatingFilter";
 import { SlidersHorizontal, X } from "lucide-react";
+import { useStatesAndLgas } from "@/hooks/useStatesAndLgas";
 
 interface FiltersPanelProps {
   products: Product[];
@@ -14,6 +15,8 @@ interface FiltersPanelProps {
   additionalFilters: CategoryGroup[];
   selectedLocations?: string[];
   setSelectedLocations?: (v: string[]) => void;
+  selectedLocationLga?: string;
+  setSelectedLocationLga?: (lga?: string) => void;
   selectedFilters?: string[];
   setSelectedFilters?: (v: string[]) => void;
   onPriceChange: (min: number, max: number) => void;
@@ -55,6 +58,8 @@ export const FiltersPanel = ({
   additionalFilters,
   selectedLocations,
   setSelectedLocations,
+  selectedLocationLga,
+  setSelectedLocationLga,
   selectedFilters,
   setSelectedFilters,
   onPriceChange,
@@ -63,6 +68,10 @@ export const FiltersPanel = ({
   selectedRating,
   setSelectedRating,
 }: FiltersPanelProps) => {
+  // Derive selected state for LGA lookup from the first selected location
+  const selectedState = selectedLocations?.[0] ?? "";
+  const { lgaOptions } = useStatesAndLgas({ selectedState });
+
   return (
     <div className="space-y-3">
       {/* ── Header with clear all ─────────────────────────────── */}
@@ -106,13 +115,16 @@ export const FiltersPanel = ({
         </FilterSection>
       )}
 
-      {/* ── Location ──────────────────────────────────────────── */}
+      {/* ── Location (State) ──────────────────────────────────── */}
       {locations.length > 0 && (
         <FilterSection
-          label="Location"
+          label="State"
           onClear={
             selectedLocations?.length
-              ? () => setSelectedLocations?.([])
+              ? () => {
+                  setSelectedLocations?.([]);
+                  setSelectedLocationLga?.(undefined);
+                }
               : undefined
           }
         >
@@ -121,6 +133,76 @@ export const FiltersPanel = ({
             selected={selectedLocations || []}
             setSelected={setSelectedLocations || (() => {})}
           />
+        </FilterSection>
+      )}
+
+      {/* ── LGA filter (appears when a state is selected) ─────── */}
+      {selectedState && lgaOptions.length > 0 && setSelectedLocationLga && (
+        <FilterSection
+          label="Local Government Area"
+          onClear={
+            selectedLocationLga
+              ? () => setSelectedLocationLga(undefined)
+              : undefined
+          }
+        >
+          <div className="flex flex-col gap-0.5 max-h-52 overflow-y-auto pr-0.5">
+            {/* Show All option */}
+            <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                  !selectedLocationLga ? "border-primary bg-white" : "border-gray-300"
+                }`}
+              >
+                {!selectedLocationLga && (
+                  <div className="w-2 h-2 rounded-full bg-primary" />
+                )}
+              </div>
+              <input
+                type="radio"
+                name="lga-filter"
+                className="hidden"
+                checked={!selectedLocationLga}
+                onChange={() => setSelectedLocationLga(undefined)}
+              />
+              <span className="text-sm text-primary font-medium">Show All</span>
+            </label>
+
+            {/* LGA options */}
+            {lgaOptions.map((lga) => (
+              <label
+                key={lga.value}
+                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+              >
+                <div
+                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    selectedLocationLga === lga.value
+                      ? "border-primary bg-white"
+                      : "border-gray-300"
+                  }`}
+                >
+                  {selectedLocationLga === lga.value && (
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  )}
+                </div>
+                <input
+                  type="radio"
+                  name="lga-filter"
+                  className="hidden"
+                  checked={selectedLocationLga === lga.value}
+                  onChange={() => setSelectedLocationLga(lga.value)}
+                />
+                <span className="text-sm capitalize text-gray-700">
+                  {lga.label}
+                </span>
+              </label>
+            ))}
+          </div>
+          {lgaOptions.length > 6 && (
+            <p className="text-[10px] text-gray-400 text-center mt-1 italic">
+              Scroll to see more
+            </p>
+          )}
         </FilterSection>
       )}
 

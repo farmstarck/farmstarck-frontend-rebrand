@@ -13,7 +13,7 @@ import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import Navigation from "@/components/common/MarketPlace/Navigation";
 import { useCartStore, useWishlistStore } from "@/store/slices/cart.slice";
 import { buildWhatsappMessage, SuccessMessage } from "@/utils/PageUtils";
-import BaseLoader from "@/Loaders/BaseLoader";
+import ProductDetailSkeleton from "@/components/common/Skeletons/ProductDetailSkeleton";
 import DeliveryAccordion from "@/components/common/MarketPlace/DeliveryAccordion";
 import { ProductsGrid } from "@/components/common/MarketPlace/ProductGrid";
 import { Product } from "@/types/prisma-schema-types";
@@ -126,7 +126,7 @@ const ProductDetailPage = () => {
     ));
 
   // ── Guards ───────────────────────────────────────────────────────
-  if (loading) return <BaseLoader />;
+  if (loading) return <ProductDetailSkeleton />;
 
   if (!product) {
     return (
@@ -327,7 +327,7 @@ const ProductDetailPage = () => {
                   { label: "Count Type", value: product.countType },
                   { label: "Quantity Type", value: product.quantityType },
                   { label: "Condition", value: product.condition },
-                  { label: "Location", value: product.location },
+                  { label: "Location", value: [product.locationLga, product.location].filter(Boolean).join(", ") || "—" },
                   product.brand && { label: "Brand", value: product.brand },
                   product.weightRange && {
                     label: "Weight Range",
