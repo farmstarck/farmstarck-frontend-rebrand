@@ -29,6 +29,7 @@ import {
 import { ProductFilter } from "@/hooks/useProductFilter";
 import { useQueries } from "@tanstack/react-query";
 import { productQueries } from "@/queries/product.queries";
+import { getEffectivePrice, hasDiscount } from "@/utils/pricing.utils";
 
 const RELATED_FILTER = { page: 1, size: 5 } as ProductFilter;
 
@@ -236,11 +237,11 @@ const ProductDetailPage = () => {
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-2xl md:text-4xl font-bold text-[#00C700]">
-                    ₦{product.pricePerUnit.toLocaleString()}.00
+                    ₦{getEffectivePrice(product).toLocaleString()}.00
                   </span>
-                  {product.discountPerUnit > 0 && (
+                  {hasDiscount(product) && (
                     <span className="text-lg md:text-xl text-gray-400 line-through">
-                      ₦{product.discountPerUnit.toLocaleString()}.00
+                      ₦{product.pricePerUnit.toLocaleString()}.00
                     </span>
                   )}
                 </div>

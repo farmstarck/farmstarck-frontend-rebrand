@@ -265,7 +265,10 @@ export const consumeRedirectAfterAuth = () => {
 };
 
 export const buildWhatsappMessage = (product: Product, quantity: number) => {
-  const unitPrice = product.pricePerUnit - (product.discountPerUnit ?? 0);
+  const unitPrice =
+    product.discountPerUnit && product.discountPerUnit > 0
+      ? product.discountPerUnit
+      : product.pricePerUnit;
 
   const totalAmount = unitPrice * quantity;
 

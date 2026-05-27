@@ -15,7 +15,7 @@ export interface ProductFilter {
 export interface ProductFilterActions {
   setSubCategoryId: (id?: string) => void;
   setSortBy: (sort: string) => void;
-  setPriceRange: (min: number, max: number) => void;
+  setPriceRange: (min: number | undefined, max: number | undefined) => void;
   setLocations: (locations: string[]) => void;
   setLocationLga: (lga?: string) => void;
   setAttributes: (attributes: string[]) => void;
@@ -46,8 +46,15 @@ export const useProductFilters = () => {
       })),
     setSortBy: (sort: string) =>
       setFilters((f) => ({ ...f, sortBy: sort, page: 1 })),
-    setPriceRange: (min: number, max: number) =>
-      setFilters((f) => ({ ...f, priceRange: { min, max }, page: 1 })),
+    setPriceRange: (min: number | undefined, max: number | undefined) =>
+      setFilters((f) => ({
+        ...f,
+        priceRange:
+          min === undefined && max === undefined
+            ? undefined
+            : { min: min ?? 0, max: max ?? 500_000 },
+        page: 1,
+      })),
     setLocations: (locations: string[]) =>
       setFilters((f) => ({ ...f, locations, locationLga: undefined, page: 1 })),
     setLocationLga: (lga?: string) =>

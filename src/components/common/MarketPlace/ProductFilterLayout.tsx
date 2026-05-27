@@ -190,8 +190,9 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               setSelectedFilters={
                 actions?.setAttributes as (attributes: string[]) => void
               }
+              selectedPriceRange={filters?.priceRange}
               onPriceChange={
-                actions?.setPriceRange as (min: number, max: number) => void
+                actions?.setPriceRange as (min: number | undefined, max: number | undefined) => void
               }
               hasActiveFilters={hasActiveFilters}
               onClearAll={actions?.clearAll as () => void}
@@ -243,8 +244,9 @@ export const ProductFilterLayout: React.FC<ProductFilterLayoutProps> = ({
               setSelectedFilters={
                 actions?.setAttributes as (attributes: string[]) => void
               }
+              selectedPriceRange={filters?.priceRange}
               onPriceChange={
-                actions?.setPriceRange as (min: number, max: number) => void
+                actions?.setPriceRange as (min: number | undefined, max: number | undefined) => void
               }
               hasActiveFilters={hasActiveFilters}
               onClearAll={actions?.clearAll as () => void}

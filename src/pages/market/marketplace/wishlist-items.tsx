@@ -13,6 +13,7 @@ import {
 } from "@/store/actions/wishlist.action";
 import { addToCartAction } from "@/store/actions/cart.action";
 import { Product } from "@/types/prisma-schema-types";
+import { getEffectivePrice } from "@/utils/pricing.utils";
 
 const WishListItems = () => {
   const { wishlist } = useWishlistStore();
@@ -112,13 +113,13 @@ const WishListItems = () => {
                           alt={item.name}
                           height={50}
                           width={50}
-                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                          className="w-16 h-16 object-cover rounded-lg shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold capitalize text-gray-900 text-sm mb-1 line-clamp-2">
                             {item.name}
                           </h3>
-                          <div className="w-fit capitalize flex items-center gap-1 bg-[#a5faa5] text-primary py-1 text-[10px] font-medium px-2 rounded-full">
+                          <div className="w-fit capitalize flex items-center gap-1 bg-litegreen text-primary py-1 text-[10px] font-medium px-2 rounded-full">
                             <Image
                               width={6}
                               height={6}
@@ -131,7 +132,7 @@ const WishListItems = () => {
                       </div>
                       <button
                         onClick={() => removeFromWishlistAction(item.id)}
-                        className="text-red-600 hover:text-red-700 p-1 flex-shrink-0"
+                        className="text-red-600 hover:text-red-700 p-1 shrink-0"
                       >
                         <Trash2Icon className="w-4 h-4" />
                       </button>
@@ -142,7 +143,7 @@ const WishListItems = () => {
                       <div>
                         <span className="text-gray-500 text-xs">Price:</span>
                         <p className="font-semibold text-gray-900">
-                          ₦{item?.pricePerUnit?.toLocaleString()}
+                          ₦{getEffectivePrice(item).toLocaleString()}
                         </p>
                       </div>
 
@@ -200,7 +201,7 @@ const WishListItems = () => {
                       <h3 className="font-semibold capitalize text-gray-900 mb-2">
                         {item.name}
                       </h3>
-                      <div className="w-fit flex capitalize items-center gap-1 bg-[#a5faa5] text-primary py-1 text-[10px] font-medium px-3 rounded-full">
+                      <div className="w-fit flex capitalize items-center gap-1 bg-litegreen text-primary py-1 text-[10px] font-medium px-3 rounded-full">
                         <Image
                           width={8}
                           height={8}
@@ -214,7 +215,7 @@ const WishListItems = () => {
                     {/* Price */}
                     <div className="col-span-2">
                       <p className="font-semibold text-gray-900">
-                        ₦{item?.pricePerUnit?.toLocaleString()}
+                        ₦{getEffectivePrice(item).toLocaleString()}
                       </p>
                     </div>
 

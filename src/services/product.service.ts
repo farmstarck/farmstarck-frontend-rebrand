@@ -7,8 +7,6 @@ const ProductService = {
     const res = api
       .get("/api/product", { params: buildProductFilterQuery(filters) })
       .then((r) => {
-        console.log(":::::::::CHECKERSSSS", r.data);
-
         return r.data;
       });
 
@@ -70,7 +68,7 @@ const ProductService = {
     api.get("/api/product/seller", { params }).then((r) => r.data.data),
 
   getSellerProductById: (id: string) =>
-    api.get(`/api/product/seller/single/${id}`).then((r) => r.data),
+    api.get(`/api/product/seller/single/${id}`).then((r) => r.data.data),
 
   toggleProductActive: (productId: string) =>
     api.patch(`/api/product/${productId}/toggle-active`).then((r) => r.data),

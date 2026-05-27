@@ -19,6 +19,7 @@ import ProductService from "@/services/product.service";
 import { SuccessMessage, ErrorMessage } from "@/utils/PageUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { productMutations } from "@/queries/product.queries";
+import { getEffectivePrice, hasDiscount } from "@/utils/pricing.utils";
 
 type StatusBadgeProps = { status: string; quantity: number; isActive: boolean };
 
@@ -319,11 +320,16 @@ export const MerchantProductCard = ({
               {product.name}
             </p>
             <p className="text-sm md:text-base text-dark mt-0.5">
-              Amount:{" "}
+              Selling at:{" "}
               <span className="font-bold">
-                {formatNaira(product.pricePerUnit)}
+                {formatNaira(getEffectivePrice(product))}
               </span>
             </p>
+            {hasDiscount(product) && (
+              <p className="text-xs text-gray-400 mt-0.5">
+                Original: {formatNaira(product.pricePerUnit)}
+              </p>
+            )}
             <div className="mt-1 flex items-center gap-2 flex-wrap">
               <StatusBadge
                 status={product.status}

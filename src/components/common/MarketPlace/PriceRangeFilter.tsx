@@ -1,182 +1,333 @@
-import { Product } from "@/types/prisma-schema-types";
-import React, { useState, useRef, useEffect } from "react";
+"use client";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-export interface PriceRangeFilterProps {
-  products: Product[];
-  onFilter: (min: number, max: number) => void;
+const PRICE_MIN = 0;
+const PRICE_MAX = 500_000;
+const STEP = 1_000;
+
+interface PriceRangeFilterProps {
+  minPrice?: number;
+  maxPrice?: number;
+  onChange: (min: number | undefined, max: number | undefined) => void;
 }
 
-export const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
-  products,
-  onFilter,
-}) => {
-  const minPrice = Math.min(...products.map((p) => p.pricePerUnit));
-  const maxPrice = Math.max(...products.map((p) => p.pricePerUnit));
+const PriceRangeFilter = ({
+  minPrice,
+  maxPrice,
+  onChange,
+}: PriceRangeFilterProps) => {
+  const [localMin, setLocalMin] = useState<number>(minPrice ?? PRICE_MIN);
+  const [localMax, setLocalMax] = useState<number>(maxPrice ?? PRICE_MAX);
+  const [minInput, setMinInput] = useState<string>(String(minPrice ?? PRICE_MIN));
+  const [maxInput, setMaxInput] = useState<string>(String(maxPrice ?? PRICE_MAX));
+  const [minError, setMinError] = useState<string>("");
+  const [maxError, setMaxError] = useState<string>("");
 
-  const [min, setMin] = useState(minPrice);
-  const [max, setMax] = useState(maxPrice);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const minThumbRef = useRef<HTMLDivElement>(null);
+  const maxThumbRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isDraggingMin = useRef(false);
+  const isDraggingMax = useRef(false);
 
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const [isDraggingMin, setIsDraggingMin] = useState(false);
-  const [isDraggingMax, setIsDraggingMax] = useState(false);
-
+  // ── Sync when parent clears the filter externally (e.g. clearAll) ─
   useEffect(() => {
-    setMin(minPrice);
-    setMax(maxPrice);
+    setLocalMin(minPrice ?? PRICE_MIN);
+    setLocalMax(maxPrice ?? PRICE_MAX);
+    setMinInput(String(minPrice ?? PRICE_MIN));
+    setMaxInput(String(maxPrice ?? PRICE_MAX));
+    setMinError("");
+    setMaxError("");
   }, [minPrice, maxPrice]);
 
-  const handleMinChange = (value: number) => {
-    if (value <= max) {
-      setMin(value);
+  // ── Debounced API call ────────────────────────────────────────────
+  const emitChange = useCallback(
+    (min: number, max: number) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        onChange(
+          min === PRICE_MIN ? undefined : min,
+          max === PRICE_MAX ? undefined : max,
+        );
+      }, 600);
+    },
+    [onChange],
+  );
+
+  // ── Text input handlers ───────────────────────────────────────────
+  const handleMinInput = (raw: string) => {
+    setMinInput(raw);
+    setMinError("");
+
+    const num = Number(raw.replace(/,/g, ""));
+    if (raw === "" || isNaN(num)) return;
+
+    if (num < 0) {
+      setLocalMin(0);
+      setMinInput("0");
+      emitChange(0, localMax);
+      return;
     }
-  };
-
-  const handleMaxChange = (value: number) => {
-    if (value >= min) {
-      setMax(value);
+    if (num >= localMax) {
+      setMinError("Min price must be less than max price");
+      return;
     }
+
+    setLocalMin(num);
+    emitChange(num, localMax);
   };
 
-  const getPercentage = (value: number) => {
-    return ((value - minPrice) / (maxPrice - minPrice)) * 100;
+  const handleMaxInput = (raw: string) => {
+    setMaxInput(raw);
+    setMaxError("");
+
+    const num = Number(raw.replace(/,/g, ""));
+    if (raw === "" || isNaN(num)) return;
+
+    if (num > PRICE_MAX) {
+      setMaxError(`Maximum price is ₦${PRICE_MAX.toLocaleString()}`);
+      setLocalMax(PRICE_MAX);
+      emitChange(localMin, PRICE_MAX);
+      return;
+    }
+    if (num <= localMin) {
+      setMaxError("Max price must be greater than min price");
+      return;
+    }
+
+    setLocalMax(num);
+    emitChange(localMin, num);
   };
 
-  const getValueFromPosition = (clientX: number) => {
-    if (!sliderRef.current) return minPrice;
+  // ── Sync slider → inputs ─────────────────────────────────────────
+  const updateFromSlider = useCallback(
+    (min: number, max: number) => {
+      setLocalMin(min);
+      setLocalMax(max);
+      setMinInput(String(min));
+      setMaxInput(String(max));
+      setMinError("");
+      setMaxError("");
+      emitChange(min, max);
+    },
+    [emitChange],
+  );
 
-    const rect = sliderRef.current.getBoundingClientRect();
-    const percentage = Math.max(
-      0,
-      Math.min(1, (clientX - rect.left) / rect.width),
-    );
-    return Math.round(minPrice + percentage * (maxPrice - minPrice));
-  };
+  // ── Slider helpers ────────────────────────────────────────────────
+  const getPercentage = (value: number) =>
+    ((value - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
 
+  const getValueFromClientX = useCallback((clientX: number): number => {
+    if (!trackRef.current) return PRICE_MIN;
+    const rect = trackRef.current.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const raw = PRICE_MIN + ratio * (PRICE_MAX - PRICE_MIN);
+    return Math.round(raw / STEP) * STEP;
+  }, []);
+
+  // ── Mouse drag ────────────────────────────────────────────────────
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingMin) {
-        handleMinChange(getValueFromPosition(e.clientX));
+    const onMouseMove = (e: MouseEvent) => {
+      if (isDraggingMin.current) {
+        const val = getValueFromClientX(e.clientX);
+        if (val < localMax) updateFromSlider(val, localMax);
       }
-      if (isDraggingMax) {
-        handleMaxChange(getValueFromPosition(e.clientX));
+      if (isDraggingMax.current) {
+        const val = getValueFromClientX(e.clientX);
+        if (val > localMin) updateFromSlider(localMin, val);
       }
     };
+    const onMouseUp = () => {
+      isDraggingMin.current = false;
+      isDraggingMax.current = false;
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [localMin, localMax, getValueFromClientX, updateFromSlider]);
 
-    const handleMouseUp = () => {
-      setIsDraggingMin(false);
-      setIsDraggingMax(false);
+  // ── Touch drag — passive:false so preventDefault works ───────────
+  useEffect(() => {
+    const minEl = minThumbRef.current;
+    const maxEl = maxThumbRef.current;
+    if (!minEl || !maxEl) return;
+
+    const onMinTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const val = getValueFromClientX(e.touches[0].clientX);
+      if (val < localMax) updateFromSlider(val, localMax);
+    };
+    const onMaxTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const val = getValueFromClientX(e.touches[0].clientX);
+      if (val > localMin) updateFromSlider(localMin, val);
+    };
+    const onTouchEnd = () => {
+      isDraggingMin.current = false;
+      isDraggingMax.current = false;
     };
 
-    if (isDraggingMin || isDraggingMax) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.body.style.userSelect = "none";
-    }
+    minEl.addEventListener("touchmove", onMinTouchMove, { passive: false });
+    minEl.addEventListener("touchend", onTouchEnd);
+    maxEl.addEventListener("touchmove", onMaxTouchMove, { passive: false });
+    maxEl.addEventListener("touchend", onTouchEnd);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.body.style.userSelect = "";
+      minEl.removeEventListener("touchmove", onMinTouchMove);
+      minEl.removeEventListener("touchend", onTouchEnd);
+      maxEl.removeEventListener("touchmove", onMaxTouchMove);
+      maxEl.removeEventListener("touchend", onTouchEnd);
     };
-  }, [isDraggingMin, isDraggingMax, min, max]);
+  }, [localMin, localMax, getValueFromClientX, updateFromSlider]);
 
-  const handleApply = () => {
-    onFilter(min, max);
-  };
-
-  const minPercentage = getPercentage(min);
-  const maxPercentage = getPercentage(max);
+  const minPct = getPercentage(localMin);
+  const maxPct = getPercentage(localMax);
+  const isFiltered = localMin > PRICE_MIN || localMax < PRICE_MAX;
 
   return (
-    <div className="bg-white rounded-lg satoshi border border-gray-200 p-4">
-      {/* <h3 className="font-semibold text-gray-900 mb-4">Price Range</h3> */}
+    <div className="w-full flex flex-col gap-3 select-none">
 
-      {/* Price Display */}
-      <div className="flex items-center gap-5 justify-between mb-6">
-        <div className="flex flex-col gap-2 w-1/2 ">
-          <span className="font-semibold text-xs">Min Price</span>
-          <input
-            type="number"
-            value={min}
-            onChange={(e) => handleMinChange(Number(e.target.value))}
-            className="w-full pl-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:border-primary"
-            placeholder="Min"
-          />
+      {/* ── Text inputs ────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-2">
+        {/* Min */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-gray-500">
+            Min Price
+          </label>
+          <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2 bg-white focus-within:border-primary transition-colors">
+            <span className="text-gray-400 text-sm mr-1">₦</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={minInput}
+              onChange={(e) => handleMinInput(e.target.value)}
+              onBlur={() => {
+                if (minInput === "" || isNaN(Number(minInput))) {
+                  setMinInput("0");
+                  setLocalMin(0);
+                  emitChange(0, localMax);
+                }
+              }}
+              placeholder="0"
+              className="w-full text-sm font-semibold text-gray-900 outline-none bg-transparent [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+          </div>
+          {minError && (
+            <p className="text-[10px] text-red-500 font-medium">{minError}</p>
+          )}
         </div>
-        <div className="flex flex-col w-1/2  gap-2 items-start">
-          <span className="font-semibold text-xs">Max Price</span>
-          <input
-            type="number"
-            value={max}
-            onChange={(e) => handleMaxChange(Number(e.target.value))}
-            className="w-full pl-3  py-2 border border-gray-300 rounded-lg text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-            placeholder="Max"
-          />
+
+        {/* Max */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-gray-500">
+            Max Price
+          </label>
+          <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2 bg-white focus-within:border-primary transition-colors">
+            <span className="text-gray-400 text-sm mr-1">₦</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={maxInput}
+              onChange={(e) => handleMaxInput(e.target.value)}
+              onBlur={() => {
+                if (maxInput === "" || isNaN(Number(maxInput))) {
+                  setMaxInput(String(PRICE_MAX));
+                  setLocalMax(PRICE_MAX);
+                  emitChange(localMin, PRICE_MAX);
+                }
+              }}
+              placeholder={String(PRICE_MAX)}
+              className="w-full text-sm font-semibold text-gray-900 outline-none bg-transparent [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+          </div>
+          {maxError && (
+            <p className="text-[10px] text-red-500 font-medium">{maxError}</p>
+          )}
         </div>
       </div>
 
-      {/* Custom Range Slider */}
-      <div className="relative mb-6">
-        {/* Track Background */}
-        <div
-          ref={sliderRef}
-          className="relative h-2 bg-gray-200 rounded-full cursor-pointer"
-          onClick={(e) => {
-            const value = getValueFromPosition(e.clientX);
-            const distToMin = Math.abs(value - min);
-            const distToMax = Math.abs(value - max);
-
-            if (distToMin < distToMax) {
-              handleMinChange(value);
-            } else {
-              handleMaxChange(value);
-            }
-          }}
-        >
-          {/* Active Track */}
+      {/* ── Dual slider ────────────────────────────────────────── */}
+      <div className="px-2.5 pt-2 pb-1" style={{ touchAction: "none" }}>
+        <div ref={trackRef} className="relative h-1.5 rounded-full bg-gray-200">
+          {/* Active range */}
           <div
-            className="absolute h-full bg-primary rounded-full"
-            style={{
-              left: `${minPercentage}%`,
-              width: `${maxPercentage - minPercentage}%`,
-            }}
+            className="absolute h-full rounded-full bg-primary"
+            style={{ left: `${minPct}%`, width: `${maxPct - minPct}%` }}
           />
 
-          {/* Min Thumb */}
+          {/* Min thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 z-0 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform "
-            style={{ left: `${minPercentage}%` }}
+            ref={minThumbRef}
             onMouseDown={(e) => {
-              e.stopPropagation();
-              setIsDraggingMin(true);
+              e.preventDefault();
+              isDraggingMin.current = true;
             }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              isDraggingMin.current = true;
+            }}
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-primary shadow-md cursor-grab active:cursor-grabbing active:scale-125 transition-transform"
+            style={{ left: `${minPct}%`, zIndex: 20 }}
           />
 
-          {/* Max Thumb */}
+          {/* Max thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full cursor-grab active:cursor-grabbing shadow-md hover:scale-110 transition-transform z-0"
-            style={{ left: `${maxPercentage}%` }}
+            ref={maxThumbRef}
             onMouseDown={(e) => {
-              e.stopPropagation();
-              setIsDraggingMax(true);
+              e.preventDefault();
+              isDraggingMax.current = true;
             }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              isDraggingMax.current = true;
+            }}
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-primary shadow-md cursor-grab active:cursor-grabbing active:scale-125 transition-transform"
+            style={{ left: `${maxPct}%`, zIndex: 20 }}
           />
+        </div>
+
+        {/* Bound labels */}
+        <div className="flex justify-between mt-2">
+          <span className="text-[10px] text-gray-400">₦0</span>
+          <span className="text-[10px] text-gray-400">
+            ₦{PRICE_MAX.toLocaleString()}
+          </span>
         </div>
       </div>
 
-      {/* Prices */}
-
-      <div className="mt-5 text-sm font-extrabold w-full ">
-        Prices: ₦{min.toLocaleString()} - ₦{max.toLocaleString()}
-      </div>
-
-      {/* Apply Button */}
-      <button
-        onClick={handleApply}
-        className="w-full bg-primary mt-5 text-white py-2 text-sm rounded-lg font-medium hover:bg-primary/90 transition-colors"
-      >
-        Apply Price Filter
-      </button>
+      {/* ── Active range summary ────────────────────────────────── */}
+      {isFiltered && (
+        <div className="flex items-center justify-between bg-primary/5 rounded-xl px-3 py-2">
+          <p className="text-xs font-semibold text-primary">
+            ₦{localMin.toLocaleString()} — ₦{localMax.toLocaleString()}
+          </p>
+          <button
+            onClick={() => {
+              setLocalMin(PRICE_MIN);
+              setLocalMax(PRICE_MAX);
+              setMinInput("0");
+              setMaxInput(String(PRICE_MAX));
+              setMinError("");
+              setMaxError("");
+              if (debounceRef.current) clearTimeout(debounceRef.current);
+              onChange(undefined, undefined);
+            }}
+            className="text-[10px] text-gray-400 hover:text-red-500 font-semibold transition-colors cursor-pointer"
+          >
+            Clear
+          </button>
+        </div>
+      )}
     </div>
   );
 };
+
+export default PriceRangeFilter;

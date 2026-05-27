@@ -11,11 +11,27 @@ import { renderAxiosOrAuthError } from "@/lib/axios-client";
 import { useCheckoutStore } from "@/store/slices/checkout.slice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addressMutations, addressQueries } from "@/queries/address.queries";
+import { useAuthStore } from "@/store/slices/auth.slice";
+import { useRouter } from "next/router";
 
 const Addresses = () => {
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
   const { setUserSelectedAddress, selectedAddress } = useCheckoutStore();
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  // ── Auth guard ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!isAuthenticated) {
+      localStorage.setItem(
+        "redirectAfterAuth",
+        "/market/marketplace/cart/checkout",
+      );
+      router.replace("/signin");
+    }
+  }, [isAuthenticated, router.isReady]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);

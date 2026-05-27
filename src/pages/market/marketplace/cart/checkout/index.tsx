@@ -14,12 +14,28 @@ import { addressQueries } from "@/queries/address.queries";
 import { orderQueries } from "@/queries/order.queries";
 import { removeFromCartAction } from "@/store/actions/cart.action";
 import PaymentService from "@/services/payment.service";
+import { useAuthStore } from "@/store/slices/auth.slice";
+import { useRouter } from "next/router";
+import { getEffectivePrice } from "@/utils/pricing.utils";
+
+const CHECKOUT_PATH = "/market/marketplace/cart/checkout";
 
 const Checkout = () => {
   const { cart } = useCartStore();
   const { selectedAddress, setUserSelectedAddress, setShipping, setItems } =
     useCheckoutStore();
   const { navigate } = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  // ── Auth guard — redirect unauthenticated users to sign in ──────
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!isAuthenticated) {
+      localStorage.setItem("redirectAfterAuth", CHECKOUT_PATH);
+      router.replace("/signin");
+    }
+  }, [isAuthenticated, router.isReady]);
 
   const [deliveryMethod, setDeliveryMethod] = useState<"doorstep" | "pickup">(
     "doorstep",
@@ -36,7 +52,18 @@ const Checkout = () => {
     ...orderQueries.validateCart(checkoutItems),
     enabled: cart.length > 0,
     refetchOnWindowFocus: true,
-    select: (res: { data: { valid: boolean; items: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }[] } }) => res.data,
+    select: (res: {
+      data: {
+        valid: boolean;
+        items: {
+          productId: string;
+          status: string;
+          available: number;
+          availableQuantity?: number;
+          message?: string;
+        }[];
+      };
+    }) => res.data,
   });
 
   const { data: orderFeeInfo } = useQuery({
@@ -50,7 +77,14 @@ const Checkout = () => {
             : ShippingMethod.store_pickup,
       }),
     enabled: cart.length > 0,
-    select: (res: { data: { subtotal?: number; shippingFee?: number; serviceCharge?: number; totalAmount?: number } }) => res.data,
+    select: (res: {
+      data: {
+        subtotal?: number;
+        shippingFee?: number;
+        serviceCharge?: number;
+        totalAmount?: number;
+      };
+    }) => res.data,
   });
 
   const validationResult = validationResultData;
@@ -98,7 +132,7 @@ const Checkout = () => {
   const subtotal =
     orderFeeInfo?.subtotal ??
     cart.reduce(
-      (sum, item) => sum + item.pricePerUnit * (item.cartQuantity || 1),
+      (sum, item) => sum + getEffectivePrice(item) * (item.cartQuantity || 1),
       0,
     );
   const shippingFee =
@@ -155,7 +189,7 @@ const Checkout = () => {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
                         deliveryMethod === "doorstep"
                           ? "border-primary"
                           : "border-gray-300"
@@ -188,7 +222,7 @@ const Checkout = () => {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
                         deliveryMethod === "pickup"
                           ? "border-primary"
                           : "border-gray-300"
@@ -265,57 +299,76 @@ const Checkout = () => {
                   Items needing attention
                 </h3>
                 {validationResult.items
-                  .filter((v: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }) => v.status !== "available")
-                  .map((v: { productId: string; status: string; available: number; availableQuantity?: number; message?: string }) => {
-                    const cartItem = cart.find((c) => c.id === v.productId);
-                    return (
-                      <div
-                        key={v.productId}
-                        className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl"
-                      >
-                        {cartItem?.imageUrl && (
-                          <img
-                            src={cartItem.imageUrl}
-                            alt={cartItem.name}
-                            className="w-12 h-12 rounded-lg object-cover shrink-0"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">
-                            {cartItem?.name ?? "Unknown product"}
-                          </p>
-                          <div className="flex items-center gap-1 mt-0.5">
-                            {v.status === "unavailable" ? (
-                              <XCircle size={12} className="text-red-500" />
-                            ) : (
-                              <Package size={12} className="text-orange-500" />
-                            )}
-                            <p
-                              className={`text-xs font-medium ${
-                                v.status === "unavailable"
-                                  ? "text-red-500"
-                                  : "text-orange-500"
-                              }`}
-                            >
-                              {v.message}
-                            </p>
-                          </div>
-                          {v.status === "insufficient_stock" && (
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              You have {cartItem?.cartQuantity} in cart — only{" "}
-                              {v.availableQuantity} available
-                            </p>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => removeFromCartAction(v.productId)}
-                          className="shrink-0 px-3 py-1.5 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                  .filter(
+                    (v: {
+                      productId: string;
+                      status: string;
+                      available: number;
+                      availableQuantity?: number;
+                      message?: string;
+                    }) => v.status !== "available",
+                  )
+                  .map(
+                    (v: {
+                      productId: string;
+                      status: string;
+                      available: number;
+                      availableQuantity?: number;
+                      message?: string;
+                    }) => {
+                      const cartItem = cart.find((c) => c.id === v.productId);
+                      return (
+                        <div
+                          key={v.productId}
+                          className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl"
                         >
-                          Remove
-                        </button>
-                      </div>
-                    );
-                  })}
+                          {cartItem?.imageUrl && (
+                            <img
+                              src={cartItem.imageUrl}
+                              alt={cartItem.name}
+                              className="w-12 h-12 rounded-lg object-cover shrink-0"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {cartItem?.name ?? "Unknown product"}
+                            </p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              {v.status === "unavailable" ? (
+                                <XCircle size={12} className="text-red-500" />
+                              ) : (
+                                <Package
+                                  size={12}
+                                  className="text-orange-500"
+                                />
+                              )}
+                              <p
+                                className={`text-xs font-medium ${
+                                  v.status === "unavailable"
+                                    ? "text-red-500"
+                                    : "text-orange-500"
+                                }`}
+                              >
+                                {v.message}
+                              </p>
+                            </div>
+                            {v.status === "insufficient_stock" && (
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                You have {cartItem?.cartQuantity} in cart — only{" "}
+                                {v.availableQuantity} available
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => removeFromCartAction(v.productId)}
+                            className="shrink-0 px-3 py-1.5 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      );
+                    },
+                  )}
               </div>
             )}
 
@@ -365,7 +418,7 @@ const Checkout = () => {
                           : "border-b-litegreen"
                       }`}
                     >
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                         <Image
                           src={item.imageUrl}
                           alt={item.name}

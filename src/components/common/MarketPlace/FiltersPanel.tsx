@@ -1,4 +1,4 @@
-import { PriceRangeFilter } from "@/components/common/MarketPlace/PriceRangeFilter";
+import PriceRangeFilter from "@/components/common/MarketPlace/PriceRangeFilter";
 import { LocationFilter } from "@/components/common/MarketPlace/LocationFilter";
 import {
   CategoryGroup,
@@ -19,7 +19,8 @@ interface FiltersPanelProps {
   setSelectedLocationLga?: (lga?: string) => void;
   selectedFilters?: string[];
   setSelectedFilters?: (v: string[]) => void;
-  onPriceChange: (min: number, max: number) => void;
+  selectedPriceRange?: { min: number; max: number };
+  onPriceChange: (min: number | undefined, max: number | undefined) => void;
   hasActiveFilters: boolean;
   onClearAll: () => void;
   selectedRating?: number;
@@ -62,6 +63,7 @@ export const FiltersPanel = ({
   setSelectedLocationLga,
   selectedFilters,
   setSelectedFilters,
+  selectedPriceRange,
   onPriceChange,
   hasActiveFilters,
   onClearAll,
@@ -97,7 +99,11 @@ export const FiltersPanel = ({
       </div>
       {/* ── Price ─────────────────────────────────────────────── */}
       <FilterSection label="Price Range">
-        <PriceRangeFilter products={products} onFilter={onPriceChange} />
+        <PriceRangeFilter
+          minPrice={selectedPriceRange?.min}
+          maxPrice={selectedPriceRange?.max}
+          onChange={onPriceChange}
+        />
       </FilterSection>
 
       {/* ── Rating ────────────────────────────────────────────── */}

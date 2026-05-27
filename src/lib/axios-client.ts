@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL!;
 
-const AUTH_ROUTES = [
+const PUBLIC_ROUTES = [
   "/api/auth/sign-in",
   "/api/auth/sign-up",
   "/api/auth/resend-otp",
@@ -13,11 +13,16 @@ const AUTH_ROUTES = [
   "/api/auth/changePassword",
   "/api/auth/reset-password",
   "/api/auth/google-signin",
+  "/api/orders/validate-cart",
+  "/api/orders/fee-info",
+  "/api/products",
+  "/api/blogs",
+  "/api/categories",
 ];
 
-const isAuthRoute = (url?: string) => {
+const isPublicRoute = (url?: string) => {
   if (!url) return false;
-  return AUTH_ROUTES.some((route) => url.includes(route));
+  return PUBLIC_ROUTES.some((route) => url.includes(route));
 };
 
 const api = axios.create({
@@ -49,17 +54,19 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Ignore auth routes
-    if (isAuthRoute(originalRequest?.url)) {
+    if (isPublicRoute(originalRequest?.url)) {
       return Promise.reject(error);
     }
 
     // Access token expired or invalid
     if (status === 401) {
+      if (isPublicRoute(originalRequest?.url)) {
+        return Promise.reject(error);
+      }
+
       localStorage.removeItem("accessToken");
       sessionStorage.removeItem("accessToken");
-
       toast.error("Session expired. Please login again.");
-
       if (typeof window !== "undefined") {
         window.location.href = "/signin";
       }
