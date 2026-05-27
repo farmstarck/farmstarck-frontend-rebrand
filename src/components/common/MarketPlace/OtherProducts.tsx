@@ -69,6 +69,8 @@ const ProductSection = ({
   skeletonCount = 8,
 }: ProductSectionProps) => {
   const router = useRouter();
+
+  console.log(":::::CHECKERSSSS2", products);
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
@@ -118,6 +120,8 @@ const OtherProducts = () => {
       },
     ],
   });
+
+  console.log(":::::::CHECKERSSSS", allProductsQuery);
 
   return (
     <div className="w-full py-8">

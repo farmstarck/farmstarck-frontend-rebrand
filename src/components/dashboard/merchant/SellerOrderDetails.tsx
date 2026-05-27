@@ -229,7 +229,12 @@ interface SellerOrderResponse {
     order?: {
       orderId?: string;
       buyer?: { fullName?: string; email?: string };
-      address?: { street?: string; city?: string; state?: string; phoneNumber?: string };
+      address?: {
+        street?: string;
+        city?: string;
+        state?: string;
+        phoneNumber?: string;
+      };
       createdAt?: string;
       shippingMethod?: string;
     };
@@ -433,7 +438,7 @@ const SellerOrderDetails: React.FC<Props> = ({ backHref }) => {
         </div>
 
         {/* Delivery */}
-        {address && (
+        {/* {address && (
           <div className="p-6 border-t border-gray-100">
             <div className="border border-gray-200 rounded-xl overflow-hidden">
               <h2 className="font-bold text-gray-900 px-6 py-3 border-b border-gray-200 text-sm uppercase tracking-wide">
@@ -457,7 +462,7 @@ const SellerOrderDetails: React.FC<Props> = ({ backHref }) => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

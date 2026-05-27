@@ -57,7 +57,7 @@ const PaymentPage = () => {
     resetCheckout,
   } = useCheckoutStore();
 
-  const { user } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const [selected, setSelected] = useState<PaymentMethod>(PaymentMethod.wallet);
   const [successPayment, setSuccessPayment] = useState(false);
@@ -66,6 +66,18 @@ const PaymentPage = () => {
   const [showWalletModal, setShowWalletModal] = useState(false);
 
   const router = useRouter();
+
+  // ── Auth guard ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!isAuthenticated) {
+      localStorage.setItem(
+        "redirectAfterAuth",
+        "/market/marketplace/cart/checkout",
+      );
+      router.replace("/signin");
+    }
+  }, [isAuthenticated, router.isReady]);
 
   // Fetch wallet balance to show on wallet option
   const { data: walletInfo } = useQuery({
@@ -94,8 +106,12 @@ const PaymentPage = () => {
   const orderAmount = orderFeeInfo?.totalAmount ?? 0;
 
   const handlePaymentSelection = async () => {
-    if (!user?.email) {
-      router.push("/auth/login");
+    if (!isAuthenticated || !user?.email) {
+      localStorage.setItem(
+        "redirectAfterAuth",
+        "/market/marketplace/cart/checkout",
+      );
+      router.push("/signin");
       return;
     }
 

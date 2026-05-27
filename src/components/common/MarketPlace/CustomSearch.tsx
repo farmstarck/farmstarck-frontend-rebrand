@@ -4,11 +4,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import ProductService from "@/services/product.service";
 import { useNavigate } from "@/hooks/useNavigate";
+import { getEffectivePrice } from "@/utils/pricing.utils";
 
 interface SearchProduct {
   id: string;
   name: string;
   pricePerUnit: number;
+  discountPerUnit?: number | null;
   imageUrl: string;
   category: {
     name: string;
@@ -129,7 +131,7 @@ const CustomSearch = () => {
                       {item.name}
                     </p>
                     <p className="text-xs font-semibold text-gray-600">
-                      ₦{item.pricePerUnit.toLocaleString()}
+                      ₦{getEffectivePrice(item).toLocaleString()}
                     </p>
                   </div>
                 </div>

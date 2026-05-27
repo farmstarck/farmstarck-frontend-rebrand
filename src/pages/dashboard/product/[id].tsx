@@ -13,6 +13,7 @@ import ModalLayout from "@/layouts/ModalLayout";
 import UpdateProduct from "@/components/dashboard/merchant/UpdateProduct";
 import ProductForm from "@/components/dashboard/merchant/ProductForm";
 import { MerchantProductCardProduct } from "@/components/dashboard/merchant/MerchantProductCard";
+import { getEffectivePrice, hasDiscount } from "@/utils/pricing.utils";
 
 const SingleProduct = () => {
   useSellerGuard();
@@ -140,15 +141,14 @@ const SingleProduct = () => {
               { label: "Product Name", value: productData.name },
               { label: "Location", value: [productData.locationLga, productData.location].filter(Boolean).join(", ") || "—" },
               {
-                label: "Price",
-                value: `₦${Number(productData.pricePerUnit).toLocaleString()}`,
+                label: "Selling Price",
+                value: `₦${getEffectivePrice(productData).toLocaleString()}`,
               },
               {
-                label: "Discount",
-                value:
-                  productData.discountPerUnit > 0
-                    ? `₦${Number(productData.discountPerUnit).toLocaleString()}`
-                    : "N/A",
+                label: "Original Price",
+                value: hasDiscount(productData)
+                  ? `₦${Number(productData.pricePerUnit).toLocaleString()}`
+                  : "N/A",
               },
               { label: "Type", value: productData.produceType || "N/A" },
               {

@@ -12,6 +12,11 @@ import { useCartStore, useWishlistStore } from "@/store/slices/cart.slice";
 import { Product } from "@/types/prisma-schema-types";
 import { SuccessMessage } from "@/utils/PageUtils";
 import { MapPin, ShoppingCart, Heart, Star } from "lucide-react";
+import {
+  getEffectivePrice,
+  hasDiscount,
+  getDiscountPercentage,
+} from "@/utils/pricing.utils";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { cart } = useCartStore();
@@ -50,20 +55,11 @@ const ProductCard = ({ product }: { product: Product }) => {
   const inCart = cart.some((item) => item.id === product.id);
   const isWishlisted = wishlist.some((item) => item.id === product.id);
 
-  // ── Discount calculation ────────────────────────────────────────
-  const hasDiscount =
-    product.discountPerUnit > 0 &&
-    product.discountPerUnit > product.pricePerUnit; // only show if original > selling
-
-  const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.discountPerUnit - product.pricePerUnit) /
-          product.discountPerUnit) *
-          100,
-      )
-    : 0;
-  const sellingPrice = product.pricePerUnit; // ₦60,000 — what they pay
-  const originalPrice = product.discountPerUnit;
+  // ── Discount / price calculation ───────────────────────────────
+  const discounted = hasDiscount(product);
+  const discountPercent = getDiscountPercentage(product);
+  const sellingPrice = getEffectivePrice(product); // what the buyer pays
+  const originalPrice = product.pricePerUnit; // shown crossed-out when discount exists
 
   // ── Rating calculation ──────────────────────────────────────────
   const avgRating =
@@ -93,7 +89,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           />
 
           {/* Discount tag — top left */}
-          {hasDiscount && (
+          {discounted && (
             <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
               -{discountPercent}%
             </div>
@@ -146,7 +142,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             {formatPrice(sellingPrice)}
           </p>
           {/* Original price — slashed */}
-          {hasDiscount && (
+          {discounted && (
             <p className="text-gray-400 font-medium text-[10px] sm:text-xs line-through leading-tight">
               {formatPrice(originalPrice)}
             </p>
@@ -157,7 +153,9 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className="flex items-center gap-0.5 text-primary font-semibold text-[10px] sm:text-xs mt-0.5">
           <MapPin size={10} />
           <span className="capitalize truncate">
-            {[product.locationLga, product.location].filter(Boolean).join(", ") || "—"}
+            {[product.locationLga, product.location]
+              .filter(Boolean)
+              .join(", ") || "—"}
           </span>
         </div>
 

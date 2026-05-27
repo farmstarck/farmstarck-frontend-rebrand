@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChevronLeft, Trash2, Edit } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { MerchantProducts, merchantProductProps } from '@/data/ProductsData';
+import { getEffectivePrice, hasDiscount } from '@/utils/pricing.utils';
 import ProductModal from "@/components/dashboard/merchant/ProductModal";
 import ConfirmDeletion from '@/components/dashboard/ui/ConfirmDeletion';
 
@@ -134,15 +135,17 @@ const SingleProduct = () => {
               <span className="font-bold text-gray-800">{productData.location}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 font-medium">Price:</span>
+              <span className="text-gray-500 font-medium">Selling Price:</span>
               <span className="font-bold text-gray-800">
-                ₦{Number(productData.pricePerUnit).toLocaleString()}
+                ₦{getEffectivePrice(productData).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 font-medium">Discount:</span>
+              <span className="text-gray-500 font-medium">Original Price:</span>
               <span className="font-bold text-gray-800">
-                ₦{Number(productData.discountPerUnit || 0).toLocaleString()}
+                {hasDiscount(productData)
+                  ? `₦${Number(productData.pricePerUnit).toLocaleString()}`
+                  : 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center">

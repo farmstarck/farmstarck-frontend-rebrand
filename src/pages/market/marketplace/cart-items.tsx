@@ -1,6 +1,7 @@
 import { useState } from "react";
 import MarketPlaceLayout from "@/layouts/MarketPlaceLayout";
 import Navigation from "@/components/common/MarketPlace/Navigation";
+import LoginPromptModal from "@/components/common/MarketPlace/LoginPromptModal";
 import {
   Plus,
   Minus,
@@ -25,11 +26,13 @@ import { Product, ShippingMethod } from "@/types/prisma-schema-types";
 import { useQuery } from "@tanstack/react-query";
 import { orderQueries } from "@/queries/order.queries";
 import PaymentService from "@/services/payment.service";
+import { getEffectivePrice } from "@/utils/pricing.utils";
 
 const CartItems = () => {
   const { navigate } = useNavigate();
   const { cart } = useCartStore();
   const [showClearModal, setShowClearModal] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { isAuthenticated } = useAuthStore();
 
   const checkoutPath = "/market/marketplace/cart/checkout";
@@ -42,7 +45,7 @@ const CartItems = () => {
 
   const { data: validationResultData } = useQuery({
     ...orderQueries.validateCart(cartItems),
-    enabled: cart.length > 0,
+    enabled: cart.length > 0 && isAuthenticated,
     refetchOnWindowFocus: true,
     staleTime: 30 * 1000,
   });
@@ -52,17 +55,21 @@ const CartItems = () => {
     queryFn: () =>
       PaymentService.getOrderFeeInfo({
         items: cartItems,
-        shippingMethod: ShippingMethod.store_pickup, // no shipping at cart stage
+        shippingMethod: ShippingMethod.store_pickup,
       }),
-    enabled: cart.length > 0,
-    select: (res: { data: { subtotal: number; serviceCharge: number; totalAmount: number } }) => res.data,
+    enabled: cart.length > 0 && isAuthenticated,
+    select: (res: {
+      data: { subtotal: number; serviceCharge: number; totalAmount: number };
+    }) => res.data,
     staleTime: 30 * 1000,
   });
 
   const validationResult = validationResultData?.data;
 
   const getItemValidation = (productId: string) =>
-    validationResult?.items?.find((i: { productId: string; status: string }) => i.productId === productId);
+    validationResult?.items?.find(
+      (i: { productId: string; status: string }) => i.productId === productId,
+    );
 
   const hasCartIssues = !!(validationResult && !validationResult.valid);
 
@@ -72,11 +79,22 @@ const CartItems = () => {
     updateCartQuantityAction(id, value);
   };
 
+  // ── Checkout handler — only auth-guards at this step ──────────
+  const handleProceedToCheckout = () => {
+    if (hasCartIssues) return;
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    navigate(checkoutPath);
+  };
+
   // ── Totals ────────────────────────────────────────────────────
   const subtotal =
     orderFeeInfo?.subtotal ??
     cart.reduce(
-      (total, item) => total + item.pricePerUnit * (item.cartQuantity || 1),
+      (total, item) =>
+        total + getEffectivePrice(item) * (item.cartQuantity || 1),
       0,
     );
   const serviceCharge = orderFeeInfo?.serviceCharge ?? 0;
@@ -255,7 +273,7 @@ const CartItems = () => {
                                   {item.countType}
                                 </div>
                                 <p className="text-sm font-bold text-gray-900 mt-1">
-                                  ₦{item.pricePerUnit?.toLocaleString()}
+                                  ₦{getEffectivePrice(item).toLocaleString()}
                                 </p>
                               </div>
                             </div>
@@ -304,7 +322,8 @@ const CartItems = () => {
                               <p className="font-bold text-gray-900 text-sm">
                                 ₦
                                 {(
-                                  item.pricePerUnit * (item.cartQuantity || 1)
+                                  getEffectivePrice(item) *
+                                  (item.cartQuantity || 1)
                                 ).toLocaleString()}
                               </p>
                             </div>
@@ -349,7 +368,7 @@ const CartItems = () => {
                           {/* Price */}
                           <div className="col-span-2">
                             <p className="font-semibold text-gray-900">
-                              ₦{item.pricePerUnit?.toLocaleString()}
+                              ₦{getEffectivePrice(item).toLocaleString()}
                             </p>
                           </div>
 
@@ -390,7 +409,8 @@ const CartItems = () => {
                             <p className="font-semibold text-gray-900 text-sm">
                               ₦
                               {(
-                                item.pricePerUnit * (item.cartQuantity || 1)
+                                getEffectivePrice(item) *
+                                (item.cartQuantity || 1)
                               ).toLocaleString()}
                             </p>
                           </div>
@@ -480,16 +500,8 @@ const CartItems = () => {
                 )}
 
                 <button
-                  onClick={() => {
-                    if (hasCartIssues) return;
-                    if (isAuthenticated) {
-                      navigate(checkoutPath);
-                    } else {
-                      localStorage.setItem("redirectAfterAuth", checkoutPath);
-                      navigate("/signin");
-                    }
-                  }}
-                  disabled={hasCartIssues}
+                  onClick={handleProceedToCheckout}
+                  disabled={hasCartIssues || cart.length === 0}
                   className="w-full text-white rounded-full bg-primary py-3 font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <ShoppingCart size={16} />
@@ -497,6 +509,12 @@ const CartItems = () => {
                     ? "Fix items to continue"
                     : "Proceed to Checkout"}
                 </button>
+
+                {!isAuthenticated && cart.length > 0 && (
+                  <p className="text-xs text-gray-400 text-center mt-2">
+                    You&apos;ll need to sign in before checkout
+                  </p>
+                )}
 
                 <Link
                   href="/market/marketplace/allproducts"
@@ -515,6 +533,12 @@ const CartItems = () => {
         onConfirm={handleClearAll}
         closeModal={() => setShowClearModal(false)}
         confirm_text="Clear All"
+      />
+
+      <LoginPromptModal
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        redirectAfter={checkoutPath}
       />
     </>
   );
